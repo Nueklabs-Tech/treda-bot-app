@@ -37,26 +37,26 @@
 
     /* Brand colors - dynamically generated from brand.config.json */
     --brand-white: #ffffff;
-    --brand-dark-grey: #2C2C2A;
-    --brand-red-coral: #185FA5; /* legacy compatibility */
-    --brand-orange: #378ADD; /* legacy compatibility */
+    --brand-dark-grey: #0f172a;
+    --brand-red-coral: #3B82F6; /* legacy compatibility */
+    --brand-orange: #8b5cf6; /* legacy compatibility */
 
     /* Dynamic brand colors (set by brand configuration) */
-    --brand-primary: #185FA5;
-    --brand-secondary: #5F5E5A;
-    --brand-tertiary: #378ADD;
-    --brand-navy: #042C53;
-    --brand-accent: #378ADD;
-    --brand-light-tint: #E6F1FB;
-    --brand-page-background: #F1EFE8;
-    --brand-border: #B4B2A9;
-    --brand-text: #2C2C2A;
-    --brand-text-secondary: #5F5E5A;
+    --brand-primary: #3B82F6;
+    --brand-secondary: #64748b;
+    --brand-tertiary: #8b5cf6;
+    --brand-navy: #3B82F6;
+    --brand-accent: #8b5cf6;
+    --brand-light-tint: #ffffff;
+    --brand-page-background: #ffffff;
+    --brand-border: #6b7280;
+    --brand-text: #0f172a;
+    --brand-text-secondary: #64748b;
     --brand-success: #10b981;
     --brand-danger: #ef4444;
     --brand-warning: #f59e0b;
-    --brand-info: #378ADD;
-    --brand-neutral: #B4B2A9;
+    --brand-info: #0ea5e9;
+    --brand-neutral: #6b7280;
 
     /* Brand typography - dynamically generated from brand.config.json */
     --brand-font-primary: Open Sans;
