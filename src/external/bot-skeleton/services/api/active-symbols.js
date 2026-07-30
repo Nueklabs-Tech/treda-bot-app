@@ -59,8 +59,17 @@ export default class ActiveSymbols {
                 api_base.active_symbols_promise = api_base.getActiveSymbols();
             }
             // Wait for the promise and use its resolved value
-            const symbols = await api_base.active_symbols_promise;
-            this.active_symbols = symbols ?? api_base?.active_symbols ?? [];
+            try {
+                const symbols = await api_base.active_symbols_promise;
+                this.active_symbols = symbols ?? api_base?.active_symbols ?? [];
+            } catch (error) {
+                // The initial request may have failed while the socket was opening.
+                // Do not keep reusing that rejected promise; a fresh request can now
+                // succeed once the connection is ready.
+                console.warn('Initial active-symbol request failed; retrying:', error);
+                api_base.active_symbols_promise = null;
+                this.active_symbols = (await api_base.getActiveSymbols()) ?? [];
+            }
         }
 
         // If still no symbols after waiting, try one more time with a fresh fetch

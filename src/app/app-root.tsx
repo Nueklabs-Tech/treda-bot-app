@@ -67,13 +67,18 @@ const AppRoot = () => {
 
     if (!store || !is_api_initialized) return <AppRootLoader />;
 
+    // return (
+    //     <Suspense fallback={<AppRootLoader />}>
+    //         <ErrorBoundary root_store={store}>
+    //             <ErrorComponentWrapper />
+    //             <AppContent />
+    //         </ErrorBoundary>
+    //     </Suspense>
+    // );
     return (
-        <Suspense fallback={<AppRootLoader />}>
-            <ErrorBoundary root_store={store}>
-                <ErrorComponentWrapper />
-                <AppContent />
-            </ErrorBoundary>
-        </Suspense>
+        <>
+            <div>root</div>
+        </>
     );
 };
 

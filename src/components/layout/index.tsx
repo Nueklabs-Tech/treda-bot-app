@@ -30,7 +30,6 @@ const Layout = observer(() => {
     const [clientHasCurrency, setClientHasCurrency] = useState(ifClientAccountHasCurrency);
     const [isAuthenticating, setIsAuthenticating] = useState(true); // Start with true to prevent flashing
 
-    // Expose setClientHasCurrency to window for global access
     useEffect(() => {
         (window as any).setClientHasCurrency = setClientHasCurrency;
 
@@ -46,7 +45,6 @@ const Layout = observer(() => {
     let subscription: { unsubscribe: () => void };
 
     const validateApiAccounts = ({ data }: any) => {
-        //TO do work on this with account switcher
         if (data.msg_type === 'authorize') {
             const account_list = data?.authorize?.account_list || [];
             const account_list_filter = account_list.filter((acc: any) => acc.is_disabled === 0);

@@ -142,9 +142,17 @@ const AppContent = observer(() => {
         const retrieveActiveSymbols = () => {
             const { active_symbols } = ApiHelpers.instance;
 
-            active_symbols.retrieveActiveSymbols(true).then(() => {
-                setIsLoading(false);
-            });
+            active_symbols
+                .retrieveActiveSymbols(true)
+                .catch(error => {
+                    // The active-symbol service records its error state; prevent a
+                    // transient API failure from leaving an unhandled rejection or
+                    // a permanently blocked loading screen.
+                    console.error('Unable to load active symbols:', error);
+                })
+                .finally(() => {
+                    setIsLoading(false);
+                });
         };
 
         if (ApiHelpers?.instance?.active_symbols) {

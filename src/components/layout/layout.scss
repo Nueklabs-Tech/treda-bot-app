@@ -6,7 +6,12 @@
     height: 100vh;
 
     .deriv-header {
-        background: var(--general-main-1);
+        background: var(--brand-navy);
+        color: var(--brand-white);
+        --text-general: var(--brand-white);
+        --text-prominent: var(--brand-white);
+        --text-primary: var(--brand-white);
+        --border-normal: var(--brand-accent);
         height: 5.6rem;
     }
 

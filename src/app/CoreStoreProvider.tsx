@@ -47,7 +47,6 @@ const CoreStoreProvider: React.FC<{ children: React.ReactNode }> = observer(({ c
             client?.setAccountList(accountList);
             client?.setIsLoggedIn(true);
         } else if (client && !isAuthorized) {
-            // Ensure client shows as not logged in until authorization is complete
             client?.setIsLoggedIn(false);
         }
     }, [accountList, activeAccount, activeLoginid, client, isAuthorized]);
@@ -68,15 +67,12 @@ const CoreStoreProvider: React.FC<{ children: React.ReactNode }> = observer(({ c
         }
     }, [currentLang, common]);
 
-    // Type-safe interface for API with time() method
     interface ApiWithTime {
         time(): Promise<TSocketResponseData<'time'>>;
     }
 
     useEffect(() => {
         const updateServerTime = () => {
-            // Fixed type safety: replaced 'as any' with proper interface and runtime check
-            // Ensures time() method exists before calling it
             if (!api_base.api || !('time' in api_base.api)) return;
             (api_base.api as ApiWithTime)
                 .time()
@@ -88,7 +84,6 @@ const CoreStoreProvider: React.FC<{ children: React.ReactNode }> = observer(({ c
                 });
         };
 
-        // Clear any existing interval before setting up a new one
         if (timeInterval.current) {
             clearInterval(timeInterval.current);
             timeInterval.current = null;
@@ -98,14 +93,11 @@ const CoreStoreProvider: React.FC<{ children: React.ReactNode }> = observer(({ c
             if (!api_base?.api) return;
             appInitialization.current = true;
 
-            // Initial time update
             updateServerTime();
 
-            // Schedule updates every 10 seconds
             timeInterval.current = setInterval(updateServerTime, 10000);
         }
 
-        // Cleanup on unmount or dependency change
         return () => {
             if (timeInterval.current) {
                 clearInterval(timeInterval.current);
@@ -115,22 +107,17 @@ const CoreStoreProvider: React.FC<{ children: React.ReactNode }> = observer(({ c
     }, [client, common]);
 
     const handleMessages = useCallback(
-        // Changed parameter type from Record<string, unknown> to unknown to match onMessage signature
         async (res: unknown) => {
             if (!res) return;
             const data = (res as Record<string, unknown>).data as TSocketResponseData<'balance'>;
             const { msg_type, error } = data;
 
-            // Handle auth errors by calling client.logout() directly instead of useLogout hook
-            // This prevents redundant logout operations since useLogout internally calls client.logout()
             if (
                 error?.code === 'AuthorizationRequired' ||
                 error?.code === 'DisabledClient' ||
                 error?.code === 'InvalidToken'
             ) {
-                // Clear all URL query parameters for these auth errors
                 clearInvalidTokenParams();
-                // Call client store logout directly to avoid double logout
                 await client?.logout();
             }
 
@@ -145,15 +132,14 @@ const CoreStoreProvider: React.FC<{ children: React.ReactNode }> = observer(({ c
                 }
             }
         },
-        // Fixed memory leak: removed handleLogout from deps as it's not used in function body
-        // Only client is actually referenced (line 129), preventing unnecessary re-subscriptions
+
         [client]
     );
 
     useEffect(() => {
         if (!isAuthorizing && client) {
             const subscription = api_base?.api?.onMessage().subscribe(handleMessages);
-            // Fixed unsubscribe type - only store if subscription exists
+
             if (subscription) {
                 msg_listener.current = { unsubscribe: subscription.unsubscribe };
             }

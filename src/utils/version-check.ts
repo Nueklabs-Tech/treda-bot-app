@@ -64,17 +64,11 @@ const isVersionValid = (): boolean => {
 };
 
 export const performVersionCheck = (): void => {
-    console.log('Performing bot version check...');
-
     if (!isVersionValid()) {
-        console.log('Bot version mismatch or not set. Clearing localStorage and cookies...');
-
         clearLocalStorage();
         clearCookies();
 
         setBotVersion();
-
-        console.log('Storage cleared and bot version set to:', BOT_VERSION_CONFIG.REQUIRED_VERSION);
     } else {
         console.log('Bot version is valid:', BOT_VERSION_CONFIG.REQUIRED_VERSION);
     }

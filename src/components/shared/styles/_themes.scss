@@ -37,22 +37,29 @@
 
     /* Brand colors - dynamically generated from brand.config.json */
     --brand-white: #ffffff;
-    --brand-dark-grey: #0f172a;
-    --brand-red-coral: #3b82f6; /* legacy compatibility */
-    --brand-orange: #8b5cf6; /* legacy compatibility */
+    --brand-dark-grey: #2C2C2A;
+    --brand-red-coral: #185FA5; /* legacy compatibility */
+    --brand-orange: #378ADD; /* legacy compatibility */
 
     /* Dynamic brand colors (set by brand configuration) */
-    --brand-primary: #3b82f6;
-    --brand-secondary: #64748b;
-    --brand-tertiary: #8b5cf6;
+    --brand-primary: #185FA5;
+    --brand-secondary: #5F5E5A;
+    --brand-tertiary: #378ADD;
+    --brand-navy: #042C53;
+    --brand-accent: #378ADD;
+    --brand-light-tint: #E6F1FB;
+    --brand-page-background: #F1EFE8;
+    --brand-border: #B4B2A9;
+    --brand-text: #2C2C2A;
+    --brand-text-secondary: #5F5E5A;
     --brand-success: #10b981;
     --brand-danger: #ef4444;
     --brand-warning: #f59e0b;
-    --brand-info: #0ea5e9;
-    --brand-neutral: #6b7280;
+    --brand-info: #378ADD;
+    --brand-neutral: #B4B2A9;
 
     /* Brand typography - dynamically generated from brand.config.json */
-    --brand-font-primary: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --brand-font-primary: Open Sans;
     --brand-font-secondary: Georgia, 'Times New Roman', Times, serif;
     --brand-font-monospace: 'Courier New', Courier, monospace;
     /* [/AI] */
@@ -66,42 +73,42 @@
 
     .theme--light {
         // General
-        --general-main-1: #{constants.$color-white};
-        --general-main-2: #{constants.$color-white};
-        --general-main-3: #{constants.$color-grey-1};
+        --general-main-1: var(--brand-white);
+        --general-main-2: var(--brand-white);
+        --general-main-3: var(--brand-page-background);
         --general-main-4: #{constants.$alpha-color-white-4};
-        --general-section-1: #{constants.$color-grey-2};
-        --general-section-2: #{constants.$color-grey-2};
-        --general-section-3: #{constants.$color-grey-11};
-        --general-section-4: #{constants.$color-grey-12};
-        --general-section-5: #{constants.$color-grey-2};
-        --general-section-6: #{constants.$color-grey-2};
-        --general-disabled: #{constants.$color-grey-3};
-        --general-hover: #{constants.$color-grey-4};
-        --general-active: #{constants.$color-grey-5};
+        --general-section-1: var(--brand-page-background);
+        --general-section-2: var(--brand-light-tint);
+        --general-section-3: var(--brand-light-tint);
+        --general-section-4: var(--brand-light-tint);
+        --general-section-5: var(--brand-light-tint);
+        --general-section-6: var(--brand-border);
+        --general-disabled: var(--brand-border);
+        --general-hover: var(--brand-light-tint);
+        --general-active: var(--brand-light-tint);
 
         // Icons and Texts
-        --text-general: #{constants.$color-black-1};
-        --text-primary: #{constants.$color-grey-1};
-        --text-less-prominent: #{constants.$color-grey-1};
-        --text-prominent: #{constants.$color-black-1};
-        --text-disabled: #{constants.$color-grey-1};
-        --text-disabled-1: #{constants.$color-grey-6};
+        --text-general: var(--brand-text);
+        --text-primary: var(--brand-text-secondary);
+        --text-less-prominent: var(--brand-text-secondary);
+        --text-prominent: var(--brand-text);
+        --text-disabled: var(--brand-text-secondary);
+        --text-disabled-1: var(--brand-border);
         --text-loss-danger: #{constants.$color-red-1};
         --text-profit-success: #{constants.$color-green-1};
         --text-warning: #{constants.$color-yellow};
         --text-red: #{constants.$color-red};
         --text-green: #{constants.$color-green-6};
-        --text-blue: #{constants.$color-blue-3};
-        --text-info-blue: #{constants.$color-blue};
-        --text-info-blue-background: #{constants.$color-blue-5};
+        --text-blue: var(--brand-primary);
+        --text-info-blue: var(--brand-accent);
+        --text-info-blue-background: var(--brand-light-tint);
         --text-colored-background: #{constants.$color-white};
         --icon-light-background: #{constants.$color-black-9};
         --icon-dark-background: #{constants.$color-white};
         --icon-grey-background: #{constants.$color-grey-2};
         --icon-black-plus: #{constants.$color-black-7};
-        --text-status-info-blue: #{constants.$color-blue};
-        --text-hint: #{constants.$color-black-1};
+        --text-status-info-blue: var(--brand-accent);
+        --text-hint: var(--brand-text);
 
         // Purchase
         --purchase-main-1: #{constants.$color-green-1};
@@ -112,15 +119,15 @@
         --purchase-disabled-section: #{constants.$color-grey-4};
 
         // Buttons
-        --button-primary-default: var(--brand-red-coral);
-        --button-secondary-default: #{constants.$color-grey-1};
+        --button-primary-default: var(--brand-primary);
+        --button-secondary-default: var(--brand-text-secondary);
         --button-tertiary-default: transparent;
-        --button-primary-light-default: #{constants.$alpha-color-red-2};
-        --button-primary-hover: #{constants.$color-red-5};
+        --button-primary-light-default: var(--brand-light-tint);
+        --button-primary-hover: var(--brand-accent);
         --button-secondary-hover: #{constants.$alpha-color-black-3};
-        --button-tertiary-hover: #{constants.$alpha-color-red-1};
-        --button-primary-light-hover: #{constants.$alpha-color-red-3};
-        --button-toggle-primary: #{constants.$color-blue-3};
+        --button-tertiary-hover: var(--brand-light-tint);
+        --button-primary-light-hover: var(--brand-light-tint);
+        --button-toggle-primary: var(--brand-accent);
         --button-toggle-secondary: #{constants.$color-grey-5};
         --button-toggle-alternate: #{constants.$color-white};
 
@@ -143,22 +150,22 @@
         --sidebar-tab: #{constants.$color-grey-6};
 
         // Border
-        --border-normal: #{constants.$color-grey-5};
-        --border-normal-1: #{constants.$color-grey-5};
-        --border-normal-2: #{constants.$color-grey-5};
-        --border-normal-3: #{constants.$color-grey-6};
-        --border-hover: #{constants.$color-grey-1};
-        --border-hover-1: #{constants.$color-black-9};
-        --border-active: var(--brand-secondary);
-        --border-disabled: #{constants.$color-grey-3};
-        --border-divider: #{constants.$color-grey-2};
+        --border-normal: var(--brand-border);
+        --border-normal-1: var(--brand-border);
+        --border-normal-2: var(--brand-border);
+        --border-normal-3: var(--brand-border);
+        --border-hover: var(--brand-accent);
+        --border-hover-1: var(--brand-accent);
+        --border-active: var(--brand-primary);
+        --border-disabled: var(--brand-border);
+        --border-divider: var(--brand-border);
 
         // Fill
-        --fill-normal: #{constants.$color-white};
-        --fill-normal-1: #{constants.$color-grey};
-        --fill-hover: #{constants.$color-grey-1};
-        --fill-active: var(--brand-secondary);
-        --fill-disabled: #{constants.$color-grey-3};
+        --fill-normal: var(--brand-white);
+        --fill-normal-1: var(--brand-border);
+        --fill-hover: var(--brand-light-tint);
+        --fill-active: var(--brand-primary);
+        --fill-disabled: var(--brand-border);
 
         // Status
         --status-default: #{constants.$color-grey-3};
@@ -168,7 +175,7 @@
         --status-warning: #{constants.$color-yellow};
         --status-warning-transparent: #{constants.$alpha-color-yellow-1};
         --status-transfer: #{constants.$color-orange};
-        --status-info: #{constants.$color-blue};
+        --status-info: var(--brand-accent);
         --status-colored-background: #{constants.$color-white};
         --status-alert-background: #{constants.$color-yellow-3};
 
@@ -213,36 +220,36 @@
 
     .theme--dark {
         // General
-        --general-main-1: #{constants.$color-black};
-        --general-main-2: #{constants.$color-black-3};
-        --general-main-3: #{constants.$color-black-4};
+        --general-main-1: color-mix(in srgb, var(--brand-navy) 88%, black);
+        --general-main-2: color-mix(in srgb, var(--brand-navy) 82%, black);
+        --general-main-3: color-mix(in srgb, var(--brand-navy) 72%, var(--brand-primary));
         --general-main-4: #{constants.$alpha-color-black-7};
-        --general-section-1: #{constants.$color-black-3};
-        --general-section-2: #{constants.$color-black};
-        --general-section-3: #{constants.$color-black-5};
-        --general-section-4: #{constants.$color-black-5};
-        --general-section-5: #{constants.$color-black-5};
-        --general-section-6: #{constants.$color-grey-7};
-        --general-disabled: #{constants.$color-black-4};
-        --general-hover: #{constants.$color-black-5};
-        --general-active: #{constants.$color-black-8};
+        --general-section-1: color-mix(in srgb, var(--brand-navy) 92%, black);
+        --general-section-2: var(--brand-navy);
+        --general-section-3: color-mix(in srgb, var(--brand-navy) 86%, var(--brand-primary));
+        --general-section-4: color-mix(in srgb, var(--brand-navy) 82%, var(--brand-primary));
+        --general-section-5: color-mix(in srgb, var(--brand-navy) 78%, var(--brand-primary));
+        --general-section-6: color-mix(in srgb, var(--brand-border) 55%, var(--brand-navy));
+        --general-disabled: color-mix(in srgb, var(--brand-border) 45%, var(--brand-navy));
+        --general-hover: color-mix(in srgb, var(--brand-accent) 22%, var(--brand-navy));
+        --general-active: color-mix(in srgb, var(--brand-primary) 48%, var(--brand-navy));
 
         // Icons and Texts
-        --text-prominent: #{constants.$color-white};
-        --text-general: #{constants.$color-grey};
-        --text-less-prominent: #{constants.$color-grey-7};
-        --text-primary: #{constants.$color-grey-1};
-        --text-disabled: #{constants.$color-black-6};
-        --text-disabled-1: #{constants.$color-black-6};
+        --text-prominent: var(--brand-white);
+        --text-general: var(--brand-light-tint);
+        --text-less-prominent: var(--brand-border);
+        --text-primary: var(--brand-light-tint);
+        --text-disabled: var(--brand-border);
+        --text-disabled-1: var(--brand-border);
         --text-profit-success: #{constants.$color-green-3};
         --text-loss-danger: #{constants.$color-red-2};
         --text-red: #{constants.$color-red};
         --text-colored-background: #{constants.$color-white};
-        --text-info-blue: #{constants.$color-blue-6};
-        --text-info-blue-background: #{constants.$color-blue-7};
-        --text-status-info-blue: #{constants.$color-blue};
-        --text-hint: #{constants.$color-grey};
-        --icon-light-background: #{constants.$color-black-9};
+        --text-info-blue: var(--brand-accent);
+        --text-info-blue-background: color-mix(in srgb, var(--brand-light-tint) 18%, var(--brand-navy));
+        --text-status-info-blue: var(--brand-accent);
+        --text-hint: var(--brand-light-tint);
+        --icon-light-background: var(--brand-border);
         --icon-dark-background: #{constants.$color-white};
         --icon-grey-background: #{constants.$color-black-1};
         --icon-black-plus: #{constants.$color-white};
@@ -256,17 +263,17 @@
         --purchase-disabled-section: #{constants.$color-black};
 
         // Buttons
-        --button-primary-default: var(--brand-red-coral);
-        --button-secondary-default: #{constants.$color-grey-7};
+        --button-primary-default: var(--brand-primary);
+        --button-secondary-default: var(--brand-light-tint);
         --button-tertiary-default: transparent;
-        --button-primary-light-default: #{constants.$alpha-color-red-2};
-        --button-primary-hover: #{constants.$color-red-5};
+        --button-primary-light-default: color-mix(in srgb, var(--brand-light-tint) 18%, var(--brand-navy));
+        --button-primary-hover: var(--brand-accent);
         --button-secondary-hover: #{constants.$alpha-color-white-3};
-        --button-tertiary-hover: #{constants.$alpha-color-red-1};
-        --button-primary-light-hover: #{constants.$alpha-color-red-3};
-        --button-toggle-primary: #{constants.$color-blue-3};
-        --button-toggle-secondary: #{constants.$color-black-8};
-        --button-toggle-alternate: #{constants.$color-black-8};
+        --button-tertiary-hover: color-mix(in srgb, var(--brand-light-tint) 14%, var(--brand-navy));
+        --button-primary-light-hover: color-mix(in srgb, var(--brand-light-tint) 28%, var(--brand-navy));
+        --button-toggle-primary: var(--brand-accent);
+        --button-toggle-secondary: var(--general-main-3);
+        --button-toggle-alternate: var(--general-main-3);
         --button-get-started-bg: #{constants.$color-white};
 
         // Overlay
@@ -280,30 +287,30 @@
         --shadow-box: #{constants.$COLOR_DARK_GRAY_3};
 
         // States
-        --state-normal: #{constants.$color-black};
-        --state-hover: #{constants.$color-black-5};
-        --state-active: #{constants.$color-black-8};
-        --state-disabled: #{constants.$color-black-4};
+        --state-normal: var(--general-main-1);
+        --state-hover: var(--general-hover);
+        --state-active: var(--general-active);
+        --state-disabled: var(--general-disabled);
         --checkbox-disabled-grey: #{constants.$color-grey-6};
         --sidebar-tab: #{constants.$color-grey-7};
 
         // Border
-        --border-normal: #{constants.$color-black-8};
-        --border-normal-1: #{constants.$color-grey-5};
-        --border-normal-2: #{constants.$color-grey-1};
-        --border-normal-3: #{constants.$color-grey-7};
-        --border-hover: #{constants.$color-grey-7};
-        --border-hover-1: #{constants.$color-black-9};
-        --border-active: var(--brand-secondary);
-        --border-disabled: #{constants.$color-black-4};
-        --border-divider: #{constants.$color-grey-13};
+        --border-normal: var(--general-section-6);
+        --border-normal-1: var(--general-section-6);
+        --border-normal-2: var(--general-section-6);
+        --border-normal-3: var(--general-section-6);
+        --border-hover: var(--brand-accent);
+        --border-hover-1: var(--brand-accent);
+        --border-active: var(--brand-primary);
+        --border-disabled: var(--general-disabled);
+        --border-divider: var(--general-section-6);
 
         // Fill
-        --fill-normal: #{constants.$color-black};
-        --fill-normal-1: #{constants.$color-black-1};
-        --fill-hover: #{constants.$color-grey-7};
-        --fill-active: var(--brand-secondary);
-        --fill-disabled: #{constants.$color-black-4};
+        --fill-normal: var(--general-main-1);
+        --fill-normal-1: var(--general-main-2);
+        --fill-hover: var(--general-hover);
+        --fill-active: var(--brand-primary);
+        --fill-disabled: var(--general-disabled);
 
         // Status
         --status-default: #{constants.$color-grey-3};
@@ -313,7 +320,7 @@
         --status-warning-transparent: #{constants.$alpha-color-yellow-1};
         --status-success: #{constants.$color-green-3};
         --status-transfer: #{constants.$color-orange};
-        --status-info: #{constants.$color-blue};
+        --status-info: var(--brand-accent);
         --status-colored-background: #{constants.$color-white};
         --status-alert-background: #{constants.$color-yellow-3};
 
