@@ -30,9 +30,8 @@ const router = createBrowserRouter(
         <Route
             path='/'
             element={
-                <Suspense fallback={''}>
-                    <ChunkLoader message={localize('')} />
-                    {/* <TranslationProvider defaultLang='EN' i18nInstance={i18nInstance}>
+                <Suspense fallback={<ChunkLoader message={localize('Loading..')} />}>
+                    <TranslationProvider defaultLang='EN' i18nInstance={i18nInstance}>
                         <LanguageHandler>
                             <StoreProvider>
                                 <LocalStorageSyncWrapper>
@@ -43,12 +42,12 @@ const router = createBrowserRouter(
                                 </LocalStorageSyncWrapper>
                             </StoreProvider>
                         </LanguageHandler>
-                    </TranslationProvider> */}
+                    </TranslationProvider>
                 </Suspense>
             }
         >
             <Route index element={<AppRoot />} />
-            {/* <Route path='preview' element={<AppRoot />} /> */}
+            <Route path='preview' element={<AppRoot />} />
         </Route>
     ),
     { basename: routerBasename }
