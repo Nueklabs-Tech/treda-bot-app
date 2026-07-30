@@ -14,6 +14,7 @@ import { AppLogo } from '../app-logo';
 import AccountSwitcher from './account-switcher';
 import MenuItems from './menu-items';
 import MobileMenu from './mobile-menu';
+// @ts-ignore: Allow side-effect import of SCSS without type declarations
 import './header.scss';
 
 const AppHeader = observer(() => {
@@ -237,14 +238,15 @@ const AppHeader = observer(() => {
                     'app-header--mobile': !isDesktop,
                 })}
             >
-                <Wrapper variant='left'>
+                {/* <Wrapper variant='left'>
                     <MobileMenu onLogout={handleLogout} />
                     <AppLogo />
                     {isDesktop ? <MenuItems /> : renderAccountSection('left')}
                 </Wrapper>
                 <Wrapper variant='right'>
                     {renderAccountSection('right')}
-                </Wrapper>
+                </Wrapper> */}
+                head
             </Header>
         </>
     );

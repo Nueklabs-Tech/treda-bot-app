@@ -77,7 +77,7 @@ const AppRoot = () => {
     // );
     return (
         <>
-            <div>root</div>
+            <div>lorem</div>
         </>
     );
 };

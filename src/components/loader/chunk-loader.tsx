@@ -51,7 +51,6 @@ function Loader() {
         <div className='ctl-stage'>
             <div className='ctl-grid' />
             <div className='ctl-scan' />
-
             <div className='ctl-core-wrap'>
                 <svg width='200' height='200' viewBox='0 0 200 200' className='ctl-abs'>
                     <circle cx='100' cy='100' r='92' fill='none' stroke='rgba(47,111,237,.12)' strokeWidth='1' />
