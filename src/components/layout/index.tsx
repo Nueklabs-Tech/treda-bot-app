@@ -11,6 +11,7 @@ import Footer from './footer';
 import AppHeader from './header';
 import Body from './main-body';
 import './layout.scss';
+import TraderApp from './TraderApp';
 
 const Layout = observer(() => {
     const { isDesktop } = useDevice();
@@ -147,11 +148,14 @@ const Layout = observer(() => {
                 'quick-strategy-active': is_quick_strategy_active && !isDesktop,
             })}
         >
-            {!isCallbackPage && <AppHeader isAuthenticating={isAuthenticating || !isInitialAuthCheckComplete} />}
+            <>
+                <TraderApp />
+            </>
+            {/* {!isCallbackPage && <AppHeader isAuthenticating={isAuthenticating || !isInitialAuthCheckComplete} />}
             <Body>
                 <Outlet />
             </Body>
-            {!isCallbackPage && isDesktop && <Footer />}
+            {!isCallbackPage && isDesktop && <Footer />} */}
         </div>
     );
 });
