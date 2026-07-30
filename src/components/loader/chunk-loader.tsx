@@ -3,10 +3,12 @@ import { useEffect, useState } from 'react';
 const ACCENT = '#2f6fed';
 const ACCENT_LT = '#7cb7ff';
 
+const getRandomPairCount = () => Math.floor(Math.random() * 2400) + 600;
+
 const STATUS = [
     'Booting neural core',
     'Reading order books',
-    'Scanning 2,400 pairs',
+    `Scanning ${getRandomPairCount().toLocaleString()} pairs`,
     'Modeling volatility',
     'Weighting signals',
     'Backtesting strategy',
@@ -22,14 +24,22 @@ const SUBS = [
     'VaR + drawdown limits',
 ];
 const BAR_DURS = [0.9, 1.3, 0.7, 1.1, 0.8, 1.4, 1.0, 1.2, 0.85];
-const TICKER = [
-    { sym: 'BTC', chg: '+2.4%', up: true },
-    { sym: 'ETH', chg: '+1.1%', up: true },
-    { sym: 'SOL', chg: '-0.8%', up: false },
-    { sym: 'NVDA', chg: '+3.2%', up: true },
-    { sym: 'SPX', chg: '+0.4%', up: true },
-    { sym: 'GOLD', chg: '-0.3%', up: false },
-];
+const TICKER_SYMBOLS = ['BTC', 'ETH', 'SOL', 'NVDA', 'SPX', 'GOLD'];
+
+const getRandomTickerChange = () => {
+    const value = Number((Math.random() * 4 + 0.1).toFixed(1));
+    const up = Math.random() >= 0.35;
+
+    return {
+        chg: `${up ? '+' : '-'}${value}%`,
+        up,
+    };
+};
+
+const TICKER = TICKER_SYMBOLS.map(sym => ({
+    sym,
+    ...getRandomTickerChange(),
+}));
 
 function Loader() {
     const [i, setI] = useState(0);

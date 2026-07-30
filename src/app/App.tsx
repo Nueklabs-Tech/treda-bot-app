@@ -25,9 +25,9 @@ const LanguageHandler = ({ children }: { children: React.ReactNode }) => {
 
 const routerBasename = isPreviewMode() ? PREVIEW_BASE_PATH : undefined;
 
-const LazyComponent = React.lazy(
-    () => new Promise(() => {}) // never resolves
-);
+// const LazyComponent = React.lazy(
+//     () => new Promise(() => {}) // never resolves
+// );
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -41,10 +41,10 @@ const router = createBrowserRouter(
                                 <LocalStorageSyncWrapper>
                                     <RoutePromptDialog />
                                     <CoreStoreProvider>
-                                        {/* <Layout /> */}
-                                        <div>
+                                        <Layout />
+                                        {/* <div>
                                             <LazyComponent />
-                                        </div>
+                                        </div> */}
                                     </CoreStoreProvider>
                                 </LocalStorageSyncWrapper>
                             </StoreProvider>
