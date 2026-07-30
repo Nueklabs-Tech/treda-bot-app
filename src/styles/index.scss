@@ -1,0 +1,20 @@
+@use 'components/shared/styles/themes' as *;
+
+body {
+    font-family: var(--brand-font-primary);
+    background: var(--general-main-1);
+}
+
+.icon-general-fill-path {
+    path {
+        fill: var(--text-general);
+    }
+}
+
+.icon-general-fill-g-path {
+    g {
+        path {
+            fill: var(--text-general);
+        }
+    }
+}
