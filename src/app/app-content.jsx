@@ -4,7 +4,7 @@ import { ToastContainer } from 'react-toastify';
 import AuthLoadingWrapper from '@/components/auth-loading-wrapper';
 import { botNotification } from '@/components/bot-notification/bot-notification';
 import useLiveChat from '@/components/chat/useLiveChat';
-import ChunkLoader from '@/components/loader/chunk-loader';
+import AppLoading from '@/components/loader/app-loading';
 import { getUrlBase } from '@/components/shared';
 import TransactionDetailsModal from '@/components/transaction-details';
 import { api_base, ApiHelpers, ServerTime } from '@/external/bot-skeleton';
@@ -22,6 +22,7 @@ import BlocklyLoading from '../components/blockly-loading';
 import BotStopped from '../components/bot-stopped';
 import BotBuilder from '../pages/bot-builder';
 import Main from '../pages/main';
+import Welcome from '../pages/welcome';
 import './app.scss';
 import 'react-toastify/dist/ReactToastify.css';
 import '../components/bot-notification/bot-notification.scss';
@@ -40,7 +41,15 @@ const AppContent = observer(() => {
     const { recovered_transactions, recoverPendingContracts } = transactions;
     const is_subscribed_to_msg_listener = React.useRef(false);
     const msg_listener = React.useRef(null);
-    const { connectionStatus } = useApiBase();
+    const { connectionStatus, isAuthorizing, activeLoginid } = useApiBase();
+
+    // An OAuth callback (?code=…&state=…) is still an authenticated session in
+    // progress — App.tsx exchanges the code before the client store is filled in,
+    // so without this the welcome page would flash mid-login.
+    const [is_oauth_pending, setIsOAuthPending] = React.useState(() => {
+        const params = new URLSearchParams(window.location.search);
+        return Boolean(params.get('code') && params.get('state'));
+    });
 
     useDevMode();
     useEffect(() => {
@@ -66,6 +75,19 @@ const AppContent = observer(() => {
     // NOTE: Disabled Intercom until further notice
     // const token = V2GetActiveToken() ?? null;
     // useIntercom(token);
+
+    useEffect(() => {
+        if (!is_oauth_pending) return;
+
+        if (activeLoginid || client.is_logged_in) {
+            setIsOAuthPending(false);
+            return;
+        }
+
+        // Safety net: never keep the user on a blank loading screen forever.
+        const timer = setTimeout(() => setIsOAuthPending(false), 30_000);
+        return () => clearTimeout(timer);
+    }, [is_oauth_pending, activeLoginid, client.is_logged_in]);
 
     useEffect(() => {
         if (connectionStatus === CONNECTION_STATUS.OPENED) {
@@ -180,6 +202,36 @@ const AppContent = observer(() => {
 
     if (common?.error) return null;
 
+    const has_session = client.is_logged_in || Boolean(activeLoginid);
+    const is_authenticating = !has_session && (isAuthorizing || is_oauth_pending);
+
+    const renderContent = () => {
+        // // Signed-out visitors get the welcome page instead of the bot dashboard.
+        // if (!has_session) {
+        //     return is_authenticating ? <AppLoading /> : <Welcome />;
+        // }
+
+        // if (is_loading) return <AppLoading />;
+
+        // return (
+        //     <AuthLoadingWrapper>
+        //         <ThemeProvider theme={is_dark_mode_on ? 'dark' : 'light'}>
+        //             <BlocklyLoading />
+        //             <div className='bot-dashboard bot' data-testid='dt_bot_dashboard'>
+        //                 <Audio />
+        //                 <Main />
+        //                 <BotBuilder />
+        //                 <BotStopped />
+        //                 <TransactionDetailsModal />
+        //                 <ToastContainer limit={3} draggable={false} />
+        //             </div>
+        //         </ThemeProvider>
+        //     </AuthLoadingWrapper>
+        // );
+
+        return <Welcome />;
+    };
+
     return (
         <React.Fragment>
             {PreviewBranding && (
@@ -187,23 +239,7 @@ const AppContent = observer(() => {
                     <PreviewBranding />
                 </Suspense>
             )}
-            {is_loading ? (
-                <ChunkLoader message={localize('Initializing Deriv Bot account...')} />
-            ) : (
-                <AuthLoadingWrapper>
-                    <ThemeProvider theme={is_dark_mode_on ? 'dark' : 'light'}>
-                        <BlocklyLoading />
-                        <div className='bot-dashboard bot' data-testid='dt_bot_dashboard'>
-                            <Audio />
-                            <Main />
-                            <BotBuilder />
-                            <BotStopped />
-                            <TransactionDetailsModal />
-                            <ToastContainer limit={3} draggable={false} />
-                        </div>
-                    </ThemeProvider>
-                </AuthLoadingWrapper>
-            )}
+            {renderContent()}
         </React.Fragment>
     );
 });

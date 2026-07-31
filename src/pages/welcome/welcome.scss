@@ -1,0 +1,173 @@
+.welcome {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4.8rem;
+    width: 100%;
+    // 5.6rem is the app header height (see layout.scss).
+    min-height: calc(100vh - 5.6rem);
+    padding: 6.4rem 2.4rem 8rem;
+    overflow: hidden auto;
+    background: var(--general-main-1, #fff);
+    color: var(--text-general, #333);
+    text-align: center;
+
+    &__glow {
+        position: absolute;
+        inset-block-start: -30rem;
+        inset-inline-start: 50%;
+        width: 80rem;
+        height: 60rem;
+        transform: translateX(-50%);
+        background: radial-gradient(50% 50% at 50% 50%, rgb(59 130 246 / 22%) 0%, rgb(59 130 246 / 0%) 70%);
+        pointer-events: none;
+    }
+
+    &__hero {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        max-width: 62rem;
+    }
+
+    &__logo {
+        width: 6.4rem;
+        height: 6.4rem;
+        object-fit: contain;
+        margin-block-end: 2.4rem;
+    }
+
+    &__eyebrow {
+        font-size: 1.2rem;
+        font-weight: 600;
+        letter-spacing: 0.12rem;
+        text-transform: uppercase;
+        color: var(--brand-accent, #3b82f6);
+        margin-block-end: 1.2rem;
+    }
+
+    &__title {
+        font-size: 4rem;
+        font-weight: 700;
+        line-height: 1.2;
+        margin-block-end: 1.6rem;
+    }
+
+    &__subtitle {
+        font-size: 1.6rem;
+        line-height: 1.6;
+        color: var(--text-less-prominent, #7f8a94);
+        margin-block-end: 3.2rem;
+    }
+
+    &__actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1.6rem;
+    }
+
+    &__btn {
+        min-width: 20rem;
+        padding: 1.4rem 2.8rem;
+        border: 1px solid transparent;
+        border-radius: 0.8rem;
+        font-family: inherit;
+        font-size: 1.5rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition:
+            transform 0.15s ease,
+            opacity 0.15s ease,
+            background 0.15s ease;
+
+        &:hover:not(:disabled) {
+            transform: translateY(-0.1rem);
+        }
+
+        &:disabled {
+            opacity: 0.6;
+            cursor: default;
+        }
+
+        &--primary {
+            background: var(--brand-accent, #3b82f6);
+            color: #fff;
+        }
+
+        &--secondary {
+            background: transparent;
+            border-color: var(--border-normal, rgb(127 138 148 / 40%));
+            color: var(--text-general, #333);
+
+            &:hover:not(:disabled) {
+                background: var(--general-hover, rgb(127 138 148 / 12%));
+            }
+        }
+    }
+
+    &__note {
+        margin-block-start: 2rem;
+        font-size: 1.2rem;
+        color: var(--text-less-prominent, #7f8a94);
+    }
+
+    &__features {
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 2rem;
+        width: 100%;
+        max-width: 96rem;
+    }
+
+    &__feature {
+        padding: 2.4rem;
+        border: 1px solid var(--border-normal, rgb(127 138 148 / 24%));
+        border-radius: 1.2rem;
+        background: var(--general-section-1, rgb(127 138 148 / 6%));
+        text-align: start;
+    }
+
+    &__feature-title {
+        font-size: 1.6rem;
+        font-weight: 600;
+        margin-block-end: 0.8rem;
+    }
+
+    &__feature-text {
+        font-size: 1.4rem;
+        line-height: 1.5;
+        color: var(--text-less-prominent, #7f8a94);
+    }
+
+    @media (max-width: 768px) {
+        gap: 3.2rem;
+        padding: 4rem 1.6rem 6.4rem;
+
+        &__title {
+            font-size: 2.8rem;
+        }
+
+        &__subtitle {
+            font-size: 1.4rem;
+        }
+
+        &__actions {
+            width: 100%;
+            flex-direction: column;
+        }
+
+        &__btn {
+            width: 100%;
+            min-width: 0;
+        }
+
+        &__features {
+            grid-template-columns: minmax(0, 1fr);
+        }
+    }
+}
