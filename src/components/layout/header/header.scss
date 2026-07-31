@@ -254,28 +254,30 @@
 }
 
 .auth-actions {
-    // Local knobs so both button variants read from one brand source.
     --auth-cta-from: var(--brand-primary, #3b82f6);
     --auth-cta-to: var(--brand-accent, #8b5cf6);
     --auth-cta-glow: color-mix(in srgb, var(--auth-cta-from) 45%, transparent);
 
     display: flex;
-    padding-block: 8px;
+    padding-block: 5px;
     align-items: center;
-    gap: 1.2rem;
+    gap: 1rem;
     margin-inline-end: 1.6rem;
 
-    // Compounded with .dc-btn so these win over the .dc-btn--primary /
-    // --tertiary variant rules in shared_ui/button.scss regardless of the
-    // stylesheet order (those are single-class selectors).
+    // The mobile header shares its row with the logo and brand name, so the
+    // CTAs tighten up instead of pushing the row wider.
+    @include mobile-screen {
+        gap: 0.6rem;
+        padding-block: 0;
+        margin-inline-end: 0.8rem;
+    }
+
     &__btn.dc-btn {
-        // `overflow: hidden` clips the shimmer sweep to the pill.
         position: relative;
         overflow: hidden;
-        height: 3.6rem;
-        padding-inline: 1.8rem;
+        padding-inline: 10px;
         border-radius: 16px;
-        font-weight: 600;
+        font-weight: 500;
         transition:
             transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
             box-shadow 0.25s ease,
@@ -284,7 +286,7 @@
 
         .dc-btn__icon {
             padding-right: 0;
-            padding-inline-end: 0.7rem;
+            padding-inline-end: 0.2rem;
             color: currentColor;
 
             svg {
@@ -296,19 +298,43 @@
             letter-spacing: 0.02em;
         }
 
-        // Light sweep that crosses the pill on hover — the "wow" beat. It sits
-        // above the fill (translucent, pointer-events: none) so it reads as a
-        // reflection passing over the label rather than behind it.
+        @include mobile-screen {
+            height: 2.8rem;
+            padding-inline: 1rem;
+            border-radius: 1.4rem;
+
+            .dc-btn__icon {
+                padding-inline-end: 0.4rem;
+
+                svg {
+                    width: 1.4rem;
+                    height: 1.4rem;
+                }
+            }
+
+            .dc-btn__text {
+                font-size: 1.2rem;
+                line-height: 1.6rem;
+            }
+        }
+
+        // Small handsets (iPhone SE / 360px Androids) need one more notch down
+        // so "Log in" and "Get Started" still sit on a single line.
+        @media (max-width: 380px) {
+            height: 2.6rem;
+            padding-inline: 0.8rem;
+            border-radius: 1.3rem;
+
+            .dc-btn__text {
+                font-size: 1.1rem;
+            }
+        }
+
         &::after {
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(
-                115deg,
-                transparent 35%,
-                rgba(255, 255, 255, 0.45) 50%,
-                transparent 65%
-            );
+            background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.45) 50%, transparent 65%);
             transform: translateX(-120%);
             transition: transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
             pointer-events: none;
@@ -333,8 +359,6 @@
             outline-offset: 2px;
         }
 
-        // Log in / Get Started stay clickable-looking while the OAuth app id is
-        // unset (no faded 0.32 opacity), but must not animate or invite a click.
         &:disabled,
         &[disabled] {
             opacity: 1;
@@ -442,6 +466,10 @@
 }
 
 @keyframes auth-spinner-rotate {
-    from { transform: rotate(0deg); }
-    to   { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
