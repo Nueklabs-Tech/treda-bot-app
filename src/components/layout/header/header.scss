@@ -264,8 +264,6 @@
     gap: 1rem;
     margin-inline-end: 1.6rem;
 
-    // The mobile header shares its row with the logo and brand name, so the
-    // CTAs tighten up instead of pushing the row wider.
     @include mobile-screen {
         gap: 0.6rem;
         padding-block: 0;
