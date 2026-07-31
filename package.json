@@ -2,6 +2,7 @@
     "name": "treda-bot-app",
     "version": "0.2.2",
     "private": true,
+    "type": "module",
     "engines": {
         "node": ">=22"
     },
@@ -10,8 +11,8 @@
         "build": "rsbuild build",
         "test": "jest",
         "type-check": "tsc --noEmit",
-        "generate:brand-css": "node scripts/generate-brand-css.js",
-        "prebuild": "node scripts/generate-brand-css.js"
+        "generate:brand-css": "node scripts/generate-brand-css.cjs",
+        "prebuild": "node scripts/generate-brand-css.cjs"
     },
     "dependencies": {
         "@deriv-com/quill-ui": "1.18.1",
