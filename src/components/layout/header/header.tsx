@@ -12,7 +12,7 @@ import { Localize } from '@deriv-com/translations';
 import { Header, useDevice, Wrapper } from '@deriv-com/ui';
 import { AppLogo } from '../app-logo';
 import AccountSwitcher from './account-switcher';
-import { BotIcon, SignalIcon, TransferIcon } from './auth-icons';
+import { TransferIcon } from './auth-icons';
 import MenuItems from './menu-items';
 import MobileMenu from './mobile-menu';
 // @ts-ignore: Allow side-effect import of SCSS without type declarations
@@ -182,7 +182,6 @@ const AppHeader = observer(() => {
                         <Button
                             tertiary
                             type='button'
-                            icon={<SignalIcon />}
                             className='auth-actions__btn auth-actions__btn--ghost'
                             disabled={!isAuthConfigured}
                             onClick={handleLogin}
@@ -192,7 +191,6 @@ const AppHeader = observer(() => {
                         <Button
                             primary_light
                             type='button'
-                            icon={<BotIcon />}
                             className='auth-actions__btn auth-actions__btn--cta'
                             disabled={!isAuthConfigured}
                             onClick={handleSignup}
