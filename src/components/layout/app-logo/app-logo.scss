@@ -5,7 +5,27 @@
         height: 32px;
         display: flex;
         align-items: center;
+        gap: 0.8rem;
         text-decoration: none;
+        margin-left: 5px;
+
+        img {
+            height: 100%;
+            width: auto;
+            object-fit: contain;
+        }
+    }
+
+    // App name rendered next to the logo image, vertically centred against it.
+    &__logo-name {
+        color: var(--text-general);
+        font-weight: 600;
+        font-size: 1.8rem;
+        line-height: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 220px;
     }
 
     // Logo + app name mark (shared by the header and the mobile drawer).
@@ -57,6 +77,12 @@
 
         .app-header__logo-text {
             display: none;
+        }
+
+        // The name stays on mobile (the left wrapper has room), just a touch smaller.
+        .app-header__logo-name {
+            font-size: 1.6rem;
+            max-width: 140px;
         }
     }
 }

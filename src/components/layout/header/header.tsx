@@ -12,6 +12,7 @@ import { Localize } from '@deriv-com/translations';
 import { Header, useDevice, Wrapper } from '@deriv-com/ui';
 import { AppLogo } from '../app-logo';
 import AccountSwitcher from './account-switcher';
+import { TransferIcon } from './auth-icons';
 import MenuItems from './menu-items';
 import MobileMenu from './mobile-menu';
 // @ts-ignore: Allow side-effect import of SCSS without type declarations
@@ -66,23 +67,25 @@ const AppHeader = observer(() => {
 
     // Fallback timeout: show login button if auth never resolves.
     // Suppressed during the OAuth callback flow (isOAuthPending = true).
+    // The flag is only cleared when a *new* attempt starts or auth succeeds —
+    // clearing it whenever `isAuthorizing` is false would wipe it one render
+    // after the timeout fires (the timeout itself sets isAuthorizing = false).
     useEffect(() => {
-        if (isOAuthPending) return;
-
-        const timer = setTimeout(() => {
-            if (isAuthorizing && !activeLoginid) {
-                setAuthTimeout(true);
-                setIsAuthorizing(false);
-            }
-        }, 5000);
-
-        if (activeLoginid || !isAuthorizing) {
-            if (authTimeout) setAuthTimeout(false);
-            clearTimeout(timer);
+        if (activeLoginid) {
+            setAuthTimeout(false);
+            return;
         }
 
+        if (isOAuthPending || !isAuthorizing) return;
+
+        setAuthTimeout(false);
+        const timer = setTimeout(() => {
+            setAuthTimeout(true);
+            setIsAuthorizing(false);
+        }, 5000);
+
         return () => clearTimeout(timer);
-    }, [isAuthorizing, activeLoginid, setIsAuthorizing, authTimeout, isOAuthPending]);
+    }, [isAuthorizing, activeLoginid, setIsAuthorizing, isOAuthPending]);
 
     const handleSignup = useCallback(async () => {
         try {
@@ -131,102 +134,118 @@ const AppHeader = observer(() => {
         navigateToTransfer(transferCurrency);
     }, [authData?.currency]);
 
-    // const renderAccountSection = useCallback(
-    //     (position: 'left' | 'right' = 'right') => {
-    //         // Show account switcher and logout when user is fully authenticated
-    //         if (activeLoginid && !is_account_regenerating) {
-    //             if (position === 'left' && !isDesktop) {
-    //                 // For mobile left section - only account switcher
-    //                 return (
-    //                     <div className='auth-actions'>
-    //                         <div className='account-info'>
-    //                             <AccountSwitcher activeAccount={activeAccount} />
-    //                         </div>
-    //                     </div>
-    //                 );
-    //             } else if (position === 'right') {
-    //                 // For right section - transfer button (and account switcher on desktop)
-    //                 return (
-    //                     <div className='auth-actions'>
-    //                         {isDesktop && (
-    //                             <div className='account-info'>
-    //                                 <AccountSwitcher activeAccount={activeAccount} />
-    //                             </div>
-    //                         )}
-    //                         <Button
-    //                             primary
-    //                             disabled={client?.is_logging_out || !authData?.currency}
-    //                             onClick={handleTransfer}
-    //                         >
-    //                             <Localize i18n_default_text='Transfer' />
-    //                         </Button>
-    //                     </div>
-    //                 );
-    //             }
-    //         }
-    //         // Show login button only when fully settled (not during OAuth flow)
-    //         else if (
-    //             position === 'right' &&
-    //             !isOAuthPending &&
-    //             ((!is_account_regenerating && !isAuthorizing && !activeLoginid) || authTimeout)
-    //         ) {
-    //             // Disable auth buttons until the OAuth app id is configured, so the
-    //             // click handlers (which would otherwise log "Failed to generate OAuth
-    //             // URL") never fire. The env-not-set toast explains why.
-    //             const isAuthConfigured = Boolean(process.env.NEXT_PUBLIC_DERIV_APP_ID);
-    //             return (
-    //                 <div className='auth-actions'>
-    //                     <Button tertiary disabled={!isAuthConfigured} onClick={handleLogin}>
-    //                         <Localize i18n_default_text='Log in' />
-    //                     </Button>
-    //                     <Button primary_light disabled={!isAuthConfigured} onClick={handleSignup}>
-    //                         <Localize i18n_default_text='Sign up' />
-    //                     </Button>
-    //                 </div>
-    //             );
-    //         }
-    //         // Default: Show spinner during loading states or when authorizing
-    //         else if (position === 'right') {
-    //             return (
-    //                 <div className='auth-actions auth-actions--loading'>
-    //                     <svg
-    //                         className='auth-actions__spinner'
-    //                         viewBox='0 0 24 24'
-    //                         fill='none'
-    //                         xmlns='http://www.w3.org/2000/svg'
-    //                     >
-    //                         <circle
-    //                             cx='12'
-    //                             cy='12'
-    //                             r='10'
-    //                             stroke='currentColor'
-    //                             strokeWidth='2.5'
-    //                             strokeLinecap='round'
-    //                             strokeDasharray='31.416'
-    //                             strokeDashoffset='10'
-    //                         />
-    //                     </svg>
-    //                 </div>
-    //             );
-    //         }
+    const renderAccountSection = useCallback(
+        (position: 'left' | 'right' = 'right') => {
+            // Show account switcher and logout when user is fully authenticated
+            if (activeLoginid && !is_account_regenerating) {
+                if (position === 'left' && !isDesktop) {
+                    // For mobile left section - only account switcher
+                    return (
+                        <div className='auth-actions'>
+                            <div className='account-info'>
+                                <AccountSwitcher activeAccount={activeAccount} />
+                            </div>
+                        </div>
+                    );
+                } else if (position === 'right') {
+                    // For right section - transfer button (and account switcher on desktop)
+                    return (
+                        <div className='auth-actions'>
+                            {isDesktop && (
+                                <div className='account-info'>
+                                    <AccountSwitcher activeAccount={activeAccount} />
+                                </div>
+                            )}
+                            <Button
+                                primary
+                                type='button'
+                                icon={<TransferIcon />}
+                                className='auth-actions__btn auth-actions__btn--cta'
+                                disabled={client?.is_logging_out || !authData?.currency}
+                                onClick={handleTransfer}
+                            >
+                                <Localize i18n_default_text='Transfer' />
+                            </Button>
+                        </div>
+                    );
+                }
+            }
+            // Show login button only when fully settled (not during OAuth flow)
+            else if (
+                position === 'right' &&
+                !isOAuthPending &&
+                ((!is_account_regenerating && !isAuthorizing && !activeLoginid) || authTimeout)
+            ) {
+                const isAuthConfigured = Boolean(process.env.NEXT_PUBLIC_DERIV_APP_ID);
+                return (
+                    <div className='auth-actions'>
+                        <Button
+                            tertiary
+                            type='button'
+                            className='auth-actions__btn auth-actions__btn--ghost'
+                            disabled={!isAuthConfigured}
+                            onClick={handleLogin}
+                        >
+                            <Localize i18n_default_text='Log in' />
+                        </Button>
+                        <Button
+                            primary_light
+                            type='button'
+                            className='auth-actions__btn auth-actions__btn--cta'
+                            disabled={!isAuthConfigured}
+                            onClick={handleSignup}
+                        >
+                            <Localize i18n_default_text='Get Started' />
+                        </Button>
+                    </div>
+                );
+            }
+            // Default: Show spinner during loading states or when authorizing
+            else if (position === 'right') {
+                return (
+                    <div className='auth-actions auth-actions--loading' role='status' aria-live='polite'>
+                        <svg
+                            className='auth-actions__spinner'
+                            viewBox='0 0 24 24'
+                            fill='none'
+                            xmlns='http://www.w3.org/2000/svg'
+                            aria-hidden='true'
+                        >
+                            <circle
+                                cx='12'
+                                cy='12'
+                                r='10'
+                                stroke='currentColor'
+                                strokeWidth='2.5'
+                                strokeLinecap='round'
+                                strokeDasharray='31.416'
+                                strokeDashoffset='10'
+                            />
+                        </svg>
+                        <span className='auth-actions__sr-only'>
+                            <Localize i18n_default_text='Connecting to your trading account…' />
+                        </span>
+                    </div>
+                );
+            }
 
-    //         return null;
-    //     },
-    //     [
-    //         isAuthorizing,
-    //         isDesktop,
-    //         activeLoginid,
-    //         client,
-    //         activeAccount,
-    //         authTimeout,
-    //         is_account_regenerating,
-    //         isOAuthPending,
-    //         authData,
-    //         handleLogin,
-    //         handleSignup,
-    //         handleTransfer,
-    //     ]
-    // );
+            return null;
+        },
+        [
+            isAuthorizing,
+            isDesktop,
+            activeLoginid,
+            client,
+            activeAccount,
+            authTimeout,
+            is_account_regenerating,
+            isOAuthPending,
+            authData,
+            handleLogin,
+            handleSignup,
+            handleTransfer,
+        ]
+    );
 
     if (client?.should_hide_header) return null;
 
@@ -243,9 +262,7 @@ const AppHeader = observer(() => {
                     <AppLogo />
                     {/* {isDesktop ? <MenuItems /> : renderAccountSection('left')} */}
                 </Wrapper>
-                {/* <Wrapper variant='right'>
-                    {renderAccountSection('right')}
-                </Wrapper> */}
+                <Wrapper variant='right'>{renderAccountSection('right')}</Wrapper>
             </Header>
         </>
     );

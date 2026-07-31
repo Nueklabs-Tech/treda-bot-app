@@ -2,16 +2,17 @@ import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import ErrorBoundary from '@/components/error-component/error-boundary';
 import ErrorComponent from '@/components/error-component/error-component';
-import ChunkLoader from '@/components/loader/chunk-loader';
+import AppLoading from '@/components/loader/app-loading';
 import { api_base } from '@/external/bot-skeleton';
 import { useStore } from '@/hooks/useStore';
 import { localize } from '@deriv-com/translations';
+// @ts-ignore
 import './app-root.scss';
 
 const AppContent = lazy(() => import('./app-content'));
 
 const AppRootLoader = () => {
-    return <ChunkLoader message={localize('Loading...')} />;
+    return <AppLoading message={localize('Loading...')} />;
 };
 
 const ErrorComponentWrapper = observer(() => {
@@ -67,19 +68,15 @@ const AppRoot = () => {
 
     if (!store || !is_api_initialized) return <AppRootLoader />;
 
-    // return (
-    //     <Suspense fallback={<AppRootLoader />}>
-    //         <ErrorBoundary root_store={store}>
-    //             <ErrorComponentWrapper />
-    //             <AppContent />
-    //         </ErrorBoundary>
-    //     </Suspense>
-    // );
     return (
-        <>
-            <div>lorem</div>
-        </>
+        <Suspense fallback={<AppRootLoader />}>
+            <ErrorBoundary root_store={store}>
+                <ErrorComponentWrapper />
+                <AppContent />
+            </ErrorBoundary>
+        </Suspense>
     );
+ 
 };
 
 export default AppRoot;

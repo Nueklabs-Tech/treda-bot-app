@@ -2,7 +2,7 @@ import { lazy, Suspense } from 'react';
 import React from 'react';
 import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from 'react-router-dom';
 import { cleanupUrl, handleOAuthCallback } from '@/external/deriv-core';
-import ChunkLoader from '@/components/loader/chunk-loader';
+import AppLoading from '@/components/loader/app-loading';
 import LocalStorageSyncWrapper from '@/components/localStorage-sync-wrapper';
 import RoutePromptDialog from '@/components/route-prompt-dialog';
 import { useAccountSwitching } from '@/hooks/useAccountSwitching';
@@ -34,7 +34,7 @@ const router = createBrowserRouter(
         <Route
             path='/'
             element={
-                <Suspense fallback={<ChunkLoader message='' />}>
+                <Suspense fallback={<AppLoading />}>
                     <TranslationProvider defaultLang='EN' i18nInstance={i18nInstance}>
                         <LanguageHandler>
                             <StoreProvider>
