@@ -6,6 +6,7 @@ import ChunkLoader from '@/components/loader/chunk-loader';
 import { api_base } from '@/external/bot-skeleton';
 import { useStore } from '@/hooks/useStore';
 import { localize } from '@deriv-com/translations';
+// @ts-ignore
 import './app-root.scss';
 
 const AppContent = lazy(() => import('./app-content'));
