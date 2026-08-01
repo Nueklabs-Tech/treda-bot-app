@@ -154,7 +154,11 @@ const Welcome = () => {
                 </p>
 
                 <h1 className='welcome__title'>
-                    <Localize i18n_default_text='Welcome to {{app_name}}' values={{ app_name }} />
+                    <Localize
+                        i18n_default_text='Welcome to <0>{{app_name}}</0>'
+                        values={{ app_name }}
+                        components={[<span key={0} className='welcome__title-accent' />]}
+                    />
                 </h1>
 
                 <p className='welcome__subtitle'>
