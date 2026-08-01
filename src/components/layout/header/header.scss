@@ -417,17 +417,6 @@
         }
     }
 
-    &--loading {
-        align-items: center;
-    }
-
-    &__spinner {
-        width: 2rem;
-        height: 2rem;
-        color: var(--text-prominent);
-        animation: auth-spinner-rotate 0.8s linear infinite;
-    }
-
     &__sr-only {
         position: absolute;
         width: 1px;
@@ -453,21 +442,8 @@
             display: none;
         }
     }
-
-    .auth-actions__spinner {
-        animation-duration: 2.4s;
-    }
 }
 
 .deriv-accordion--underline {
     border-bottom: none;
-}
-
-@keyframes auth-spinner-rotate {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
 }

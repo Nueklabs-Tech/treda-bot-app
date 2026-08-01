@@ -206,30 +206,28 @@ const AppContent = observer(() => {
     const is_authenticating = !has_session && (isAuthorizing || is_oauth_pending);
 
     const renderContent = () => {
-        // // Signed-out visitors get the welcome page instead of the bot dashboard.
-        // if (!has_session) {
-        //     return is_authenticating ? <AppLoading /> : <Welcome />;
-        // }
+        // Signed-out visitors get the welcome page instead of the bot dashboard.
+        if (!has_session) {
+            return is_authenticating ? <AppLoading /> : <Welcome />;
+        }
 
-        // if (is_loading) return <AppLoading />;
+        if (is_loading) return <AppLoading />;
 
-        // return (
-        //     <AuthLoadingWrapper>
-        //         <ThemeProvider theme={is_dark_mode_on ? 'dark' : 'light'}>
-        //             <BlocklyLoading />
-        //             <div className='bot-dashboard bot' data-testid='dt_bot_dashboard'>
-        //                 <Audio />
-        //                 <Main />
-        //                 <BotBuilder />
-        //                 <BotStopped />
-        //                 <TransactionDetailsModal />
-        //                 <ToastContainer limit={3} draggable={false} />
-        //             </div>
-        //         </ThemeProvider>
-        //     </AuthLoadingWrapper>
-        // );
-
-        return <Welcome />;
+        return (
+            <AuthLoadingWrapper>
+                <ThemeProvider theme={is_dark_mode_on ? 'dark' : 'light'}>
+                    <BlocklyLoading />
+                    <div className='bot-dashboard bot' data-testid='dt_bot_dashboard'>
+                        <Audio />
+                        <Main />
+                        <BotBuilder />
+                        <BotStopped />
+                        <TransactionDetailsModal />
+                        <ToastContainer limit={3} draggable={false} />
+                    </div>
+                </ThemeProvider>
+            </AuthLoadingWrapper>
+        );
     };
 
     return (

@@ -1,7 +1,6 @@
 // @ts-nocheck — vendored bot code with known upstream type gaps; see AGENTS.md
-/* [AI] - Analytics removed - utility functions moved to @/utils/account-helpers */
 import { getAccountId, getAccountType, isDemoAccount, removeUrlParameter } from '@/utils/account-helpers';
-/* [/AI] */
+
 import CommonStore from '@/stores/common-store';
 import { DerivWSAccountsService } from '@/services/derivws-accounts.service';
 import { TAuthData } from '@/types/api-types';

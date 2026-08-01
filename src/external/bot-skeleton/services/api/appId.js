@@ -103,7 +103,7 @@ export const generateDerivApiInstance = async (forceNew = false) => {
 
             return deriv_api;
         } catch (error) {
-            console.error('[DerivAPI] Error creating instance:', error);
+            // console.error('[DerivAPI] Error creating instance:', error);
             derivApiPromise = null;
             derivApiInstance = null;
             throw error;

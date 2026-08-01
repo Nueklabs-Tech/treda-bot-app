@@ -37,16 +37,23 @@ export const WS_SERVERS = {
 // Helper to check if we're on production.
 // NEXT_PUBLIC_DERIV_ENV is the authoritative signal (set at build/deploy time and
 // also read by vendored deriv-core for OAuth), so a deployed partner domain resolves the
-// same environment for WebSocket and OAuth. Falls back to hostname detection when
-// the env var is unset (e.g. local dev).
+// same environment for WebSocket and OAuth.
+//
+// The fallback for an unset/unrecognised value must mirror deriv-core's
+// `getEnv()` (src/external/deriv-core/config/urls.ts), which resolves anything
+// that is not literally 'preview' to production. Resolving to staging here
+// instead would authorize against production but open the *staging* socket and
+// call the staging REST base — which is exactly how a typo'd env var turns into
+// a "WebSocket connection to wss://staging-api.derivws.com/... failed".
+// A staging hostname is the one exception: those deploys are staging by definition.
 export const isProduction = () => {
     const env = process.env.NEXT_PUBLIC_DERIV_ENV;
     if (env === 'production') return true;
     if (env === 'preview' || env === 'staging') return false;
 
     const hostname = window.location.hostname;
-    const productionDomains = Object.values(PRODUCTION_DOMAINS) as string[];
-    return productionDomains.includes(hostname);
+    const stagingDomains = Object.values(STAGING_DOMAINS) as string[];
+    return !stagingDomains.includes(hostname);
 };
 
 export const isLocal = () => /localhost(:\d+)?$/i.test(window.location.hostname);

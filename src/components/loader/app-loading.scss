@@ -1,4 +1,11 @@
 .app-loading {
+    --al-accent: var(--brand-primary, #3b82f6);
+    --al-node: color-mix(in srgb, var(--al-accent) 55%, #fff);
+    --al-bg: var(--brand-page-background, #000);
+    --al-text: var(--brand-white, #fff);
+    --al-muted: color-mix(in srgb, var(--al-accent) 62%, var(--al-text));
+
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -6,35 +13,281 @@
     gap: 1.6rem;
     width: 100%;
     height: 100%;
-    // Fills its container when one has a height, and still reads as a loading
-    // screen when dropped into an auto-height parent (e.g. a Suspense fallback).
     min-height: 24rem;
     flex: 1;
-    background: var(--general-main-1, #fff);
+    overflow: hidden;
+    background: var(--al-bg);
+    font-family: var(--brand-font-primary, sans-serif);
 
-    &__spinner {
-        width: 3.2rem;
-        height: 3.2rem;
-        border: 0.3rem solid var(--border-normal, rgb(127 138 148 / 30%));
-        border-top-color: var(--brand-accent, #3b82f6);
+    &__grid {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background-image:
+            linear-gradient(to right, color-mix(in srgb, var(--al-accent) 12%, transparent) 1px, transparent 1px),
+            linear-gradient(to bottom, color-mix(in srgb, var(--al-accent) 12%, transparent) 1px, transparent 1px);
+        background-size: 4rem 4rem;
+        mask-image: radial-gradient(circle at 50% 45%, #000 0%, #000 70%, transparent 100%);
+        animation: app-loading-grid-drift 8s linear infinite;
+    }
+
+    &__stage {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.6rem;
+        width: 100%;
+        max-width: 32rem;
+        padding: 0 2.4rem;
+    }
+
+    &__radar-wrap {
+        position: relative;
+        display: grid;
+        place-items: center;
+        width: 23rem;
+        height: 23rem;
+    }
+
+    &__radar {
+        position: absolute;
+        inset: 0;
         border-radius: 50%;
-        animation: app-loading-spin 0.8s linear infinite;
+        background: conic-gradient(
+            from 0deg,
+            transparent 0deg,
+            color-mix(in srgb, var(--al-accent) 38%, transparent) 42deg,
+            transparent 70deg
+        );
+        mask-image: radial-gradient(circle, transparent 26%, #000 30%, #000 99%, transparent 100%);
+        animation: app-loading-sweep 3.2s linear infinite;
+    }
+
+    &__net {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    &__orbit {
+        fill: none;
+        stroke: color-mix(in srgb, var(--al-accent) 16%, transparent);
+        stroke-width: 1;
+    }
+
+    &__links {
+        fill: none;
+        stroke: var(--al-accent);
+        stroke-width: 1.4;
+        stroke-dasharray: 4 6;
+        opacity: 0.55;
+        animation: app-loading-dash 1.4s linear infinite;
+    }
+
+    &__node {
+        fill: var(--al-node);
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: app-loading-node 1.8s ease-in-out infinite;
+    }
+
+    &__core {
+        position: relative;
+        display: grid;
+        place-items: center;
+        width: 7rem;
+        height: 7rem;
+        border-radius: 50%;
+        background: linear-gradient(150deg, #000, color-mix(in srgb, #000 55%, #000));
+        animation: app-loading-core 2.4s ease-in-out infinite;
+    }
+
+    &__core-img {
+        width: 5.6rem;
+        height: 5.6rem;
+        object-fit: contain;
+        border-radius: 50%;
+    }
+
+    &__core-mark {
+        font-size: 3.2rem;
+        font-weight: 700;
+        line-height: 1;
+        color: var(--al-text);
+        user-select: none;
+    }
+
+    &__caption {
+        display: flex;
+        align-items: baseline;
+        gap: 0.4rem;
     }
 
     &__message {
-        font-size: 1.4rem;
-        color: var(--text-less-prominent, #7f8a94);
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--al-text);
+    }
+
+    &__dots {
+        display: inline-flex;
+        gap: 0.3rem;
+
+        span {
+            width: 0.4rem;
+            height: 0.4rem;
+            border-radius: 50%;
+            background: var(--al-node);
+            animation: app-loading-node 1.4s ease-in-out infinite;
+
+            &:nth-child(2) {
+                animation-delay: 0.2s;
+            }
+
+            &:nth-child(3) {
+                animation-delay: 0.4s;
+            }
+        }
+    }
+
+    &__sub {
+        font-size: 1.1rem;
+        letter-spacing: 0.12em;
+        font-family: var(--brand-font-monospace, monospace);
+        color: var(--al-muted);
+    }
+
+    &__progress {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+    }
+
+    &__progress-head {
+        display: flex;
+        justify-content: space-between;
+        font-size: 1.1rem;
+        letter-spacing: 0.08em;
+        font-family: var(--brand-font-monospace, monospace);
+        color: var(--al-muted);
+
+        b {
+            color: var(--al-accent);
+        }
+    }
+
+    &__track {
+        position: relative;
+        height: 0.4rem;
+        border-radius: 0.4rem;
+        overflow: hidden;
+        background: color-mix(in srgb, var(--al-accent) 22%, var(--al-bg));
+    }
+
+    &__fill {
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(
+            90deg,
+            var(--al-accent),
+            color-mix(in srgb, var(--al-accent) 55%, white) 50%,
+            var(--al-accent)
+        );
+        background-size: 200% 100%;
+        transition: width 0.3s ease;
+        animation: app-loading-shimmer 1.6s linear infinite;
+
+        // No `progress` supplied: the bar can't report real completion, so it
+        // runs as an indeterminate sweep instead of parking at a fake value.
+        &--indeterminate {
+            width: 40%;
+            animation:
+                app-loading-shimmer 1.6s linear infinite,
+                app-loading-indeterminate 1.4s ease-in-out infinite;
+        }
     }
 }
 
-@keyframes app-loading-spin {
+@keyframes app-loading-sweep {
     to {
         transform: rotate(360deg);
     }
 }
 
+@keyframes app-loading-grid-drift {
+    to {
+        background-position:
+            4rem 4rem,
+            4rem 4rem;
+    }
+}
+
+@keyframes app-loading-dash {
+    to {
+        stroke-dashoffset: -20;
+    }
+}
+
+@keyframes app-loading-node {
+    0%,
+    100% {
+        opacity: 0.35;
+        transform: scale(0.8);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.25);
+    }
+}
+
+@keyframes app-loading-core {
+    0%,
+    100% {
+        box-shadow: 0 0 0 0.1rem color-mix(in srgb, var(--al-accent) 30%, transparent);
+    }
+
+    50% {
+        box-shadow:
+            0 0 0 0.1rem color-mix(in srgb, var(--al-accent) 55%, transparent),
+            0 0 2.4rem 0.2rem color-mix(in srgb, var(--al-accent) 35%, transparent);
+    }
+}
+
+@keyframes app-loading-shimmer {
+    to {
+        background-position: -200% 0;
+    }
+}
+
+@keyframes app-loading-indeterminate {
+    0% {
+        transform: translateX(-110%);
+    }
+
+    100% {
+        transform: translateX(260%);
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
-    .app-loading__spinner {
-        animation-duration: 2.4s;
+    .app-loading {
+        &__grid,
+        &__radar,
+        &__links,
+        &__node,
+        &__core,
+        &__fill,
+        &__dots span {
+            animation: none;
+        }
+
+        &__fill--indeterminate {
+            width: 100%;
+            opacity: 0.5;
+        }
     }
 }

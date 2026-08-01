@@ -23,7 +23,7 @@ const StoreProvider: React.FC<TStoreProvider> = ({ children, mockStore }) => {
 
         if (!store && !initializingStore.current) {
             initializingStore.current = true;
-            // If the store is mocked for testing purposes, then return the mocked value.
+
             if (mockStore) {
                 setStore(mockStore);
             } else {

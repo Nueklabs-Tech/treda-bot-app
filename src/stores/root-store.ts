@@ -1,4 +1,4 @@
-// @ts-nocheck — vendored bot code with known upstream type gaps; see AGENTS.md
+import type { TBotSkeleton } from '../types/dbot.types';
 import AppStore from './app-store';
 import BlocklyStore from './blockly-store';
 import ChartStore from './chart-store';
@@ -20,9 +20,14 @@ import ToolboxStore from './toolbox-store';
 import TransactionsStore from './transactions-store';
 import UiStore from './ui-store';
 
-// TODO: need to write types for the individual classes and convert them to ts
+export type TCoreStores = {
+    ui: UiStore;
+    client: ClientStore;
+    common: CommonStore;
+};
+
 export default class RootStore {
-    public dbot;
+    public dbot: TBotSkeleton;
     public app: AppStore;
     public summary_card: SummaryCardStore;
     public flyout: FlyoutStore;
@@ -47,22 +52,20 @@ export default class RootStore {
     public client: ClientStore;
     public common: CommonStore;
 
-    core = {
-        ui: {},
-        client: {},
-        common: {},
-    };
+    public core: TCoreStores;
 
-    constructor(dbot: unknown) {
+    constructor(dbot: TBotSkeleton) {
         this.dbot = dbot;
 
-        // Need to fix later without using this.core
         this.ui = new UiStore();
-        this.client = new ClientStore();
+
+        this.client = new ClientStore(this);
         this.common = new CommonStore();
-        this.core.ui = this.ui;
-        this.core.client = this.client;
-        this.core.common = this.common;
+        this.core = {
+            ui: this.ui,
+            client: this.client,
+            common: this.common,
+        };
 
         this.app = new AppStore(this, this.core);
         this.summary_card = new SummaryCardStore(this, this.core);
@@ -80,7 +83,6 @@ export default class RootStore {
 
         this.dashboard = new DashboardStore(this, this.core);
 
-        // need to be at last for dependency
         this.chart_store = new ChartStore(this);
         this.blockly_store = new BlocklyStore(this);
         this.data_collection_store = new DataCollectionStore(this, this.core);

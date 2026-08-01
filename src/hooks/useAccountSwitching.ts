@@ -2,24 +2,6 @@ import { useEffect } from 'react';
 import { crypto_currencies_display_order, fiat_currencies_display_order } from '@/components/shared';
 import { TAuthData } from '@/types/api-types';
 
-/**
- * Custom hook to handle account switching via URL parameter
- *
- * This hook:
- * 1. Reads 'account' parameter from URL
- * 2. Validates the currency against supported currencies
- * 3. Switches to the specified account (demo or real)
- * 4. Updates localStorage with the selected account's token and loginid
- *
- * @example
- * ```tsx
- * // In your component
- * useAccountSwitching();
- *
- * // URL: ?account=USD - switches to USD account
- * // URL: ?account=DEMO - switches to demo account
- * ```
- */
 export const useAccountSwitching = () => {
     useEffect(() => {
         const accounts_list = localStorage.getItem('accountsList');
@@ -30,7 +12,6 @@ export const useAccountSwitching = () => {
 
         const is_valid_currency = account_currency && validCurrencies.includes(account_currency?.toUpperCase());
 
-        // Early return if required data is not available
         if (!accounts_list || !client_accounts) return;
 
         try {
@@ -42,7 +23,6 @@ export const useAccountSwitching = () => {
                 localStorage.setItem('active_loginid', loginid);
             };
 
-            // Handle demo account switching
             if (account_currency?.toUpperCase() === 'DEMO') {
                 const demo_account = Object.entries(parsed_accounts).find(([key]) => key.startsWith('VR'));
 

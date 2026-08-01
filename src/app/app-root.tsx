@@ -1,9 +1,9 @@
-import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense } from 'react';
 import { observer } from 'mobx-react-lite';
 import ErrorBoundary from '@/components/error-component/error-boundary';
 import ErrorComponent from '@/components/error-component/error-component';
 import AppLoading from '@/components/loader/app-loading';
-import { api_base } from '@/external/bot-skeleton';
+import { useAuthBootstrap } from '@/hooks/useAuthBootstrap';
 import { useStore } from '@/hooks/useStore';
 import { localize } from '@deriv-com/translations';
 // @ts-ignore
@@ -36,37 +36,12 @@ const ErrorComponentWrapper = observer(() => {
 
 const AppRoot = () => {
     const store = useStore();
-    const api_base_initialized = useRef(false);
-    const [is_api_initialized, setIsApiInitialized] = useState(false);
+    // The connection and authorization are owned by the bootstrap (see
+    // @/services/auth-bootstrap); this awaits the same promise, which has
+    // normally already resolved by the time this route renders.
+    const is_auth_ready = useAuthBootstrap(Boolean(store));
 
-    // Initialize API
-    useEffect(() => {
-        const timeoutId = setTimeout(() => {
-            if (!is_api_initialized) {
-                setIsApiInitialized(true);
-            }
-        }, 5000);
-
-        const initializeApi = async () => {
-            if (!api_base_initialized.current) {
-                try {
-                    await api_base.init();
-                    api_base_initialized.current = true;
-                } catch (error) {
-                    console.error('API initialization failed:', error);
-                    api_base_initialized.current = false;
-                } finally {
-                    setIsApiInitialized(true);
-                    clearTimeout(timeoutId); // Clear timeout if API init completes
-                }
-            }
-        };
-
-        initializeApi();
-        return () => clearTimeout(timeoutId);
-    }, []);
-
-    if (!store || !is_api_initialized) return <AppRootLoader />;
+    if (!store || !is_auth_ready) return <AppRootLoader />;
 
     return (
         <Suspense fallback={<AppRootLoader />}>
@@ -76,7 +51,6 @@ const AppRoot = () => {
             </ErrorBoundary>
         </Suspense>
     );
- 
 };
 
 export default AppRoot;

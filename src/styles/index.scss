@@ -1,5 +1,14 @@
 @use 'components/shared/styles/themes' as *;
 
+// Full-height chain so anything rendered straight into #root can size itself
+// against the viewport — notably the boot Suspense fallback, which mounts
+// before .layout (and its own height: 100vh) exists.
+html,
+body,
+#root {
+    height: 100%;
+}
+
 body {
     font-family: var(--brand-font-primary);
     background: var(--general-section-1);

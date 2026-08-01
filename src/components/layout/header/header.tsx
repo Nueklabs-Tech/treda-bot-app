@@ -1,11 +1,10 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
 import clsx from 'clsx';
 import { observer } from 'mobx-react-lite';
 import { generateOAuthURL } from '@/components/shared';
 import Button from '@/components/shared_ui/button';
 import useActiveAccount from '@/hooks/api/account/useActiveAccount';
 import { useApiBase } from '@/hooks/useApiBase';
-import { useLogout } from '@/hooks/useLogout';
 import { useStore } from '@/hooks/useStore';
 import { navigateToTransfer } from '@/utils/transfer-utils';
 import { Localize } from '@deriv-com/translations';
@@ -18,74 +17,18 @@ import MobileMenu from './mobile-menu';
 // @ts-ignore: Allow side-effect import of SCSS without type declarations
 import './header.scss';
 
+// The session is fully resolved by AuthBootstrapGate before this component ever
+// mounts (see @/services/auth-bootstrap), so `activeLoginid` is authoritative
+// here: there is no in-between state left to render a spinner for.
 const AppHeader = observer(() => {
     const { isDesktop } = useDevice();
-    const { isAuthorizing, activeLoginid, setIsAuthorizing, authData } = useApiBase();
+    const { activeLoginid, setIsAuthorizing, authData } = useApiBase();
     const { client } = useStore() ?? {};
-    const [authTimeout, setAuthTimeout] = useState(false);
-    const is_account_regenerating = client?.is_account_regenerating || false;
-
-    // Detect OAuth callback on mount (before App.tsx cleans up the URL).
-    // When ?code=...&state=... is present the full auth flow can take 7-15 s
-    // (token exchange → accounts fetch → OTP → WebSocket auth), so we must
-    // suppress the short fallback timeout and keep the spinner throughout.
-    const [isOAuthPending, setIsOAuthPending] = useState(() => {
-        const params = new URLSearchParams(window.location.search);
-        return Boolean(params.get('code') && params.get('state'));
-    });
 
     const { data: activeAccount } = useActiveAccount({
         allBalanceData: client?.all_accounts_balance,
         directBalance: client?.balance,
     });
-
-    const handleLogout = useLogout();
-
-    // Clear OAuth-pending flag once the account is set (auth succeeded)
-    // or after a generous timeout in case something goes wrong.
-    useEffect(() => {
-        if (!isOAuthPending) return;
-
-        if (activeLoginid) {
-            setIsOAuthPending(false);
-            return;
-        }
-
-        // Safety net: give up after 30 s and let the normal flow decide
-        const timer = setTimeout(() => setIsOAuthPending(false), 30_000);
-        return () => clearTimeout(timer);
-    }, [isOAuthPending, activeLoginid]);
-
-    // Handle direct URL access with legacy token param
-    useEffect(() => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const account_id = urlParams.get('account_id');
-        if (account_id) {
-            setIsAuthorizing(true);
-        }
-    }, [setIsAuthorizing]);
-
-    // Fallback timeout: show login button if auth never resolves.
-    // Suppressed during the OAuth callback flow (isOAuthPending = true).
-    // The flag is only cleared when a *new* attempt starts or auth succeeds —
-    // clearing it whenever `isAuthorizing` is false would wipe it one render
-    // after the timeout fires (the timeout itself sets isAuthorizing = false).
-    useEffect(() => {
-        if (activeLoginid) {
-            setAuthTimeout(false);
-            return;
-        }
-
-        if (isOAuthPending || !isAuthorizing) return;
-
-        setAuthTimeout(false);
-        const timer = setTimeout(() => {
-            setAuthTimeout(true);
-            setIsAuthorizing(false);
-        }, 5000);
-
-        return () => clearTimeout(timer);
-    }, [isAuthorizing, activeLoginid, setIsAuthorizing, isOAuthPending]);
 
     const handleSignup = useCallback(async () => {
         try {
@@ -136,8 +79,8 @@ const AppHeader = observer(() => {
 
     const renderAccountSection = useCallback(
         (position: 'left' | 'right' = 'right') => {
-            // Show account switcher and logout when user is fully authenticated
-            if (activeLoginid && !is_account_regenerating) {
+            // Authenticated: account switcher (and transfer on the right).
+            if (activeLoginid) {
                 if (position === 'left' && !isDesktop) {
                     // For mobile left section - only account switcher
                     return (
@@ -170,13 +113,10 @@ const AppHeader = observer(() => {
                     );
                 }
             }
-            // Show login button only when fully settled (not during OAuth flow)
-            else if (
-                position === 'right' &&
-                !isOAuthPending &&
-                ((!is_account_regenerating && !isAuthorizing && !activeLoginid) || authTimeout)
-            ) {
+            // Logged out: the session is already settled, so this is final.
+            else if (position === 'right') {
                 const isAuthConfigured = Boolean(process.env.NEXT_PUBLIC_DERIV_APP_ID);
+
                 return (
                     <div className='auth-actions'>
                         <Button
@@ -200,51 +140,10 @@ const AppHeader = observer(() => {
                     </div>
                 );
             }
-            // Default: Show spinner during loading states or when authorizing
-            else if (position === 'right') {
-                return (
-                    <div className='auth-actions auth-actions--loading' role='status' aria-live='polite'>
-                        <svg
-                            className='auth-actions__spinner'
-                            viewBox='0 0 24 24'
-                            fill='none'
-                            xmlns='http://www.w3.org/2000/svg'
-                            aria-hidden='true'
-                        >
-                            <circle
-                                cx='12'
-                                cy='12'
-                                r='10'
-                                stroke='currentColor'
-                                strokeWidth='2.5'
-                                strokeLinecap='round'
-                                strokeDasharray='31.416'
-                                strokeDashoffset='10'
-                            />
-                        </svg>
-                        <span className='auth-actions__sr-only'>
-                            <Localize i18n_default_text='Connecting to your trading account…' />
-                        </span>
-                    </div>
-                );
-            }
 
             return null;
         },
-        [
-            isAuthorizing,
-            isDesktop,
-            activeLoginid,
-            client,
-            activeAccount,
-            authTimeout,
-            is_account_regenerating,
-            isOAuthPending,
-            authData,
-            handleLogin,
-            handleSignup,
-            handleTransfer,
-        ]
+        [isDesktop, activeLoginid, client, activeAccount, authData, handleLogin, handleSignup, handleTransfer]
     );
 
     if (client?.should_hide_header) return null;
@@ -258,9 +157,7 @@ const AppHeader = observer(() => {
                 })}
             >
                 <Wrapper variant='left'>
-                    {/* <MobileMenu onLogout={handleLogout} /> */}
                     <AppLogo />
-                    {/* {isDesktop ? <MenuItems /> : renderAccountSection('left')} */}
                 </Wrapper>
                 <Wrapper variant='right'>{renderAccountSection('right')}</Wrapper>
             </Header>

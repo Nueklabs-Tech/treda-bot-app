@@ -4,7 +4,9 @@ import clsx from 'clsx';
 import { observer } from 'mobx-react-lite';
 import { Outlet } from 'react-router-dom';
 import { api_base } from '@/external/bot-skeleton';
+import { useIsReauthorizing } from '@/hooks/useAuthBootstrap';
 import { useStore } from '@/hooks/useStore';
+import { localize } from '@deriv-com/translations';
 import { useDevice } from '@deriv-com/ui';
 import { crypto_currencies_display_order, fiat_currencies_display_order } from '../shared';
 import Footer from './footer';
@@ -12,6 +14,7 @@ import AppHeader from './header';
 import Body from './main-body';
 import './layout.scss';
 import TraderApp from './TraderApp';
+import AppLoading from '../loader/app-loading';
 
 const Layout = observer(() => {
     const { isDesktop } = useDevice();
@@ -29,7 +32,11 @@ const Layout = observer(() => {
         currency === 'demo' ||
         currency === '';
     const [clientHasCurrency, setClientHasCurrency] = useState(ifClientAccountHasCurrency);
-    const [isAuthenticating, setIsAuthenticating] = useState(true); // Start with true to prevent flashing
+
+    // The initial session is already resolved by AuthBootstrapGate; the only
+    // loading state left here is an account switch, which drops the socket and
+    // re-authorizes.
+    const is_reauthorizing = useIsReauthorizing(store?.client?.is_account_regenerating);
 
     useEffect(() => {
         (window as any).setClientHasCurrency = setClientHasCurrency;
@@ -117,29 +124,12 @@ const Layout = observer(() => {
     useEffect(() => {
         // Always set the currency in session storage, even if the user is not logged in
         // This ensures the currency is available on the callback page
-        setIsAuthenticating(true);
         if (currency) {
             sessionStorage.setItem('query_param_currency', currency);
         }
-
-        // Authentication is now handled by the OAuth flow
-        setIsAuthenticating(false);
     }, [isClientAccountsPopulated, isCallbackPage, clientHasCurrency, currency]);
 
-    // Add a state to track if initial authentication check is complete
-    const [isInitialAuthCheckComplete, setIsInitialAuthCheckComplete] = useState(false);
-
-    // Effect to mark initial auth check as complete after a short delay
-    useEffect(() => {
-        if (!isAuthenticating && !isInitialAuthCheckComplete) {
-            // Wait a bit to ensure all state updates have propagated
-            const timer = setTimeout(() => {
-                setIsInitialAuthCheckComplete(true);
-            }, 500); // Give it enough time to stabilize
-
-            return () => clearTimeout(timer);
-        }
-    }, [isAuthenticating, isInitialAuthCheckComplete]);
+    if (is_reauthorizing) return <AppLoading message={localize('Switching account')} />;
 
     return (
         <div
@@ -148,11 +138,12 @@ const Layout = observer(() => {
                 'quick-strategy-active': is_quick_strategy_active && !isDesktop,
             })}
         >
-            {!isCallbackPage && <AppHeader isAuthenticating={isAuthenticating || !isInitialAuthCheckComplete} />}
+            {!isCallbackPage && <AppHeader />}
             <Body>
+                {/* <div style={{ color: 'white' }}>We are Back</div> */}
                 <Outlet />
             </Body>
-            {!isCallbackPage && isDesktop && <Footer />}
+            {/*  {!isCallbackPage && isDesktop && <Footer />}  */}
         </div>
     );
 });
