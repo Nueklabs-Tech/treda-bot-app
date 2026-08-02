@@ -108,11 +108,13 @@ export const getDebugServiceWorker = () => {
 export const generateOAuthURL = async (prompt?: string): Promise<string> => {
     try {
         const clientId = process.env.NEXT_PUBLIC_DERIV_APP_ID;
-        if (!clientId) return '';
+        const redirectUri = process.env.NEXT_PUBLIC_DERIV_REDIRECT_URI || window.location.origin;
+
+        if (!clientId && !redirectUri) return '';
 
         const config: AuthConfig = {
             clientId,
-            redirectUri: process.env.NEXT_PUBLIC_DERIV_REDIRECT_URI ?? window.location.origin,
+            redirectUri,
             scopes: 'trade',
         };
 

@@ -2,6 +2,8 @@
 @use 'components/shared/styles/mixins' as *;
 
 .app-header {
+    padding: 1.5rem 0px;
+
     &__account-settings {
         padding-inline-end: 1.2rem;
         border-inline-end: 0.1rem solid var(--general-section-1);

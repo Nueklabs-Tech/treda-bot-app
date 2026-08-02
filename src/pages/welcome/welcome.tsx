@@ -169,26 +169,26 @@ const Welcome = () => {
                     <button
                         type='button'
                         className='welcome__btn welcome__btn--primary'
-                        onClick={() => redirectToOAuth('signup')}
-                        disabled={is_busy}
-                    >
-                        {pending_action === 'signup' ? (
-                            <Localize i18n_default_text='Redirecting…' />
-                        ) : (
-                            <Localize i18n_default_text='Create free account' />
-                        )}
-                    </button>
-
-                    <button
-                        type='button'
-                        className='welcome__btn welcome__btn--secondary'
                         onClick={() => redirectToOAuth('login')}
                         disabled={is_busy}
                     >
                         {pending_action === 'login' ? (
                             <Localize i18n_default_text='Redirecting…' />
                         ) : (
-                            <Localize i18n_default_text='Log in' />
+                            <Localize i18n_default_text='Start Trading Now' />
+                        )}
+                    </button>
+
+                    <button
+                        type='button'
+                        className='welcome__btn welcome__btn--secondary'
+                        onClick={() => redirectToOAuth('signup')}
+                        disabled={is_busy}
+                    >
+                        {pending_action === 'signup' ? (
+                            <Localize i18n_default_text='Redirecting…' />
+                        ) : (
+                            <Localize i18n_default_text='Sign Up' />
                         )}
                     </button>
                 </div>
