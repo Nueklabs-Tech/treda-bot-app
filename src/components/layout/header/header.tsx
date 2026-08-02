@@ -48,19 +48,20 @@ const AppHeader = observer(() => {
 
     const handleLogin = useCallback(async () => {
         try {
-            // Set authorizing state immediately when login is clicked
-            setIsAuthorizing(true);
-
-            // Generate OAuth URL with CSRF token and PKCE parameters
+            // // Set authorizing state immediately when login is clicked
+            // setIsAuthorizing(true);
+            // // Generate OAuth URL with CSRF token and PKCE parameters
             const oauthUrl = await generateOAuthURL();
 
-            if (oauthUrl) {
-                // Redirect to OAuth URL
-                window.location.replace(oauthUrl);
-            } else {
-                console.error('Failed to generate OAuth URL');
-                setIsAuthorizing(false);
-            }
+            console.log(oauthUrl);
+
+            // if (oauthUrl) {
+            //     // Redirect to OAuth URL
+            //     window.location.replace(oauthUrl);
+            // } else {
+            //     console.error('Failed to generate OAuth URL');
+            //     setIsAuthorizing(false);
+            // }
         } catch (error) {
             console.error('Login redirection failed:', error);
             // Reset authorizing state if redirection fails
