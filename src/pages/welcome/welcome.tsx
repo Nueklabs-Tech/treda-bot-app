@@ -161,8 +161,12 @@ const Welcome = () => {
                     />
                 </h1>
 
+                <p className='welcome__subtitle' style={{ marginBottom: '0px' }}>
+                    <Localize i18n_default_text='Create, test, and run automated trading strategies.' />
+                </p>
+
                 <p className='welcome__subtitle'>
-                    <Localize i18n_default_text='Create, test, and run trading bots — no coding required. Log in to open your dashboard, or create an account to start on a demo balance.' />
+                    <Localize i18n_default_text='Log in to open your dashboard, or create an account to start on a demo balance.' />
                 </p>
 
                 <div className='welcome__actions'>
@@ -175,7 +179,25 @@ const Welcome = () => {
                         {pending_action === 'login' ? (
                             <Localize i18n_default_text='Redirecting…' />
                         ) : (
-                            <Localize i18n_default_text='Start Trading Now' />
+                            <>
+                                <Localize i18n_default_text='Start Trading Now' />
+                                <svg
+                                    className='welcome__btn-arrow'
+                                    viewBox='0 0 24 24'
+                                    width='16'
+                                    height='16'
+                                    fill='none'
+                                    stroke='currentColor'
+                                    strokeWidth='2'
+                                    strokeLinecap='round'
+                                    strokeLinejoin='round'
+                                    aria-hidden='true'
+                                    focusable='false'
+                                >
+                                    <path d='M5 12h14' />
+                                    <path d='m13 6 6 6-6 6' />
+                                </svg>
+                            </>
                         )}
                     </button>
 
