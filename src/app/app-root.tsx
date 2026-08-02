@@ -47,7 +47,8 @@ const AppRoot = () => {
         <Suspense fallback={<AppRootLoader />}>
             <ErrorBoundary root_store={store}>
                 <ErrorComponentWrapper />
-                <AppContent />
+                <div>Welcome Home</div>
+                {/* <AppContent /> */}
             </ErrorBoundary>
         </Suspense>
     );

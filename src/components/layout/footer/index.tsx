@@ -1,6 +1,3 @@
-// @ts-nocheck — vendored bot code with known upstream type gaps; see AGENTS.md
-// Updated to use brand configuration for footer elements visibility
-// Controls language settings and theme toggle via brand.config.json
 import brandConfig from '@/../brand.config.json';
 import { useApiBase } from '@/hooks/useApiBase';
 import useModalManager from '@/hooks/useModalManager';
@@ -14,6 +11,7 @@ import LanguageSettings from './LanguageSettings';
 import LogoutFooter from './LogoutFooter';
 import NetworkStatus from './NetworkStatus';
 import ServerTime from './ServerTime';
+// @ts-ignore: Side-effect import of SCSS file without type declarations
 import './footer.scss';
 
 const Footer = () => {
@@ -24,33 +22,35 @@ const Footer = () => {
     // Get footer configuration from brand.config.json
     const enableLanguageSettings = brandConfig.platform.footer?.enable_language_settings ?? true;
     const enableThemeToggle = brandConfig.platform.footer?.enable_theme_toggle ?? true;
+    const languageItems = FILTERED_LANGUAGES.map(language => ({
+        ...language,
+        icon: language.code.toLowerCase(),
+    }));
 
     const openLanguageSettingModal = () => showModal('DesktopLanguagesModal');
     return (
         <footer className='app-footer'>
             <FullScreen />
             {isAuthorized && <LogoutFooter />}
-            {/* [AI] Conditionally render language settings based on brand config */}
+
             {enableLanguageSettings && (
                 <>
                     <LanguageSettings openLanguageSettingModal={openLanguageSettingModal} />
                     <div className='app-footer__vertical-line' />
                 </>
             )}
-            {/* [/AI] */}
-            {/* [AI] Conditionally render theme toggle based on brand config */}
+
             {enableThemeToggle && (
                 <>
                     <ChangeTheme />
                     <div className='app-footer__vertical-line' />
                 </>
             )}
-            {/* [/AI] */}
+
             <ServerTime />
             <div className='app-footer__vertical-line' />
             <NetworkStatus />
 
-            {/* [AI] Only show language modal if language settings are enabled */}
             {enableLanguageSettings && isModalOpenFor('DesktopLanguagesModal') && (
                 <DesktopLanguagesModal
                     headerTitle={localize('Select Language')}
@@ -73,7 +73,6 @@ const Footer = () => {
                     selectedLanguage={currentLang}
                 />
             )}
-            {/* [/AI] */}
         </footer>
     );
 };

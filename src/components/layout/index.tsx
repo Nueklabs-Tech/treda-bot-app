@@ -13,7 +13,7 @@ import Footer from './footer';
 import AppHeader from './header';
 import Body from './main-body';
 import './layout.scss';
-import TraderApp from './TraderApp';
+
 import AppLoading from '../loader/app-loading';
 
 const Layout = observer(() => {
@@ -140,10 +140,9 @@ const Layout = observer(() => {
         >
             {!isCallbackPage && <AppHeader />}
             <Body>
-                {/* <div style={{ color: 'white' }}>We are Back</div> */}
                 <Outlet />
             </Body>
-            {/*  {!isCallbackPage && isDesktop && <Footer />}  */}
+            {!isCallbackPage && isDesktop && <Footer />}
         </div>
     );
 });
