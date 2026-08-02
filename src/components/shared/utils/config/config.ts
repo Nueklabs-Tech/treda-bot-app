@@ -112,11 +112,11 @@ export const generateOAuthURL = async (prompt?: string): Promise<string> => {
 
         const config: AuthConfig = {
             clientId,
-            redirectUri: window.location.origin,
+            redirectUri: process.env.NEXT_PUBLIC_DERIV_REDIRECT_URI ?? window.location.origin,
             scopes: 'trade',
         };
 
-        // Static referral link (fallback for direct visits without affiliate click)
+        // Static
         const referralLink = process.env.NEXT_PUBLIC_DERIV_REFERRAL_LINK;
         if (referralLink) {
             const referral = parseReferralLink(referralLink);
@@ -161,6 +161,7 @@ export const generateOAuthURL = async (prompt?: string): Promise<string> => {
         if (prompt === 'registration') {
             return await buildSignUpUrl(config);
         }
+
         return await buildAuthorizationUrl(config);
     } catch (error) {
         console.error('Error generating OAuth URL:', error);
