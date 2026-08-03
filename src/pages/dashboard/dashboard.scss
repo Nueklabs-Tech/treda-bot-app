@@ -6,7 +6,8 @@
     --translate-panel-reset: 0px;
 
     position: relative;
-    height: calc(100vh - 4.4rem);
+    // --bottom-nav-offset is 0 unless the fixed mobile tab bar is on screen.
+    height: calc(100vh - 4.4rem - var(--bottom-nav-offset, 0rem));
     overflow: hidden;
 
     .toolbar__section {
@@ -184,7 +185,7 @@
             }
 
             @include mobile-or-tablet-screen {
-                height: calc(100vh - 19rem);
+                height: calc(100vh - 19rem - var(--bottom-nav-offset, 0rem));
                 align-items: flex-start;
                 padding: 1.6rem;
             }

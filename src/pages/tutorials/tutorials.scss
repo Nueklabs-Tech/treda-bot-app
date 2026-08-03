@@ -481,7 +481,7 @@
     &__qs-guide,
     &__search {
         @include mobile-or-tablet-screen {
-            height: calc(100vh - 28rem);
+            height: calc(100vh - 28rem - var(--bottom-nav-offset, 0rem));
             min-height: 100%;
             overflow: auto;
             background-color: var(--general-main-1);

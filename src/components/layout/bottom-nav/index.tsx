@@ -9,7 +9,7 @@ import { localize } from '@deriv-com/translations';
 import { useDevice } from '@deriv-com/ui';
 import './bottom-nav.scss';
 
-const PROFILE_PATH = '/profile';
+const WALLET_PATH = '/wallet';
 
 /** 24px outline glyphs on `currentColor`, matching the profile screen's icon set. */
 const ICONS = {
@@ -27,10 +27,10 @@ const ICONS = {
             <path d='M7 3.5V7M7 17v3.5M17 3.5V7M17 17v3.5' />
         </>
     ),
-    profile: (
+    wallet: (
         <>
-            <circle cx='12' cy='8' r='3.6' />
-            <path d='M5 20c0-3.4 3.1-5.6 7-5.6s7 2.2 7 5.6' />
+            <rect x='3' y='6' width='18' height='13' rx='3' />
+            <path d='M3 10.5h18M16.5 14.8h1.2' />
         </>
     ),
 } as const;
@@ -47,7 +47,7 @@ const getNavItems = (): TNavItem[] => [
     { key: 'home', label: localize('Home'), tab: DBOT_TABS.DASHBOARD },
     { key: 'bots', label: localize('Bots'), tab: DBOT_TABS.BOT_BUILDER },
     { key: 'chart', label: localize('Chart'), tab: DBOT_TABS.CHART },
-    { key: 'profile', label: localize('Profile'), path: PROFILE_PATH },
+    { key: 'wallet', label: localize('Wallet'), path: WALLET_PATH },
 ];
 
 /**
@@ -97,12 +97,13 @@ const BottomNav = observer(() => {
 
     if (!is_visible) return null;
 
-    const is_profile_route = pathname === PROFILE_PATH;
+    // Any non-root route (wallet, profile) means no app tab is on screen.
+    const is_app_root = pathname === '/';
 
     return (
         <nav className='bottom-nav' aria-label={localize('Main navigation')}>
             {getNavItems().map(item => {
-                const is_active = item.path ? is_profile_route : !is_profile_route && active_tab === item.tab;
+                const is_active = item.path ? pathname === item.path : is_app_root && active_tab === item.tab;
 
                 return (
                     <button

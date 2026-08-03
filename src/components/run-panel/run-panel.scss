@@ -164,13 +164,13 @@
                 display: flex;
                 height: var(--drawer-content-height-mobile);
                 position: fixed;
-                bottom: 15.7rem;
+                bottom: calc(15.7rem + var(--bottom-nav-offset, 0rem));
                 width: 100vw;
                 padding: 0.4rem 0;
 
                 /* Fix for iOS devices to prevent tab content overlap with bottom controls */
                 @supports (-webkit-touch-callout: none) {
-                    bottom: calc(15.7rem + env(safe-area-inset-bottom, 0));
+                    bottom: calc(15.7rem + env(safe-area-inset-bottom, 0) + var(--bottom-nav-bar, 0rem));
                 }
             }
 
@@ -197,7 +197,8 @@
 
         flex-direction: column;
         position: fixed;
-        bottom: 0;
+        /* Sits directly above the mobile tab bar; the offset is 0 without it. */
+        bottom: var(--bottom-nav-offset, 0rem);
         width: 100%;
         background-color: var(--general-main-1);
         border-top: solid 2px var(--general-section-1);
@@ -205,13 +206,13 @@
 
         /* Fix for iOS devices to respect safe area */
         @supports (-webkit-touch-callout: none) {
-            bottom: env(safe-area-inset-bottom, 0);
+            bottom: calc(env(safe-area-inset-bottom, 0) + var(--bottom-nav-bar, 0rem));
             padding-bottom: env(safe-area-inset-bottom, 0);
         }
 
         /* Additional class for iOS detection via JS */
         &.ios-device {
-            bottom: env(safe-area-inset-bottom, 0);
+            bottom: calc(env(safe-area-inset-bottom, 0) + var(--bottom-nav-bar, 0rem));
             padding-bottom: env(safe-area-inset-bottom, 0);
         }
     }

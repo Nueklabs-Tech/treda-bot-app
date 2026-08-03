@@ -106,7 +106,8 @@
         .run-panel__stat {
             margin: 0;
             position: fixed;
-            bottom: 0;
+            /* Clears the mobile tab bar; the offset is 0 when it is not shown. */
+            bottom: var(--bottom-nav-offset, 0rem);
             width: 100%;
         }
     }

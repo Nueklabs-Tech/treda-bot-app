@@ -22,9 +22,9 @@ const Layout = observer(() => {
     const store = useStore();
     const is_quick_strategy_active = store?.quick_strategy?.is_open;
     const isCallbackPage = window.location.pathname === '/callback';
-    // The profile screen is a standalone mobile-app style page: it carries its own
-    // dark hero and back button, so the app header would double up on both.
-    const isProfilePage = useLocation().pathname === '/profile';
+    // The profile and wallet screens are standalone mobile-app style pages: each
+    // carries its own dark hero and back button, so the app header would double up.
+    const isStandalonePage = ['/profile', '/wallet'].includes(useLocation().pathname);
 
     const checkClientAccount = JSON.parse(localStorage.getItem('clientAccounts') ?? '{}');
     const getQueryParams = new URLSearchParams(window.location.search);
@@ -142,7 +142,7 @@ const Layout = observer(() => {
                 'quick-strategy-active': is_quick_strategy_active && !isDesktop,
             })}
         >
-            {!isCallbackPage && !isProfilePage && <AppHeader />}
+            {!isCallbackPage && !isStandalonePage && <AppHeader />}
             <Body>
                 <Outlet />
             </Body>

@@ -27,7 +27,8 @@
 }
 
 .injectionDiv {
-    height: calc(100vh - 16.4rem);
+    // --bottom-nav-offset is 0 unless the fixed mobile tab bar is on screen.
+    height: calc(100vh - 16.4rem - var(--bottom-nav-offset, 0rem));
     position: relative;
     touch-action: none;
     overflow: hidden;

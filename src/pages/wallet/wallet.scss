@@ -1,0 +1,272 @@
+@use 'components/shared/styles/mixins' as *;
+
+// Wallet screen — same shape as the profile page (dark hero card, flat rows
+// underneath) so the two bottom-nav destinations read as one app. Colours are
+// existing theme/brand tokens only.
+.wallet {
+    height: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    background: var(--general-main-2);
+
+    &__hero {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 5.6rem 2.4rem 2.8rem;
+        border-radius: 0 0 2.8rem 2.8rem;
+        background: var(--brand-dark-grey, #0f172a);
+        color: var(--brand-white, #fff);
+        text-align: center;
+    }
+
+    &__back {
+        position: absolute;
+        top: 1.6rem;
+        inset-inline-start: 1.6rem;
+        display: grid;
+        place-items: center;
+        width: 4.4rem;
+        height: 4.4rem;
+        padding: 0;
+        border: none;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        color: inherit;
+        cursor: pointer;
+        transition: background 0.2s ease;
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.18);
+        }
+    }
+
+    &__hero-label {
+        font-size: 1.3rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        opacity: 0.7;
+    }
+
+    &__hero-balance {
+        display: flex;
+        align-items: baseline;
+        gap: 0.8rem;
+        margin: 0.8rem 0 0;
+        font-size: 3.6rem;
+        font-weight: 700;
+        line-height: 4.4rem;
+        overflow-wrap: anywhere;
+    }
+
+    &__hero-currency {
+        font-size: 1.6rem;
+        font-weight: 600;
+        opacity: 0.7;
+    }
+
+    &__hero-account {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.8rem;
+        margin-top: 0.8rem;
+        padding: 0.5rem 1.4rem;
+        border-radius: 1.2rem;
+        background: rgba(255, 255, 255, 0.08);
+        font-size: 1.3rem;
+        opacity: 0.9;
+    }
+
+    &__hero-dot {
+        opacity: 0.5;
+    }
+
+    &__hero-actions {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.8rem;
+        width: 100%;
+        max-width: 40rem;
+        margin-top: 2.4rem;
+    }
+
+    &__hero-action {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 1.2rem 0.4rem;
+        border: none;
+        border-radius: 1.4rem;
+        background: rgba(255, 255, 255, 0.1);
+        color: inherit;
+        font-size: 1.3rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s ease;
+
+        &:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.18);
+        }
+
+        &:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+    }
+
+    &__sheet {
+        display: flex;
+        flex-direction: column;
+        max-width: 52rem;
+        margin: 0 auto;
+        padding: 2.4rem 0 calc(3.2rem + env(safe-area-inset-bottom));
+    }
+
+    &__group + &__group {
+        margin-top: 2.4rem;
+    }
+
+    &__group-title {
+        margin: 0 0 0.4rem;
+        padding: 0 2.4rem;
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--text-prominent);
+    }
+
+    &__note {
+        margin: 0 0 0.8rem;
+        padding: 0 2.4rem;
+        font-size: 1.3rem;
+        color: var(--text-less-prominent);
+    }
+
+    &__list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    &__account,
+    &__row {
+        display: flex;
+        align-items: center;
+        gap: 1.6rem;
+        width: 100%;
+        min-height: 5.8rem;
+        padding: 1.2rem 2.4rem;
+        border: none;
+        background: none;
+        color: var(--text-prominent);
+        font-size: 1.5rem;
+        text-align: start;
+        cursor: pointer;
+        transition: background 0.2s ease;
+
+        &:hover:not(:disabled) {
+            background: color-mix(in srgb, var(--text-less-prominent) 10%, transparent);
+        }
+    }
+
+    // Hairlines between rows, mirroring the profile screen's lists.
+    li + li > &__account,
+    li + li > &__row {
+        box-shadow: inset 0 1px 0 color-mix(in srgb, var(--text-less-prominent) 22%, transparent);
+    }
+
+    &__account {
+        // The active account is not tappable, but it must not read as disabled.
+        &:disabled {
+            cursor: default;
+        }
+
+        &[aria-current='true'] {
+            opacity: 1;
+        }
+    }
+
+    &__account-icon {
+        display: grid;
+        place-items: center;
+        width: 3.2rem;
+        height: 3.2rem;
+        flex-shrink: 0;
+
+        svg {
+            width: 3.2rem;
+            height: 3.2rem;
+        }
+    }
+
+    &__account-text {
+        display: flex;
+        flex: 1;
+        min-width: 0;
+        flex-direction: column;
+        gap: 0.2rem;
+    }
+
+    &__account-name {
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+
+    &__account-loginid {
+        font-size: 1.2rem;
+        color: var(--text-less-prominent);
+    }
+
+    &__account-balance {
+        font-size: 1.5rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    &__account-check {
+        width: 1.8rem;
+        height: 1.8rem;
+        flex-shrink: 0;
+        color: var(--status-success);
+    }
+
+    &__row-icon {
+        flex-shrink: 0;
+    }
+
+    &__row-label {
+        flex: 1;
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+
+    &__chevron {
+        width: 1.8rem;
+        height: 1.8rem;
+        flex-shrink: 0;
+        color: var(--text-less-prominent);
+    }
+
+    @include desktop-screen {
+        &__hero {
+            max-width: 52rem;
+            margin: 2.4rem auto 0;
+            padding-top: 4rem;
+            border-radius: 2.8rem;
+        }
+
+        &__sheet {
+            padding-top: 1.6rem;
+        }
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .wallet__account,
+    .wallet__row,
+    .wallet__back,
+    .wallet__hero-action {
+        transition: none;
+    }
+}

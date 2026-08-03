@@ -31,11 +31,12 @@
     display: flex;
     overflow: hidden;
     width: 100%;
-    height: calc(100vh - 9rem);
+    // --bottom-nav-offset is 0 unless the fixed mobile tab bar is on screen.
+    height: calc(100vh - 9rem - var(--bottom-nav-offset, 0rem));
     padding: 1.6rem;
 
     @include mobile-or-tablet-screen {
-        height: calc(100vh - 6rem);
+        height: calc(100vh - 6rem - var(--bottom-nav-offset, 0rem));
         padding: 0;
     }
 

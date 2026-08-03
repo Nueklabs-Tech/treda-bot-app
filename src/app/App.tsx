@@ -22,6 +22,7 @@ const Layout = lazy(() => import('../components/layout'));
 const AppRoot = lazy(() => import('./app-root'));
 
 const Profile = lazy(() => import('../pages/profile'));
+const Wallet = lazy(() => import('../pages/wallet'));
 
 const LanguageHandler = ({ children }: { children: React.ReactNode }) => {
     useLanguageFromURL();
@@ -124,6 +125,14 @@ const router = createBrowserRouter(
                 element={
                     <Suspense fallback={<CircleLoader message={localize('Loading')} />}>
                         <Profile />
+                    </Suspense>
+                }
+            />
+            <Route
+                path='wallet'
+                element={
+                    <Suspense fallback={<CircleLoader message={localize('Loading')} />}>
+                        <Wallet />
                     </Suspense>
                 }
             />

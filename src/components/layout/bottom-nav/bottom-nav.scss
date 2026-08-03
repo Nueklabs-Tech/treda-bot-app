@@ -3,6 +3,14 @@
 // below), so nothing ends up hidden underneath it. Colours are theme tokens only.
 :root {
     --bottom-nav-height: 6.4rem;
+
+    // Space the fixed bar occupies at the bottom of the viewport, safe-area
+    // included. Both stay 0 while the bar is not mounted, so layout rules elsewhere
+    // can subtract them unconditionally instead of duplicating the
+    // mobile/signed-in condition. Use --bottom-nav-bar (height only) in rules that
+    // already add the safe-area inset themselves.
+    --bottom-nav-offset: 0rem;
+    --bottom-nav-bar: 0rem;
 }
 
 .bottom-nav {
@@ -50,9 +58,16 @@
 
 // Set by <BottomNav /> only while it is actually rendered (signed-in, mobile),
 // so no page reserves the space when the bar is absent.
-body.has-bottom-nav .layout {
-    box-sizing: border-box;
-    padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom));
+body.has-bottom-nav {
+    --bottom-nav-offset: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom));
+    --bottom-nav-bar: var(--bottom-nav-height);
+
+    // Covers pages sized by the flex column (profile, wallet). Pages that size
+    // themselves from the viewport subtract --bottom-nav-offset in their own SCSS.
+    .layout {
+        box-sizing: border-box;
+        padding-bottom: var(--bottom-nav-offset);
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
