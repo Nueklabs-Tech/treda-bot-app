@@ -38,16 +38,16 @@ const domains: Record<Service, DomainConfig> = {
     derivHome: {
         staging: 'https://staging-home.deriv.com',
         production: {
-            me: 'https://home.deriv.com', // No .me domain yet, using .com
-            be: 'https://home.deriv.com', // No .be domain yet, using .com
+            me: 'https://home.deriv.com',
+            be: 'https://home.deriv.com',
             com: 'https://home.deriv.com',
         },
     },
     derivDtrader: {
         staging: 'https://staging-dtrader.deriv.com',
         production: {
-            me: 'https://dtrader.deriv.com', // No .me domain yet, using .com
-            be: 'https://dtrader.deriv.com', // No .be domain yet, using .com
+            me: 'https://dtrader.deriv.com',
+            be: 'https://dtrader.deriv.com',
             com: 'https://dtrader.deriv.com',
         },
     },
@@ -57,20 +57,15 @@ export const getDerivDomain = (service: Service): string => {
     const hostname = window.location.hostname;
     const domainType: DomainType = hostname.endsWith('.me') ? 'me' : hostname.endsWith('.be') ? 'be' : 'com';
 
-    // NEXT_PUBLIC_DERIV_ENV is the authoritative signal (set at deploy time by App Builder,
-    // and also read by vendored deriv-core for OAuth). Fall back to hostname detection only
-    // when it is unset (local dev), preserving the previous behaviour in that case.
     const env = process.env.NEXT_PUBLIC_DERIV_ENV;
     const isProductionEnv = env === 'production';
     const isStagingEnv = env === 'preview' || env === 'staging';
     const isDev =
-        !env &&
-        (hostname.includes('dev-') || hostname.includes('localhost') || hostname.includes('127.0.0.1'));
+        !env && (hostname.includes('dev-') || hostname.includes('localhost') || hostname.includes('127.0.0.1'));
     const isStaging = isStagingEnv || (!isProductionEnv && !isDev && hostname.includes('staging'));
 
     const serviceConfig = domains[service];
 
-    // Handle development environment for derivHome and derivDtrader
     if (service === 'derivHome' && isDev) {
         return 'https://dev-home.deriv.com';
     }
@@ -85,10 +80,6 @@ export const getDerivDomain = (service: Service): string => {
     return serviceConfig.production[domainType];
 };
 
-/**
- * Standalone routes that use the domain helper functions.
- * Uses template literals to compose URLs dynamically.
- */
 export const standalone_routes = {
     account_settings: `${getDerivDomain('derivHub')}/accounts`,
     bot: `${window.location.origin}`,

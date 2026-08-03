@@ -1,0 +1,752 @@
+@use 'components/shared/styles/mixins' as *;
+
+/**
+ * The trade screen.
+ *
+ * Mobile is the design target: one viewport-height column — chips, asset, chart,
+ * ticket — with nothing scrolling except the chart's own canvas, so the buy
+ * button never leaves the thumb's reach. Desktop reuses the same pieces with the
+ * ticket moved into a sticky right-hand column.
+ *
+ * Theme tokens only; the screen follows the light/dark switch with no overrides.
+ */
+.trade {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    height: 100%;
+    min-height: 0;
+    padding: 0.8rem 1.2rem 1.2rem;
+    background: var(--general-section-1);
+    box-sizing: border-box;
+
+    &__chart {
+        position: relative;
+        flex: 1;
+        min-height: 18rem;
+        border-radius: 1.2rem;
+        background: var(--general-main-1);
+        overflow: hidden;
+
+        // SmartCharts fills whatever box it is handed; this is that box.
+        .dashboard__chart-wrapper,
+        .smartcharts {
+            width: 100%;
+            height: 100%;
+        }
+    }
+
+    &__bot-notice {
+        margin: 0;
+        padding: 0.8rem 1.2rem;
+        border-radius: 0.8rem;
+        background: var(--transparent-info, color-mix(in srgb, var(--status-info) 12%, transparent));
+        color: var(--text-less-prominent);
+        font-size: 1.2rem;
+        line-height: 1.6rem;
+    }
+
+    @include desktop-screen {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 36rem;
+        column-gap: 1.6rem;
+        align-content: start;
+        padding: 1.6rem;
+        overflow-y: auto;
+
+        > .trade-types,
+        > .symbol-header,
+        > .trade__chart,
+        > .active-contract,
+        > .trade__bot-notice {
+            grid-column: 1;
+        }
+
+        > .trade-panel {
+            grid-column: 2;
+            grid-row: 1 / -1;
+            align-self: start;
+            position: sticky;
+            top: 0;
+            border-radius: 1.6rem;
+            box-shadow: none;
+            border: 1px solid var(--border-normal);
+        }
+
+        &__chart {
+            min-height: 46rem;
+        }
+    }
+}
+
+/* ---------------------------------------------------------------- trade types */
+
+.trade-types {
+    display: flex;
+    gap: 0.8rem;
+    flex-shrink: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    // The strip bleeds to the screen edges so a chip can sit half off-screen and
+    // read as "there is more", while the row above it keeps the page padding.
+    margin: 0 -1.2rem;
+    padding: 0.2rem 1.2rem;
+    -webkit-overflow-scrolling: touch;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
+    &__chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        flex-shrink: 0;
+        padding: 0.8rem 1.4rem;
+        border: 1px solid var(--border-normal);
+        border-radius: 2.4rem;
+        background: var(--general-main-1);
+        color: var(--text-less-prominent);
+        font-size: 1.4rem;
+        font-weight: 600;
+        line-height: 2rem;
+        white-space: nowrap;
+        cursor: pointer;
+        transition:
+            border-color 0.2s ease,
+            color 0.2s ease;
+
+        &--active {
+            border-color: var(--text-prominent);
+            color: var(--text-prominent);
+        }
+    }
+
+    @include desktop-screen {
+        margin: 0;
+        padding: 0 0 0.4rem;
+    }
+}
+
+/* -------------------------------------------------------------- symbol header */
+
+.symbol-header {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    flex-shrink: 0;
+
+    &__asset {
+        display: flex;
+        align-items: center;
+        gap: 1.2rem;
+        flex: 1;
+        min-width: 0;
+        padding: 0.4rem 0;
+        border: none;
+        background: none;
+        text-align: start;
+        cursor: pointer;
+    }
+
+    &__icon {
+        display: flex;
+        flex-shrink: 0;
+        align-items: center;
+        justify-content: center;
+        width: 3.6rem;
+        height: 3.6rem;
+        border-radius: 50%;
+        background: var(--general-main-1);
+    }
+
+    &__text {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+        min-width: 0;
+    }
+
+    &__name {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        min-width: 0;
+        color: var(--text-prominent);
+        font-size: 1.6rem;
+        font-weight: 700;
+        line-height: 2.4rem;
+
+        // The name is the long part; the chevron must not be pushed off-screen.
+        > :first-child {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
+
+    &__chevron {
+        flex-shrink: 0;
+        color: var(--text-less-prominent);
+    }
+
+    &__price {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        color: var(--text-less-prominent);
+        font-size: 1.4rem;
+        font-weight: 600;
+        line-height: 2rem;
+        font-variant-numeric: tabular-nums;
+        transition: color 0.2s ease;
+
+        &--up {
+            color: var(--status-success);
+        }
+
+        &--down {
+            color: var(--status-danger);
+        }
+
+        &--closed {
+            color: var(--status-warning);
+        }
+    }
+
+    &__submarket {
+        color: var(--text-less-prominent);
+        font-weight: 400;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &__positions {
+        display: flex;
+        flex-shrink: 0;
+        align-items: center;
+        justify-content: center;
+        width: 4rem;
+        height: 4rem;
+        border: none;
+        border-radius: 50%;
+        background: var(--general-main-1);
+        color: var(--text-prominent);
+        cursor: pointer;
+
+        &:hover {
+            background: var(--general-hover);
+        }
+    }
+}
+
+/* ----------------------------------------------------------------- the ticket */
+
+.trade-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    flex-shrink: 0;
+    // Pulls level with the screen edges so the ticket reads as a sheet resting on
+    // the chart, the way a native trade drawer does.
+    margin: 0 -1.2rem -1.2rem;
+    padding: 0.4rem 1.6rem 1.6rem;
+    border-radius: 1.6rem 1.6rem 0 0;
+    background: var(--general-main-1);
+    box-shadow: 0 -2px 16px rgb(0 0 0 / 8%);
+
+    &__handle {
+        align-self: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 4.8rem;
+        height: 2.4rem;
+        border: none;
+        background: none;
+        color: var(--text-less-prominent);
+        cursor: pointer;
+
+        svg {
+            transition: transform 0.25s ease;
+        }
+    }
+
+    &--expanded &__handle svg {
+        transform: rotate(180deg);
+    }
+
+    &__sides {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.4rem;
+        padding: 0.4rem;
+        border-radius: 1.2rem;
+        background: var(--general-section-1);
+    }
+
+    &__side {
+        padding: 1.2rem 0.8rem;
+        border: none;
+        border-radius: 0.8rem;
+        background: none;
+        color: var(--text-less-prominent);
+        font-size: 1.5rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition:
+            background 0.2s ease,
+            color 0.2s ease;
+
+        &--active {
+            background: var(--general-main-1);
+            box-shadow: 0 1px 4px rgb(0 0 0 / 10%);
+        }
+
+        &--up#{&}--active {
+            color: var(--status-success);
+        }
+
+        &--down#{&}--active {
+            color: var(--status-danger);
+        }
+    }
+
+    &__params {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.8rem;
+    }
+
+    &__param {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        padding: 1.2rem;
+        border: 1px solid var(--border-normal);
+        border-radius: 1.2rem;
+        background: var(--general-main-1);
+        text-align: start;
+        cursor: pointer;
+
+        &:hover {
+            border-color: var(--text-less-prominent);
+        }
+
+        &-label {
+            color: var(--text-less-prominent);
+            font-size: 1.2rem;
+            line-height: 1.6rem;
+        }
+
+        &-value {
+            color: var(--text-prominent);
+            font-size: 1.6rem;
+            font-weight: 600;
+            line-height: 2.4rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
+
+    &__message {
+        margin: 0;
+        color: var(--status-danger);
+        font-size: 1.2rem;
+        line-height: 1.6rem;
+    }
+
+    &__buy {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.2rem;
+        min-height: 5.6rem;
+        padding: 0.8rem 1.6rem;
+        border: none;
+        border-radius: 1.2rem;
+        color: var(--brand-white, #fff);
+        cursor: pointer;
+        transition: opacity 0.2s ease;
+
+        &--up {
+            background: var(--status-success);
+        }
+
+        &--down {
+            background: var(--status-danger);
+        }
+
+        &:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        &-label {
+            font-size: 1.8rem;
+            font-weight: 700;
+            line-height: 2.4rem;
+        }
+
+        &-payout {
+            font-size: 1.2rem;
+            line-height: 1.6rem;
+            opacity: 0.9;
+        }
+    }
+
+    @include desktop-screen {
+        margin: 0;
+        padding: 1.6rem;
+
+        &__params {
+            grid-template-columns: minmax(0, 1fr);
+        }
+    }
+}
+
+/* ------------------------------------------------------------ bought contract */
+
+.active-contract {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    flex-shrink: 0;
+    padding: 1rem 1.2rem;
+    border: 1px solid var(--border-normal);
+    border-radius: 1.2rem;
+    background: var(--general-main-1);
+
+    &--win {
+        border-color: var(--status-success);
+    }
+
+    &--loss {
+        border-color: var(--status-danger);
+    }
+
+    &__text {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+        flex: 1;
+        min-width: 0;
+    }
+
+    &__title {
+        color: var(--text-prominent);
+        font-size: 1.4rem;
+        font-weight: 600;
+        line-height: 2rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &__meta {
+        color: var(--text-less-prominent);
+        font-size: 1.2rem;
+        line-height: 1.6rem;
+    }
+
+    &__profit {
+        font-size: 1.4rem;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+
+        &--win {
+            color: var(--status-success);
+        }
+
+        &--loss {
+            color: var(--status-danger);
+        }
+    }
+
+    &__dismiss {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.8rem;
+        height: 2.8rem;
+        border: none;
+        border-radius: 50%;
+        background: none;
+        color: var(--text-less-prominent);
+        cursor: pointer;
+
+        &:hover {
+            background: var(--general-hover);
+        }
+    }
+}
+
+/* ------------------------------------------------------------- parameter sheets */
+
+.param-sheet {
+    &__units {
+        display: grid;
+        grid-auto-flow: column;
+        gap: 0.4rem;
+        padding: 0.4rem;
+        border-radius: 1.2rem;
+        background: var(--general-section-1);
+    }
+
+    &__unit {
+        padding: 1rem 0.8rem;
+        border: none;
+        border-radius: 0.8rem;
+        background: none;
+        color: var(--text-less-prominent);
+        font-size: 1.4rem;
+        font-weight: 600;
+        cursor: pointer;
+
+        &--active {
+            background: var(--general-main-1);
+            color: var(--text-prominent);
+            box-shadow: 0 1px 4px rgb(0 0 0 / 10%);
+        }
+    }
+
+    &__stepper,
+    &__amount {
+        display: flex;
+        align-items: center;
+        gap: 1.2rem;
+        margin-top: 1.6rem;
+        padding: 0.8rem 1.2rem;
+        border: 1px solid var(--border-normal);
+        border-radius: 1.2rem;
+    }
+
+    &__step {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 4rem;
+        height: 4rem;
+        flex-shrink: 0;
+        border: none;
+        border-radius: 50%;
+        background: var(--general-section-1);
+        color: var(--text-prominent);
+        font-size: 2rem;
+        line-height: 1;
+        cursor: pointer;
+
+        &:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+    }
+
+    &__input {
+        flex: 1;
+        min-width: 0;
+        width: 100%;
+        border: none;
+        background: none;
+        color: var(--text-prominent);
+        font-size: 2rem;
+        font-weight: 700;
+        text-align: center;
+        font-variant-numeric: tabular-nums;
+
+        &:focus {
+            outline: none;
+        }
+
+        // The spin buttons duplicate the +/- controls either side of the field.
+        &::-webkit-outer-spin-button,
+        &::-webkit-inner-spin-button {
+            appearance: none;
+            margin: 0;
+        }
+
+        &--amount {
+            text-align: start;
+        }
+    }
+
+    &__currency {
+        flex-shrink: 0;
+        color: var(--text-less-prominent);
+        font-size: 1.4rem;
+        font-weight: 600;
+    }
+
+    &__hint {
+        margin: 1.2rem 0 0;
+        color: var(--text-less-prominent);
+        font-size: 1.2rem;
+        line-height: 1.6rem;
+
+        &--error {
+            color: var(--status-danger);
+        }
+    }
+
+    &__quick {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.8rem;
+        margin-top: 1.6rem;
+    }
+
+    &__quick-item {
+        min-width: 6rem;
+        padding: 0.8rem 1.2rem;
+        border: 1px solid var(--border-normal);
+        border-radius: 2.4rem;
+        background: var(--general-main-1);
+        color: var(--text-prominent);
+        font-size: 1.4rem;
+        font-weight: 600;
+        cursor: pointer;
+
+        &--active {
+            border-color: var(--text-prominent);
+            background: var(--general-section-1);
+        }
+    }
+
+    &__digits {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 0.8rem;
+    }
+
+    &__digit {
+        padding: 1.2rem 0;
+        border: 1px solid var(--border-normal);
+        border-radius: 1.2rem;
+        background: var(--general-main-1);
+        color: var(--text-prominent);
+        font-size: 1.6rem;
+        font-weight: 700;
+        cursor: pointer;
+
+        &--active {
+            border-color: var(--text-prominent);
+            background: var(--general-section-1);
+        }
+    }
+}
+
+/* -------------------------------------------------------------- symbol picker */
+
+.symbol-sheet {
+    &__search {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 1.2rem 1.6rem;
+        border: 1px solid var(--border-normal);
+        border-radius: 1.2rem;
+        background: var(--general-main-1);
+        color: var(--text-prominent);
+        font-size: 1.4rem;
+
+        &:focus {
+            outline: none;
+            border-color: var(--text-less-prominent);
+        }
+    }
+
+    &__empty {
+        margin: 2.4rem 0;
+        color: var(--text-less-prominent);
+        font-size: 1.4rem;
+        text-align: center;
+    }
+
+    &__group {
+        margin-top: 2rem;
+    }
+
+    &__group-title {
+        margin: 0 0 0.8rem;
+        color: var(--text-less-prominent);
+        font-size: 1.2rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+
+    &__list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    &__row {
+        display: flex;
+        align-items: center;
+        gap: 1.2rem;
+        width: 100%;
+        padding: 1rem 1.2rem;
+        border: none;
+        border-radius: 1.2rem;
+        background: none;
+        text-align: start;
+        cursor: pointer;
+
+        &:hover {
+            background: var(--general-hover);
+        }
+
+        &--active {
+            background: var(--general-section-1);
+        }
+
+        &-icon {
+            display: flex;
+            flex-shrink: 0;
+            align-items: center;
+            justify-content: center;
+            width: 3.2rem;
+            height: 3.2rem;
+        }
+
+        &-text {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+            flex: 1;
+            min-width: 0;
+        }
+
+        &-name {
+            color: var(--text-prominent);
+            font-size: 1.4rem;
+            font-weight: 600;
+            line-height: 2rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        &-meta {
+            color: var(--text-less-prominent);
+            font-size: 1.2rem;
+            line-height: 1.6rem;
+        }
+
+        &-closed {
+            flex-shrink: 0;
+            padding: 0.2rem 0.8rem;
+            border-radius: 2.4rem;
+            background: var(--general-section-1);
+            color: var(--status-warning);
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+    }
+}

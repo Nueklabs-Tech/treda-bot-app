@@ -12,7 +12,16 @@ import { useDevice } from '@deriv-com/ui';
 import ToolbarWidgets from './toolbar-widgets';
 import '@deriv-com/smartcharts-champion/dist/smartcharts.css';
 
-const Chart = observer(({ show_digits_stats }: { show_digits_stats: boolean }) => {
+type TChartProps = {
+    show_digits_stats: boolean;
+    /**
+     * SmartCharts' own asset title. The trade screen turns it off because it
+     * renders its own header — symbol, live price and picker in one row.
+     */
+    show_top_widgets?: boolean;
+};
+
+const Chart = observer(({ show_digits_stats, show_top_widgets = true }: TChartProps) => {
     const barriers: [] = [];
     const { common, ui } = useStore();
     const { chart_store, run_panel, dashboard } = useStore();
@@ -120,7 +129,7 @@ const Chart = observer(({ show_digits_stats }: { show_digits_stats: boolean }) =
                 chartData={{ activeSymbols: chartData.activeSymbols, tradingTimes: chartData.tradingTimes }}
                 settings={settings}
                 symbol={symbol}
-                topWidgets={() => <ChartTitle onChange={onSymbolChange} />}
+                topWidgets={show_top_widgets ? () => <ChartTitle onChange={onSymbolChange} /> : undefined}
                 isConnectionOpened={is_connection_opened}
                 getMarketsOrder={getMarketsOrder}
                 isLive

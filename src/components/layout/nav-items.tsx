@@ -48,11 +48,11 @@ export const getNavItems = (): TNavItem[] => [
     { key: 'wallet', label: localize('Wallet'), path: APP_ROUTES.WALLET },
 ];
 
-export const NavIcon = ({ name, size = 24 }: { name: TNavKey; size?: number }) => (
+export const NavIcon = ({ name, size = 26 }: { name: TNavKey; size?: number }) => (
     <svg
         width={size}
         height={size}
-        viewBox='0 0 24 24'
+        viewBox='0 0 26 26'
         fill='none'
         stroke='currentColor'
         strokeWidth='1.6'

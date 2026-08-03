@@ -1,10 +1,18 @@
 import { lazy, Suspense, useEffect } from 'react';
 import React from 'react';
-import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider, useNavigate } from 'react-router-dom';
+import {
+    createBrowserRouter,
+    createRoutesFromElements,
+    Navigate,
+    Route,
+    RouterProvider,
+    useNavigate,
+} from 'react-router-dom';
 import BootLoader from '@/components/loader/boot-loader';
 import SkeletonLoader from '@/components/loader/skeleton-loader';
 import LocalStorageSyncWrapper from '@/components/localStorage-sync-wrapper';
 import RoutePromptDialog from '@/components/route-prompt-dialog';
+import { APP_ROUTES } from '@/constants/routes';
 import { useAccountSwitching } from '@/hooks/useAccountSwitching';
 import { useAuthBootstrap } from '@/hooks/useAuthBootstrap';
 import { useLanguageFromURL } from '@/hooks/useLanguageFromURL';
@@ -24,6 +32,7 @@ const AppRoot = lazy(() => import('./app-root'));
 const Profile = lazy(() => import('../pages/profile'));
 const Wallet = lazy(() => import('../pages/wallet'));
 const Positions = lazy(() => import('../pages/positions'));
+const Trade = lazy(() => import('../pages/trade'));
 
 const LanguageHandler = ({ children }: { children: React.ReactNode }) => {
     useLanguageFromURL();
@@ -125,6 +134,20 @@ const router = createBrowserRouter(
                         <Positions />
                     </Suspense>
                 }
+            />
+            {/* The trade screen fills in its own query params on arrival — see useTradeUrlParams. */}
+            <Route
+                path='trade'
+                element={
+                    <Suspense fallback={<SkeletonLoader message={localize('Loading')} />}>
+                        <Trade />
+                    </Suspense>
+                }
+            />
+            {/* `/chart` was this screen's URL before it became the trade screen. */}
+            <Route
+                path='chart'
+                element={<Navigate to={{ pathname: APP_ROUTES.TRADE, search: window.location.search }} replace />}
             />
             <Route path='preview' element={appRootRoute} />
             {oauthCallbackRoute && <Route path={oauthCallbackRoute} element={appRootRoute} />}
