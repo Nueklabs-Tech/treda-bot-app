@@ -1,22 +1,30 @@
-// Mobile tab bar: the last flex child of `.layout`, so it takes its own height
-// rather than overlaying the page. Colours are theme tokens only.
+// Mobile tab bar: pinned to the bottom of the viewport. `.layout` reserves the
+// same height as bottom padding while the bar is mounted (see the body class
+// below), so nothing ends up hidden underneath it. Colours are theme tokens only.
+:root {
+    --bottom-nav-height: 6.4rem;
+}
+
 .bottom-nav {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
     display: flex;
     align-items: stretch;
-    flex-shrink: 0;
     padding-bottom: env(safe-area-inset-bottom);
     background: var(--general-main-1);
     box-shadow: inset 0 1px 0 color-mix(in srgb, var(--text-less-prominent) 22%, transparent);
-    z-index: 5;
+    z-index: 20;
 
     &__item {
         display: flex;
         flex: 1;
+        min-width: 0;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         gap: 0.6rem;
-        min-height: 6.4rem;
+        min-height: var(--bottom-nav-height);
         padding: 0.8rem 0.4rem;
         border: none;
         background: none;
@@ -38,6 +46,13 @@
         font-weight: 600;
         line-height: 1.6rem;
     }
+}
+
+// Set by <BottomNav /> only while it is actually rendered (signed-in, mobile),
+// so no page reserves the space when the bar is absent.
+body.has-bottom-nav .layout {
+    box-sizing: border-box;
+    padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom));
 }
 
 @media (prefers-reduced-motion: reduce) {

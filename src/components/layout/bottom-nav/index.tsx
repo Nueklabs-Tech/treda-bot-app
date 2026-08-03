@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import clsx from 'clsx';
 import { observer } from 'mobx-react-lite';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -51,10 +51,10 @@ const getNavItems = (): TNavItem[] => [
 ];
 
 /**
- * Mobile-only tab bar for signed-in users. It sits as the last flex child of
- * `.layout`, so it reserves its own height instead of floating over the bot
- * builder. The three app tabs drive the same `dashboard.active_tab` the top tab
- * strip does — main.tsx's `active_tab` effect keeps the `#hash` in sync.
+ * Mobile-only tab bar for signed-in users, fixed to the bottom of the viewport;
+ * `.layout` pads itself by the same height while it is mounted so nothing hides
+ * underneath. The three app tabs drive the same `dashboard.active_tab` the top
+ * tab strip does — main.tsx's `active_tab` effect keeps the `#hash` in sync.
  */
 const BottomNav = observer(() => {
     const { isDesktop } = useDevice();
@@ -83,7 +83,19 @@ const BottomNav = observer(() => {
 
     // The quick strategy sheet covers the screen on mobile; a tab bar under it
     // would only get in the way.
-    if (isDesktop || !isAuthorized || is_quick_strategy_open) return null;
+    const is_visible = !isDesktop && isAuthorized && !is_quick_strategy_open;
+
+    // The bar is fixed, so the layout has to reserve its height. Flagging it on
+    // <body> keeps that padding tied to the bar actually being on screen.
+    useEffect(() => {
+        if (!is_visible) return;
+
+        document.body.classList.add('has-bottom-nav');
+
+        return () => document.body.classList.remove('has-bottom-nav');
+    }, [is_visible]);
+
+    if (!is_visible) return null;
 
     const is_profile_route = pathname === PROFILE_PATH;
 

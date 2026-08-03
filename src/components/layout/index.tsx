@@ -147,7 +147,7 @@ const Layout = observer(() => {
                 <Outlet />
             </Body>
             {!isCallbackPage && isDesktop && <Footer />}
-            {/* Mobile tab bar; renders itself only for a signed-in mobile session. */}
+            {/* Fixed mobile tab bar; renders itself only for a signed-in mobile session. */}
             {!isCallbackPage && <BottomNav />}
         </div>
     );
