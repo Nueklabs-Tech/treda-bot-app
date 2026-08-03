@@ -29,15 +29,6 @@ const LanguageHandler = ({ children }: { children: React.ReactNode }) => {
     return <>{children}</>;
 };
 
-/**
- * Puts the router back on the app root after a trip to the OAuth provider.
- *
- * The bootstrap strips the OAuth params with `history.replaceState`, which
- * react-router does not observe — so its location can still be the callback path
- * (and still carry `?code=`) even though the address bar is clean. Replacing it
- * from inside the router resyncs both, and is what actually gets the user off a
- * dedicated redirect path like `/callback`.
- */
 const OAuthReturnRedirect = () => {
     const navigate = useNavigate();
 
@@ -50,11 +41,6 @@ const OAuthReturnRedirect = () => {
     return null;
 };
 
-/**
- * Resolves the session (OAuth exchange, socket, authorize) before rendering the
- * app, so every component below mounts with `activeLoginid` already determined
- * and none of them needs a spinner of its own.
- */
 const AuthBootstrapGate = ({ children }: { children: React.ReactNode }) => {
     // The root store registers itself with api_base on construction, so wait for
     // it before opening the connection.
@@ -73,14 +59,6 @@ const AuthBootstrapGate = ({ children }: { children: React.ReactNode }) => {
 
 const routerBasename = isPreviewMode() ? PREVIEW_BASE_PATH : undefined;
 
-/**
- * The OAuth provider redirects to NEXT_PUBLIC_DERIV_REDIRECT_URI, which may point
- * at a dedicated path (e.g. `/callback`). Without a route for it the router falls
- * through to its 404 boundary and AuthBootstrapGate — which performs the code
- * exchange — never mounts, so the user comes back from Deriv to a blank page.
- * Mount the same AppRoot there; auth-bootstrap rewrites the URL back to the app
- * root once the exchange is done.
- */
 const getOAuthCallbackRoute = (): string | null => {
     let path = getOAuthRedirectPath();
 
@@ -95,6 +73,10 @@ const getOAuthCallbackRoute = (): string | null => {
 };
 
 const oauthCallbackRoute = getOAuthCallbackRoute();
+
+// One element shared by every route that renders the app shell, so React
+// reconciles it across those routes instead of tearing the tree down.
+const appRootRoute = <AppRoot />;
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -135,15 +117,10 @@ const router = createBrowserRouter(
                     </Suspense>
                 }
             />
-            <Route path='preview' element={<AppRoot />} />
-            {oauthCallbackRoute && <Route path={oauthCallbackRoute} element={<AppRoot />} />}
-            {/* Home, bots, the builder, the chart and the tutorials are all the
-                same shell — one catch-all match keeps <AppRoot /> (and with it the
-                Blockly workspace and the socket subscriptions) mounted while the
-                user moves between them; a separate <Route> per path would remount
-                the whole tree on every navigation. main.tsx picks the screen from
-                the pathname. It also absorbs unknown URLs, which land on home. */}
-            <Route path='*' element={<AppRoot />} />
+            <Route path='preview' element={appRootRoute} />
+            {oauthCallbackRoute && <Route path={oauthCallbackRoute} element={appRootRoute} />}
+            <Route index element={appRootRoute} />
+            <Route path='*' element={appRootRoute} />
         </Route>
     ),
     { basename: routerBasename }
@@ -152,8 +129,6 @@ const router = createBrowserRouter(
 function App() {
     useAccountSwitching();
 
-    // The OAuth callback, socket init and authorize all run in AuthBootstrapGate
-    // (see @/services/auth-bootstrap) so the UI never renders a half-known session.
     return <RouterProvider router={router} future={{ v7_startTransition: true }} />;
 }
 

@@ -1,8 +1,9 @@
 @use 'components/shared/styles/mixins' as *;
 
-// Mobile-app style profile screen: a full-bleed dark hero card that the content
-// sheet tucks under, then flat setting rows grouped by section. Every colour
-// comes from an existing theme/brand token — this file introduces none of its own.
+// Mobile-app style profile screen: a full-bleed hero card that the content sheet
+// tucks under, then flat setting rows grouped by section. Every colour comes from
+// an existing theme/brand token — this file introduces none of its own. The hero
+// is navy in dark mode and brand-primary in light mode (see --hero-background).
 .profile {
     height: 100%;
     overflow-y: auto;
@@ -16,8 +17,8 @@
         align-items: center;
         padding: 5.6rem 2.4rem 3.6rem;
         border-radius: 0 0 2.8rem 2.8rem;
-        background: var(--brand-dark-grey, #0f172a);
-        color: var(--brand-white, #fff);
+        background: var(--hero-background);
+        color: var(--hero-text);
         text-align: center;
     }
 
@@ -49,7 +50,7 @@
         height: 12rem;
         border-radius: 50%;
         background: rgba(255, 255, 255, 0.1);
-        color: var(--brand-white, #fff);
+        color: var(--hero-text);
     }
 
     &__name {

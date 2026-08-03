@@ -13,10 +13,12 @@
     left: 0;
     border-top: 1px solid var(--brand-accent);
     box-shadow: 0 1px 0 0 var(--brand-accent) inset;
-    background: var(--brand-navy);
-    color: var(--brand-white);
-    --text-prominent: var(--brand-white);
-    --text-general: var(--brand-white);
+    // Same chrome tokens as the header — --brand-navy is black regardless of
+    // theme, which made the footer a dark bar in light mode.
+    background: var(--app-chrome-background);
+    color: var(--app-chrome-text);
+    --text-prominent: var(--app-chrome-text);
+    --text-general: var(--app-chrome-text);
     --general-section-1: var(--brand-accent);
     z-index: 2;
 

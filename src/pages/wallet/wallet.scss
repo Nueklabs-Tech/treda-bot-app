@@ -1,6 +1,6 @@
 @use 'components/shared/styles/mixins' as *;
 
-// Wallet screen — same shape as the profile page (dark hero card, flat rows
+// Wallet screen — same shape as the profile page (hero card, flat rows
 // underneath) so the two bottom-nav destinations read as one app. Colours are
 // existing theme/brand tokens only.
 .wallet {
@@ -16,8 +16,8 @@
         align-items: center;
         padding: 5.6rem 2.4rem 2.8rem;
         border-radius: 0 0 2.8rem 2.8rem;
-        background: var(--brand-dark-grey, #0f172a);
-        color: var(--brand-white, #fff);
+        background: var(--hero-background);
+        color: var(--hero-text);
         text-align: center;
     }
 

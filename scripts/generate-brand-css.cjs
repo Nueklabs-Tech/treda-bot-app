@@ -46,11 +46,30 @@ const updateBrandColorsInThemes = () => {
         `    --brand-neutral: ${colors.neutral};`,
     ];
 
+    // Light-theme surfaces. `page_background` and `navy` above describe the dark
+    // chrome, so `.theme--light` cannot derive from them — it reads this palette
+    // instead. Falls back to the grey ramp when `colors.light` is absent.
+    const light = colors.light ?? {};
+    const grey = colors.grey ?? {};
+    brandColorLines.push('');
+    brandColorLines.push('    /* Light-theme surfaces - consumed by .theme--light */');
+    brandColorLines.push(`    --brand-light-page-background: ${light.page_background ?? grey['100'] ?? '#f1f5f9'};`);
+    brandColorLines.push(`    --brand-light-surface: ${light.surface ?? colors.white};`);
+    brandColorLines.push(`    --brand-light-surface-alt: ${light.surface_alt ?? grey['50'] ?? '#f8fafc'};`);
+    brandColorLines.push(`    --brand-light-border: ${light.border ?? grey['200'] ?? '#e2e8f0'};`);
+    brandColorLines.push(`    --brand-light-text: ${light.text ?? colors.black};`);
+    brandColorLines.push(`    --brand-light-text-secondary: ${light.text_secondary ?? grey['600'] ?? colors.secondary};`);
+
     // Generate typography variables if available
     if (typography && typography.font_family) {
         brandColorLines.push('');
         brandColorLines.push('    /* Brand typography - dynamically generated from brand.config.json */');
         brandColorLines.push(`    --brand-font-primary: ${typography.font_family.primary};`);
+        // Display face for the wordmark and headline chrome. Optional — falls back to
+        // the primary family so brands that don't set one keep a single typeface.
+        brandColorLines.push(
+            `    --brand-font-display: ${typography.font_family.display ?? typography.font_family.primary};`
+        );
         brandColorLines.push(`    --brand-font-secondary: ${typography.font_family.secondary};`);
         brandColorLines.push(`    --brand-font-monospace: ${typography.font_family.monospace};`);
     }
@@ -144,6 +163,7 @@ const updateBrandColorsInThemes = () => {
         if (typography && typography.font_family) {
             console.log('   Typography:');
             console.log(`      • Primary Font: ${typography.font_family.primary.substring(0, 50)}...`);
+            console.log(`      • Display Font: ${typography.font_family.display ?? '(falls back to primary)'}`);
             console.log(`      • Secondary Font: ${typography.font_family.secondary}`);
             console.log(`      • Monospace Font: ${typography.font_family.monospace}`);
         }

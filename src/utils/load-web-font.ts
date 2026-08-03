@@ -1,3 +1,6 @@
+// Families we are willing to pull from Google Fonts. The second group are display
+// faces — geometric/technical sans suited to the wordmark and headline chrome
+// rather than to body copy.
 const SUPPORTED_FONTS = new Set([
     'Inter',
     'Roboto',
@@ -9,6 +12,11 @@ const SUPPORTED_FONTS = new Set([
     'Montserrat',
     'Raleway',
     'Source Sans 3',
+    'Space Grotesk',
+    'Sora',
+    'Outfit',
+    'Manrope',
+    'Plus Jakarta Sans',
 ]);
 
 const loaded = new Set<string>();

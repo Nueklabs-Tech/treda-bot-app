@@ -5,13 +5,17 @@
     flex-direction: column;
     height: 100vh;
 
+    // The header ink follows the theme rather than being pinned to white on an
+    // (undefined) --brand-dark, which resolved to no background at all — so the
+    // header only looked right while the page underneath it was dark.
     .deriv-header {
-        background: var(--brand-dark);
-        color: var(--brand-white);
-        --text-general: var(--brand-white);
-        --text-prominent: var(--brand-white);
-        --text-primary: var(--brand-white);
-        --border-normal: var(--brand-accent);
+        background: var(--app-chrome-background);
+        color: var(--app-chrome-text);
+        --text-general: var(--app-chrome-text);
+        --text-prominent: var(--app-chrome-text);
+        --text-primary: var(--app-chrome-text);
+        --border-normal: var(--app-chrome-border);
+        border-bottom: 1px solid var(--app-chrome-border);
         height: 5.6rem;
     }
 

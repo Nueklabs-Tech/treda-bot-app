@@ -58,8 +58,17 @@
     --brand-info: #0ea5e9;
     --brand-neutral: #6b7280;
 
+    /* Light-theme surfaces - consumed by .theme--light */
+    --brand-light-page-background: #f1f5f9;
+    --brand-light-surface: #ffffff;
+    --brand-light-surface-alt: #f8fafc;
+    --brand-light-border: #e2e8f0;
+    --brand-light-text: #0f172a;
+    --brand-light-text-secondary: #475569;
+
     /* Brand typography - dynamically generated from brand.config.json */
     --brand-font-primary: Open Sans;
+    --brand-font-display: Space Grotesk;
     --brand-font-secondary: Georgia, 'Times New Roman', Times, serif;
     --brand-font-monospace: 'Courier New', Courier, monospace;
     /* [/AI] */
@@ -72,28 +81,30 @@
     --tw-border-opacity: 1;
 
     .theme--light {
-        // General
-        --general-main-1: var(--brand-white);
-        --general-main-2: var(--brand-white);
-        --general-main-3: var(--brand-page-background);
+        // General — mirrors the structure of .theme--dark below, but built off the
+        // light surface ramp rather than --brand-navy/--brand-page-background (both
+        // of which describe the *dark* chrome and would render this theme black).
+        --general-main-1: var(--brand-light-surface);
+        --general-main-2: var(--brand-light-surface);
+        --general-main-3: color-mix(in srgb, var(--brand-light-surface) 94%, var(--brand-primary));
         --general-main-4: #{constants.$alpha-color-white-4};
-        --general-section-1: var(--brand-page-background);
-        --general-section-2: var(--brand-light-tint);
-        --general-section-3: var(--brand-light-tint);
-        --general-section-4: var(--brand-light-tint);
-        --general-section-5: var(--brand-light-tint);
-        --general-section-6: var(--brand-border);
-        --general-disabled: var(--brand-border);
-        --general-hover: var(--brand-light-tint);
-        --general-active: var(--brand-light-tint);
+        --general-section-1: var(--brand-light-page-background);
+        --general-section-2: var(--brand-light-surface-alt);
+        --general-section-3: color-mix(in srgb, var(--brand-light-surface-alt) 94%, var(--brand-primary));
+        --general-section-4: color-mix(in srgb, var(--brand-light-surface-alt) 88%, var(--brand-primary));
+        --general-section-5: color-mix(in srgb, var(--brand-light-surface-alt) 82%, var(--brand-primary));
+        --general-section-6: var(--brand-light-border);
+        --general-disabled: color-mix(in srgb, var(--brand-light-border) 65%, var(--brand-light-surface));
+        --general-hover: color-mix(in srgb, var(--brand-primary) 10%, var(--brand-light-surface));
+        --general-active: color-mix(in srgb, var(--brand-primary) 18%, var(--brand-light-surface));
 
         // Icons and Texts
-        --text-general: var(--brand-text);
-        --text-primary: var(--brand-text-secondary);
-        --text-less-prominent: var(--brand-text-secondary);
-        --text-prominent: var(--brand-text);
-        --text-disabled: var(--brand-text-secondary);
-        --text-disabled-1: var(--brand-border);
+        --text-general: var(--brand-light-text);
+        --text-primary: var(--brand-light-text-secondary);
+        --text-less-prominent: var(--brand-light-text-secondary);
+        --text-prominent: var(--brand-light-text);
+        --text-disabled: color-mix(in srgb, var(--brand-light-text-secondary) 55%, var(--brand-light-surface));
+        --text-disabled-1: var(--brand-light-border);
         --text-loss-danger: #{constants.$color-red-1};
         --text-profit-success: #{constants.$color-green-1};
         --text-warning: #{constants.$color-yellow};
@@ -101,14 +112,14 @@
         --text-green: #{constants.$color-green-6};
         --text-blue: var(--brand-primary);
         --text-info-blue: var(--brand-accent);
-        --text-info-blue-background: var(--brand-light-tint);
+        --text-info-blue-background: color-mix(in srgb, var(--brand-accent) 12%, var(--brand-light-surface));
         --text-colored-background: #{constants.$color-white};
         --icon-light-background: #{constants.$color-black-9};
         --icon-dark-background: #{constants.$color-white};
         --icon-grey-background: #{constants.$color-grey-2};
         --icon-black-plus: #{constants.$color-black-7};
         --text-status-info-blue: var(--brand-accent);
-        --text-hint: var(--brand-text);
+        --text-hint: var(--brand-light-text);
 
         // Purchase
         --purchase-main-1: #{constants.$color-green-1};
@@ -120,16 +131,17 @@
 
         // Buttons
         --button-primary-default: var(--brand-primary);
-        --button-secondary-default: var(--brand-text-secondary);
+        --button-secondary-default: var(--brand-light-text-secondary);
         --button-tertiary-default: transparent;
-        --button-primary-light-default: var(--brand-light-tint);
+        --button-primary-light-default: color-mix(in srgb, var(--brand-primary) 12%, var(--brand-light-surface));
         --button-primary-hover: var(--brand-accent);
         --button-secondary-hover: #{constants.$alpha-color-black-3};
-        --button-tertiary-hover: var(--brand-light-tint);
-        --button-primary-light-hover: var(--brand-light-tint);
+        --button-tertiary-hover: var(--general-hover);
+        --button-primary-light-hover: color-mix(in srgb, var(--brand-primary) 20%, var(--brand-light-surface));
         --button-toggle-primary: var(--brand-accent);
-        --button-toggle-secondary: #{constants.$color-grey-5};
-        --button-toggle-alternate: #{constants.$color-white};
+        --button-toggle-secondary: var(--brand-light-surface-alt);
+        --button-toggle-alternate: var(--brand-light-surface);
+        --button-get-started-bg: var(--brand-light-surface);
 
         // Overlay
         --overlay-outside-dialog: #{constants.$alpha-color-black-1};
@@ -142,30 +154,30 @@
         --shadow-box: #{constants.$COLOR_LIGHT_BLACK_2};
 
         // States
-        --state-normal: #{constants.$color-white};
-        --state-hover: #{constants.$color-grey-4};
-        --state-active: #{constants.$color-grey-5};
-        --state-disabled: #{constants.$color-grey-3};
+        --state-normal: var(--brand-light-surface);
+        --state-hover: var(--general-hover);
+        --state-active: var(--general-active);
+        --state-disabled: var(--general-disabled);
         --checkbox-disabled-grey: #{constants.$color-grey-6};
-        --sidebar-tab: #{constants.$color-grey-6};
+        --sidebar-tab: var(--brand-light-surface-alt);
 
         // Border
-        --border-normal: var(--brand-border);
-        --border-normal-1: var(--brand-border);
-        --border-normal-2: var(--brand-border);
-        --border-normal-3: var(--brand-border);
+        --border-normal: var(--brand-light-border);
+        --border-normal-1: var(--brand-light-border);
+        --border-normal-2: var(--brand-light-border);
+        --border-normal-3: var(--brand-light-border);
         --border-hover: var(--brand-accent);
         --border-hover-1: var(--brand-accent);
         --border-active: var(--brand-primary);
-        --border-disabled: var(--brand-border);
-        --border-divider: var(--brand-border);
+        --border-disabled: var(--general-disabled);
+        --border-divider: var(--brand-light-border);
 
         // Fill
-        --fill-normal: var(--brand-white);
-        --fill-normal-1: var(--brand-border);
-        --fill-hover: var(--brand-light-tint);
+        --fill-normal: var(--brand-light-surface);
+        --fill-normal-1: var(--brand-light-surface-alt);
+        --fill-hover: var(--general-hover);
         --fill-active: var(--brand-primary);
-        --fill-disabled: var(--brand-border);
+        --fill-disabled: var(--general-disabled);
 
         // Status
         --status-default: #{constants.$color-grey-3};
@@ -216,6 +228,19 @@
         // Header
         --header-background-mt5: #{constants.$color-blue-8};
         --header-background-others: #{constants.$color-green-7};
+
+        // App chrome (AppHeader / app footer). The header used to hardcode white
+        // ink over an undefined --brand-dark, so it only ever worked against a
+        // dark page; these give it a real, per-theme surface to sit on.
+        --app-chrome-background: var(--brand-light-surface);
+        --app-chrome-text: var(--brand-light-text);
+        --app-chrome-hover: color-mix(in srgb, var(--brand-primary) 12%, transparent);
+        --app-chrome-border: var(--brand-light-border);
+
+        // Full-bleed hero cards (profile / wallet). Brand-coloured in light mode
+        // so the screens keep an accent band without going dark.
+        --hero-background: var(--brand-primary);
+        --hero-text: var(--brand-white);
     }
 
     .theme--dark {
@@ -357,5 +382,15 @@
         // Header
         --header-background-mt5: #{constants.$color-blue-8};
         --header-background-others: #{constants.$color-green-7};
+
+        // App chrome (AppHeader / app footer) — see the note in .theme--light.
+        --app-chrome-background: var(--general-section-1);
+        --app-chrome-text: var(--brand-white);
+        --app-chrome-hover: color-mix(in srgb, var(--brand-white) 14%, transparent);
+        --app-chrome-border: color-mix(in srgb, var(--brand-white) 12%, transparent);
+
+        // Full-bleed hero cards (profile / wallet).
+        --hero-background: var(--brand-dark-grey);
+        --hero-text: var(--brand-white);
     }
 }

@@ -1,3 +1,15 @@
+// Wordmark typography. The display face comes from brand.config.json
+// (typography.font_family.display) via --brand-font-display, and falls back to the
+// body font for brands that don't set one. Tightened tracking keeps the name
+// reading as a logotype rather than as a run of UI text.
+@mixin wordmark {
+    font-family: var(--brand-font-display, var(--brand-font-primary));
+    font-weight: 700;
+    font-size: 1.9rem;
+    letter-spacing: -0.02em;
+    color: var(--text-general);
+}
+
 .app-header {
     &__logo {
         padding-inline-start: 1.6rem;
@@ -18,9 +30,8 @@
 
     // App name rendered next to the logo image, vertically centred against it.
     &__logo-name {
-        color: var(--text-general);
-        font-weight: 600;
-        font-size: 1.8rem;
+        @include wordmark;
+
         line-height: 1;
         white-space: nowrap;
         overflow: hidden;
@@ -50,16 +61,16 @@
         border-radius: 0.8rem;
         background: color-mix(in srgb, var(--brand-primary, var(--text-general)) 10%, transparent);
         color: var(--brand-primary, var(--text-general));
+        font-family: var(--brand-font-display, var(--brand-font-primary));
         font-weight: 700;
         font-size: 1.4rem;
         line-height: 1;
     }
 
     &__logo-text {
+        @include wordmark;
+
         margin-left: 1.2rem;
-        color: var(--text-general);
-        font-weight: 600;
-        font-size: 1.8rem;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;

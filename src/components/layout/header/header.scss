@@ -6,7 +6,7 @@
 
     &__account-settings {
         padding-inline-end: 1.2rem;
-        border-inline-end: 0.1rem solid var(--general-section-1);
+        border-inline-end: 0.1rem solid var(--app-chrome-border);
     }
 
     &__account-settings,
@@ -126,7 +126,7 @@
         }
 
         .deriv-context-menu {
-            box-shadow: 0 0 2px 0 var(--du-shadow-box, #00000014);
+            box-shadow: 0 0 2px 0 var(--shadow-box);
         }
 
         .deriv-account-switcher__balance + svg > path {
@@ -163,7 +163,7 @@
                     background: none;
 
                     span {
-                        color: #000;
+                        color: var(--text-prominent);
                         font-size: 12px;
                         border: solid 2px var(--text-disabled-1);
                         padding: 0.1rem 1.6rem;
@@ -252,21 +252,6 @@
 
     .deriv-text {
         color: var(--text-prominent) !important;
-    }
-}
-
-// Placeholder shown while the lazily-loaded account switcher chunk is in flight.
-// Matches the switcher's rendered footprint so the header does not reflow.
-.account-info__skeleton {
-    width: 12rem;
-    height: 4rem;
-    border-radius: 8px;
-    background: var(--general-section-1);
-    opacity: 0.5;
-
-    @include mobile-screen {
-        width: 10rem;
-        height: 3.5rem;
     }
 }
 
@@ -404,10 +389,11 @@
         }
     }
 
-    // Secondary action: white-on-dark glass pill (the header sits on
-    // --brand-dark), picking up the brand tint on hover.
+    // Secondary action: a glass pill inked with the header's own foreground
+    // colour (white on the dark header, near-black on the light one), picking up
+    // the brand tint on hover.
     &__btn--ghost.dc-btn {
-        --auth-ghost-ink: var(--brand-white, #fff);
+        --auth-ghost-ink: var(--app-chrome-text);
 
         background: color-mix(in srgb, var(--auth-ghost-ink) 8%, transparent);
         border: 1px solid color-mix(in srgb, var(--auth-ghost-ink) 40%, transparent);
@@ -464,7 +450,7 @@
         border: none;
         border-radius: 50%;
         background: transparent;
-        color: var(--brand-white, #fff);
+        color: var(--app-chrome-text);
         cursor: pointer;
         transition:
             background 0.2s ease,
@@ -472,7 +458,7 @@
 
         &:hover,
         &--active {
-            background: color-mix(in srgb, var(--brand-white, #fff) 14%, transparent);
+            background: var(--app-chrome-hover);
         }
 
         &:active {
@@ -480,7 +466,7 @@
         }
 
         &:focus-visible {
-            outline: 2px solid var(--brand-white, #fff);
+            outline: 2px solid var(--brand-primary);
             outline-offset: 2px;
         }
 
@@ -507,9 +493,10 @@
         height: 1.6rem;
         padding: 0 0.4rem;
         border-radius: 0.8rem;
-        border: 2px solid var(--brand-dark, #0e0e0e);
+        // Punches the badge out of the header surface, so it has to track it.
+        border: 2px solid var(--app-chrome-background);
         background: var(--status-danger, #e6190e);
-        color: #fff;
+        color: var(--brand-white, #fff);
         font-size: 1rem;
         font-weight: 700;
         line-height: 1.2rem;

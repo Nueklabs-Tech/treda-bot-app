@@ -1,4 +1,4 @@
-import { applyBrandFont, applyPrimaryColor } from './apply-branding';
+import { applyBrandDisplayFont, applyBrandFont, applyPrimaryColor } from './apply-branding';
 import { getAppName, LOGO_CANDIDATES } from './branding';
 import { isPreviewMode } from './is-preview-mode';
 import brandConfig from '../../brand.config.json';
@@ -58,8 +58,11 @@ export function applyFaviconFromLogo(): void {
 }
 
 export function applyBrandFontFromConfig(): void {
-    const family = brandConfig?.typography?.font_family?.primary;
-    if (family) applyBrandFont(family);
+    const fonts = brandConfig?.typography?.font_family;
+    if (fonts?.primary) applyBrandFont(fonts.primary);
+    // Optional: brands without a display face fall back to the primary one, which
+    // is also what the generated --brand-font-display already resolves to.
+    if (fonts?.display) applyBrandDisplayFont(fonts.display);
 }
 
 export function applyPrimaryColorFromConfig(): void {

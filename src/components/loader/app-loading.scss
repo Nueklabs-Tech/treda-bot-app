@@ -1,8 +1,10 @@
 .app-loading {
     --al-accent: var(--brand-primary, #3b82f6);
-    --al-node: color-mix(in srgb, var(--al-accent) 55%, #fff);
-    --al-bg: var(--brand-page-background, #000);
-    --al-text: var(--brand-white, #fff);
+    --al-node: color-mix(in srgb, var(--al-accent) 55%, var(--al-text));
+    // --brand-page-background is the dark chrome's black; the loader mounts after
+    // the theme class is on <body>, so it can follow the resolved page surface.
+    --al-bg: var(--general-section-1);
+    --al-text: var(--text-prominent);
     --al-muted: color-mix(in srgb, var(--al-accent) 62%, var(--al-text));
 
     position: relative;
@@ -100,7 +102,9 @@
         width: 7rem;
         height: 7rem;
         border-radius: 50%;
-        background: linear-gradient(150deg, #000, color-mix(in srgb, #000 55%, #000));
+        // Plate behind the logo — one step off the loader background so it reads
+        // as raised in either theme (it used to be flat black).
+        background: linear-gradient(150deg, var(--general-main-1), var(--general-main-3));
         animation: app-loading-core 2.4s ease-in-out infinite;
     }
 

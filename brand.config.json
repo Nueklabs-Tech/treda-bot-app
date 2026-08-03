@@ -19,6 +19,14 @@
         "neutral": "#6b7280",
         "black": "#0f172a",
         "white": "#ffffff",
+        "light": {
+            "page_background": "#f1f5f9",
+            "surface": "#ffffff",
+            "surface_alt": "#f8fafc",
+            "border": "#e2e8f0",
+            "text": "#0f172a",
+            "text_secondary": "#475569"
+        },
         "grey": {
             "50": "#f8fafc",
             "100": "#f1f5f9",
@@ -35,6 +43,7 @@
     "typography": {
         "font_family": {
             "primary": "Open Sans",
+            "display": "Space Grotesk",
             "secondary": "Georgia, 'Times New Roman', Times, serif",
             "monospace": "'Courier New', Courier, monospace"
         },
