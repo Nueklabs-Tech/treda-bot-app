@@ -42,3 +42,19 @@ export const setAuthData = (authData: TAuthData | null) => {
     }
     authData$.next(authData);
 };
+
+/**
+ * Folds late-arriving details (the user's name, for one) into the published auth
+ * data without re-publishing the parts that authorization already settled.
+ *
+ * `for_loginid` pins the update to the account it was fetched for, so a response
+ * that lands after an account switch is dropped rather than labelling the new
+ * account with the previous user's details.
+ */
+export const mergeAuthData = (partial: Partial<TAuthData>, for_loginid?: string) => {
+    const current = authData$.getValue();
+    if (!current) return;
+    if (for_loginid && current.loginid !== for_loginid) return;
+
+    authData$.next({ ...current, ...partial });
+};

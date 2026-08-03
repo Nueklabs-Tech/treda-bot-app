@@ -3,6 +3,7 @@ import { getAccountId, getAccountType, isDemoAccount, removeUrlParameter } from 
 
 import CommonStore from '@/stores/common-store';
 import { DerivWSAccountsService } from '@/services/derivws-accounts.service';
+import { fetchUserProfile } from '@/services/user-profile.service';
 import { TAuthData } from '@/types/api-types';
 import { clearAuthData } from '@/utils/auth-utils';
 import { handleBackendError, isBackendError } from '@/utils/error-handler';
@@ -11,6 +12,7 @@ import { observer as globalObserver } from '../../utils/observer';
 import { doUntilDone, socket_state } from '../tradeEngine/utils/helpers';
 import {
     CONNECTION_STATUS,
+    mergeAuthData,
     setAccountList,
     setAuthData,
     setConnectionStatus,
@@ -343,6 +345,11 @@ class APIBase {
 
             setIsAuthorized(true);
             this.is_authorized = true;
+
+            // Deliberately not awaited: the user's name is display polish, and the
+            // run panel / chart must not wait on it to become usable.
+            this.loadUserProfile(balance?.loginid);
+
             localStorage.setItem('client_account_details', JSON.stringify(accountList));
             localStorage.setItem('client.country', balance?.country);
 
@@ -364,6 +371,15 @@ class APIBase {
         } finally {
             setIsAuthorizing(false);
         }
+    }
+
+    /**
+     * Pulls the account holder's real name and email onto the auth stream, so the
+     * UI can greet the user by name instead of falling back to "Trader".
+     */
+    async loadUserProfile(loginid) {
+        const profile = await fetchUserProfile(this.api);
+        if (profile) mergeAuthData(profile, loginid);
     }
 
     async subscribe() {

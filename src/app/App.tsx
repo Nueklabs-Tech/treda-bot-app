@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect } from 'react';
 import React from 'react';
 import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider, useNavigate } from 'react-router-dom';
 import BootLoader from '@/components/loader/boot-loader';
-import CircleLoader from '@/components/loader/circle-loader';
+import SkeletonLoader from '@/components/loader/skeleton-loader';
 import LocalStorageSyncWrapper from '@/components/localStorage-sync-wrapper';
 import RoutePromptDialog from '@/components/route-prompt-dialog';
 import { useAccountSwitching } from '@/hooks/useAccountSwitching';
@@ -104,7 +104,7 @@ const router = createBrowserRouter(
             <Route
                 path='profile'
                 element={
-                    <Suspense fallback={<CircleLoader message={localize('Loading')} />}>
+                    <Suspense fallback={<SkeletonLoader message={localize('Loading')} />}>
                         <Profile />
                     </Suspense>
                 }
@@ -112,7 +112,7 @@ const router = createBrowserRouter(
             <Route
                 path='wallet'
                 element={
-                    <Suspense fallback={<CircleLoader message={localize('Loading')} />}>
+                    <Suspense fallback={<SkeletonLoader message={localize('Loading')} />}>
                         <Wallet />
                     </Suspense>
                 }

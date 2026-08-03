@@ -10,6 +10,7 @@ import { Localize, localize } from '@deriv-com/translations';
 import { Header, useDevice, Wrapper } from '@deriv-com/ui';
 import { AppLogo } from '../app-logo';
 import PrimaryNav from '../primary-nav';
+import AccountSelector from './account-selector';
 import { NotificationIcon, ProfileIcon } from './auth-icons';
 import MenuItems from './menu-items';
 import NotificationsPanel, { useNotifications } from './notifications-panel';
@@ -172,6 +173,8 @@ const AppHeader = observer(() => {
             >
                 <Wrapper variant='left'>
                     <AppLogo />
+                    {/* Renders nothing until a session resolves, so it is safe for logged-out visitors. */}
+                    <AccountSelector />
                     <PrimaryNav />
                     {isDesktop && <MenuItems />}
                 </Wrapper>

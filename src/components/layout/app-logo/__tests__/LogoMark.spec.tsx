@@ -10,9 +10,12 @@ describe('LogoMark', () => {
         process.env.NEXT_PUBLIC_APP_BUILD = originalAppBuild;
     });
 
-    it('renders the resolved app name', () => {
+    // The app name is no longer rendered as text beside the logo — the header
+    // account selector took that spot — so it survives only as the alt text.
+    it('labels the logo with the resolved app name', () => {
         render(<LogoMark />);
-        expect(screen.getByText('TredaBot')).toBeInTheDocument();
+        expect(screen.queryByText('TredaBot')).not.toBeInTheDocument();
+        expect(screen.getByRole('img')).toHaveAttribute('alt', 'TredaBot');
     });
 
     it('renders the logo image (first candidate) by default', () => {

@@ -1,7 +1,7 @@
 import { lazy, PropsWithChildren, Suspense, useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 import BootLoader from '@/components/loader/boot-loader';
-import CircleLoader from '@/components/loader/circle-loader';
+import SkeletonLoader from '@/components/loader/skeleton-loader';
 import { useAuthBootstrap } from '@/hooks/useAuthBootstrap';
 import { useStore } from '@/hooks/useStore';
 import { applyThemeClass } from '@/utils/theme-class';
@@ -50,7 +50,7 @@ const AppRoot = observer(() => {
     if (!store || !is_auth_ready) return <AppRootLoader />;
 
     return (
-        <Suspense fallback={<CircleLoader message={localize('Loading')} />}>
+        <Suspense fallback={<SkeletonLoader message={localize('Loading')} />}>
             <ErrorBoundary root_store={store}>
                 <ErrorComponentWrapper>
                     <AppContent />

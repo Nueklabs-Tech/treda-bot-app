@@ -1,0 +1,123 @@
+.skeleton-loader {
+    // Derived from the text colour so the placeholders read correctly in both
+    // themes without needing a light/dark override of their own.
+    --skeleton-base: color-mix(in srgb, var(--text-general, #000) 9%, transparent);
+    --skeleton-highlight: color-mix(in srgb, var(--text-general, #000) 16%, transparent);
+
+    display: flex;
+    flex-direction: column;
+    gap: 2.4rem;
+    width: 100%;
+    padding: 1.6rem;
+
+    &--fullscreen {
+        height: 100%;
+        min-height: 20rem;
+        flex: 1;
+    }
+
+    &__block {
+        display: block;
+        border-radius: 0.8rem;
+        background: linear-gradient(
+                90deg,
+                var(--skeleton-base) 25%,
+                var(--skeleton-highlight) 50%,
+                var(--skeleton-base) 75%
+            )
+            0 0 / 200% 100%;
+        animation: skeleton-loader-shimmer 1.5s linear infinite;
+    }
+
+    &__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.6rem;
+    }
+
+    &__logo {
+        width: 12rem;
+        height: 3.2rem;
+    }
+
+    &__chip {
+        width: 9.6rem;
+        height: 3.2rem;
+        border-radius: 1.6rem;
+    }
+
+    &__body {
+        display: flex;
+        flex-direction: column;
+        gap: 1.6rem;
+        flex: 1;
+    }
+
+    &__hero {
+        width: 100%;
+        height: 14rem;
+        border-radius: 1.2rem;
+    }
+
+    &__cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.6rem;
+
+        @media (max-width: 600px) {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    &__card {
+        height: 8rem;
+        border-radius: 1.2rem;
+    }
+
+    &__lines {
+        display: flex;
+        flex-direction: column;
+        gap: 1.2rem;
+    }
+
+    &__line {
+        height: 1.4rem;
+        border-radius: 0.4rem;
+
+        &:nth-child(even) {
+            width: 80%;
+        }
+
+        &:last-child {
+            width: 60%;
+        }
+    }
+
+    // Announced, not drawn — see the component comment.
+    &__message {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        padding: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        border: 0;
+        clip: rect(0 0 0 0);
+        clip-path: inset(50%);
+    }
+}
+
+@keyframes skeleton-loader-shimmer {
+    to {
+        background-position: -200% 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .skeleton-loader__block {
+        animation: none;
+        background: var(--skeleton-base);
+    }
+}

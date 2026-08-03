@@ -1,7 +1,7 @@
-// Shared logo + app name "mark" rendered in the header (desktop & mobile, next to the
-// hamburger) and in the mobile drawer. Logo priority: live App Builder preview data URL
-// → public/logo.<png|jpg|jpeg|webp> → letter-badge fallback. The app name comes from the
-// live preview, else the resolved deploy/build name (see getAppName).
+// Shared logo "mark". Logo priority: live App Builder preview data URL →
+// public/logo.<png|jpg|jpeg|webp> → letter-badge fallback. The resolved app name (live
+// preview, else the deploy/build name — see getAppName) is no longer rendered as text
+// beside the logo; it survives here as the image's alt text and the badge letter.
 import { useEffect, useMemo, useState } from 'react';
 import {
     getPreviewAppName,
@@ -48,7 +48,7 @@ export const LogoMark = ({ height = 32 }: TLogoMarkProps) => {
                     alt={appName}
                     className='app-header__logo-img'
                     style={{ height: `${height}px` }}
-                    onError={() => setCandidateIndex((index) => index + 1)}
+                    onError={() => setCandidateIndex(index => index + 1)}
                 />
             ) : (
                 <span
@@ -59,7 +59,6 @@ export const LogoMark = ({ height = 32 }: TLogoMarkProps) => {
                     {badgeLetter}
                 </span>
             )}
-            <span className='app-header__logo-text'>{appName}</span>
         </span>
     );
 };
