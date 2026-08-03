@@ -1,3 +1,16 @@
+.app-root__placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2.4rem;
+    background-color: var(--general-main-1);
+    color: var(--text-general);
+    font-size: var(--text-size-l);
+    font-weight: bold;
+    text-align: center;
+}
+
 .tc-root {
     font-family: 'Space Grotesk', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;

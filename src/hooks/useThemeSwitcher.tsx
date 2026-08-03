@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { applyThemeClass } from '@/utils/theme-class';
 import { useStore } from './useStore';
 
 const useThemeSwitcher = () => {
@@ -14,12 +15,9 @@ const useThemeSwitcher = () => {
     // store so everything that reads is_dark_mode_on (incl. the chart) follows.
     const setTheme = useCallback(
         (theme: 'light' | 'dark') => {
-            const body = document.querySelector('body');
-            if (!body) return;
             const isDark = theme === 'dark';
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            body.classList.remove('theme--light', 'theme--dark');
-            body.classList.add(isDark ? 'theme--dark' : 'theme--light');
+            applyThemeClass(isDark);
             setDarkMode(isDark);
         },
         [setDarkMode]

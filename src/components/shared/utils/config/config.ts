@@ -8,6 +8,7 @@ import {
 } from '@/external/deriv-core';
 import type { AuthConfig } from '@/external/deriv-core';
 import { DerivWSAccountsService } from '@/services/derivws-accounts.service';
+import { getOAuthRedirectUri } from '@/utils/oauth-redirect';
 import brandConfig from '../../../../../brand.config.json';
 
 // =============================================================================
@@ -108,9 +109,16 @@ export const getDebugServiceWorker = () => {
 export const generateOAuthURL = async (prompt?: string): Promise<string> => {
     try {
         const clientId = process.env.NEXT_PUBLIC_DERIV_APP_ID;
-        const redirectUri = process.env.NEXT_PUBLIC_DERIV_REDIRECT_URI || window.location.origin;
+        const redirectUri = getOAuthRedirectUri();
 
-        if (!clientId && !redirectUri) return '';
+        // Both are mandatory. `redirectUri` falls back to the origin so it is
+        // never empty, which is why this has to be `||` — with `&&` a missing
+        // app id slipped through and built a URL with `client_id=undefined`,
+        // which Deriv bounces to its generic login page.
+        if (!clientId || !redirectUri) {
+            console.error('Missing OAuth configuration: NEXT_PUBLIC_DERIV_APP_ID is not set');
+            return '';
+        }
 
         const config: AuthConfig = {
             clientId,

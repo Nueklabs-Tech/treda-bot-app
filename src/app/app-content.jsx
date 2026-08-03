@@ -216,7 +216,9 @@ const AppContent = observer(() => {
         return (
             <AuthLoadingWrapper>
                 <ThemeProvider theme={is_dark_mode_on ? 'dark' : 'light'}>
-                    <BlocklyLoading />
+                    <div className='app-root__placeholder'>Welcome Home</div>
+
+                    {/* <BlocklyLoading />
                     <div className='bot-dashboard bot' data-testid='dt_bot_dashboard'>
                         <Audio />
                         <Main />
@@ -224,7 +226,7 @@ const AppContent = observer(() => {
                         <BotStopped />
                         <TransactionDetailsModal />
                         <ToastContainer limit={3} draggable={false} />
-                    </div>
+                    </div> */}
                 </ThemeProvider>
             </AuthLoadingWrapper>
         );

@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import clsx from 'clsx';
 import { observer } from 'mobx-react-lite';
 import { generateOAuthURL } from '@/components/shared';
@@ -16,6 +16,7 @@ import MenuItems from './menu-items';
 import MobileMenu from './mobile-menu';
 // @ts-ignore: Allow side-effect import of SCSS without type declarations
 import './header.scss';
+import { useLogout } from '@/hooks/useLogout';
 
 // The session is fully resolved by AuthBootstrapGate before this component ever
 // mounts (see @/services/auth-bootstrap), so `activeLoginid` is authoritative
@@ -24,14 +25,20 @@ const AppHeader = observer(() => {
     const { isDesktop } = useDevice();
     const { activeLoginid, setIsAuthorizing, authData } = useApiBase();
     const { client } = useStore() ?? {};
+    // Tracks the OAuth URL round-trip so both auth buttons stay disabled while
+    // one of them is redirecting.
+    const [isRedirecting, setIsRedirecting] = useState(false);
 
     const { data: activeAccount } = useActiveAccount({
         allBalanceData: client?.all_accounts_balance,
         directBalance: client?.balance,
     });
 
+    const handleLogout = useLogout();
+
     const handleSignup = useCallback(async () => {
         try {
+            setIsRedirecting(true);
             setIsAuthorizing(true);
             const oauthUrl = await generateOAuthURL('registration');
             if (oauthUrl) {
@@ -39,15 +46,18 @@ const AppHeader = observer(() => {
             } else {
                 console.error('Failed to generate OAuth URL for signup');
                 setIsAuthorizing(false);
+                setIsRedirecting(false);
             }
         } catch (error) {
             console.error('Signup redirection failed:', error);
             setIsAuthorizing(false);
+            setIsRedirecting(false);
         }
     }, [setIsAuthorizing]);
 
     const handleLogin = useCallback(async () => {
         try {
+            setIsRedirecting(true);
             setIsAuthorizing(true);
 
             const oauthUrl = await generateOAuthURL();
@@ -56,11 +66,13 @@ const AppHeader = observer(() => {
             } else {
                 console.error('Failed to generate OAuth URL');
                 setIsAuthorizing(false);
+                setIsRedirecting(false);
             }
         } catch (error) {
             console.error('Login redirection failed:', error);
             // Reset authorizing state if redirection fails
             setIsAuthorizing(false);
+            setIsRedirecting(false);
         }
     }, [setIsAuthorizing]);
 
@@ -119,7 +131,7 @@ const AppHeader = observer(() => {
                             tertiary
                             type='button'
                             className='auth-actions__btn auth-actions__btn--ghost'
-                            disabled={!isAuthConfigured}
+                            disabled={!isAuthConfigured || isRedirecting}
                             onClick={handleLogin}
                         >
                             <Localize i18n_default_text='Log in' />
@@ -128,7 +140,7 @@ const AppHeader = observer(() => {
                             primary_light
                             type='button'
                             className='auth-actions__btn auth-actions__btn--cta'
-                            disabled={!isAuthConfigured}
+                            disabled={!isAuthConfigured || isRedirecting}
                             onClick={handleSignup}
                         >
                             <Localize i18n_default_text='Get Started' />
@@ -139,7 +151,17 @@ const AppHeader = observer(() => {
 
             return null;
         },
-        [isDesktop, activeLoginid, client, activeAccount, authData, handleLogin, handleSignup, handleTransfer]
+        [
+            isDesktop,
+            activeLoginid,
+            client,
+            activeAccount,
+            authData,
+            isRedirecting,
+            handleLogin,
+            handleSignup,
+            handleTransfer,
+        ]
     );
 
     if (client?.should_hide_header) return null;
@@ -154,6 +176,7 @@ const AppHeader = observer(() => {
             >
                 <Wrapper variant='left'>
                     <AppLogo />
+                    {isDesktop ? <MenuItems /> : renderAccountSection('left')}
                 </Wrapper>
                 <Wrapper variant='right'>{renderAccountSection('right')}</Wrapper>
             </Header>

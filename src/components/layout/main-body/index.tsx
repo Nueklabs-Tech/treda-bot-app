@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@/hooks/useStore';
+import { applyThemeClass } from '@/utils/theme-class';
 import { useDevice } from '@deriv-com/ui';
 import './main-body.scss';
 
@@ -21,15 +22,7 @@ const MainBody: React.FC<TMainBodyProps> = observer(({ children }) => {
     // Apply the theme from the ui store, which defaults to the OS preference
     // when the user hasn't explicitly chosen one (see UiStore.getInitialDarkMode).
     useEffect(() => {
-        const body = document.querySelector('body');
-        if (!body) return;
-        if (is_dark_mode_on) {
-            body.classList.remove('theme--light');
-            body.classList.add('theme--dark');
-        } else {
-            body.classList.remove('theme--dark');
-            body.classList.add('theme--light');
-        }
+        applyThemeClass(is_dark_mode_on);
     }, [is_dark_mode_on]);
 
     useEffect(() => {

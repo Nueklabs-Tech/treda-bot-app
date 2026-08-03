@@ -61,11 +61,28 @@ export function storeAuthInfo(authInfo: AuthInfo): void {
   localStorage.setItem(AUTH_INFO_KEY, JSON.stringify(authInfo));
 }
 
-export function getAuthInfo(): AuthInfo | null {
+/**
+ * The stored auth info regardless of expiry.
+ *
+ * `getAuthInfo` hides an expired token, which also hides the `refresh_token`
+ * needed to replace it — the refresh flow has to read through that.
+ */
+export function getStoredAuthInfo(): AuthInfo | null {
   const raw = localStorage.getItem(AUTH_INFO_KEY);
   if (!raw) return null;
 
-  const authInfo: AuthInfo = JSON.parse(raw);
+  try {
+    return JSON.parse(raw) as AuthInfo;
+  } catch {
+    clearAuthInfo();
+    return null;
+  }
+}
+
+export function getAuthInfo(): AuthInfo | null {
+  const authInfo = getStoredAuthInfo();
+  if (!authInfo) return null;
+
   if (authInfo.expires_at && Date.now() > authInfo.expires_at * 1000) {
     return null; // Token expired
   }
