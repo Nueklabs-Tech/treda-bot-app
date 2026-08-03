@@ -11,7 +11,7 @@ import MobileWrapper from '@/components/shared_ui/mobile-wrapper';
 import Tabs from '@/components/shared_ui/tabs/tabs';
 import TradeTypeConfirmationModal from '@/components/trade-type-confirmation-modal';
 import TradingViewModal from '@/components/trading-view-chart/trading-view-modal';
-import { DBOT_TABS, TAB_IDS } from '@/constants/bot-contents';
+import { DBOT_TABS, TAB_HASHES, TAB_IDS } from '@/constants/bot-contents';
 import { api_base, updateWorkspaceName } from '@/external/bot-skeleton';
 import { CONNECTION_STATUS } from '@/external/bot-skeleton/services/api/observables/connection-status-stream';
 import { isDbotRTL } from '@/external/bot-skeleton/utils/workspace';
@@ -78,7 +78,7 @@ const AppWrapper = observer(() => {
     const { clear } = summary_card;
     const { DASHBOARD, BOT_BUILDER } = DBOT_TABS;
     const init_render = React.useRef(true);
-    const hash = ['dashboard', 'bot_builder', 'chart', 'tutorial'];
+    const hash = TAB_HASHES;
     const { isDesktop } = useDevice();
     const location = useLocation();
     const navigate = useNavigate();
@@ -422,9 +422,7 @@ const AppWrapper = observer(() => {
                                         : 'id-charts'
                                 }
                             >
-                                <Suspense
-                                    fallback={<AppLoading message={localize('Please wait, loading chart...')} />}
-                                >
+                                <Suspense fallback={<AppLoading message={localize('Please wait, loading chart...')} />}>
                                     <ChartWrapper show_digits_stats={false} />
                                 </Suspense>
                             </div>

@@ -2,13 +2,14 @@
 import { useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { observer } from 'mobx-react-lite';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { api_base } from '@/external/bot-skeleton';
 import { useIsReauthorizing } from '@/hooks/useAuthBootstrap';
 import { useStore } from '@/hooks/useStore';
 import { localize } from '@deriv-com/translations';
 import { useDevice } from '@deriv-com/ui';
 import { crypto_currencies_display_order, fiat_currencies_display_order } from '../shared';
+import BottomNav from './bottom-nav';
 import Footer from './footer';
 import AppHeader from './header';
 import Body from './main-body';
@@ -21,6 +22,9 @@ const Layout = observer(() => {
     const store = useStore();
     const is_quick_strategy_active = store?.quick_strategy?.is_open;
     const isCallbackPage = window.location.pathname === '/callback';
+    // The profile screen is a standalone mobile-app style page: it carries its own
+    // dark hero and back button, so the app header would double up on both.
+    const isProfilePage = useLocation().pathname === '/profile';
 
     const checkClientAccount = JSON.parse(localStorage.getItem('clientAccounts') ?? '{}');
     const getQueryParams = new URLSearchParams(window.location.search);
@@ -138,11 +142,13 @@ const Layout = observer(() => {
                 'quick-strategy-active': is_quick_strategy_active && !isDesktop,
             })}
         >
-            {!isCallbackPage && <AppHeader />}
+            {!isCallbackPage && !isProfilePage && <AppHeader />}
             <Body>
                 <Outlet />
             </Body>
             {!isCallbackPage && isDesktop && <Footer />}
+            {/* Mobile tab bar; renders itself only for a signed-in mobile session. */}
+            {!isCallbackPage && <BottomNav />}
         </div>
     );
 });

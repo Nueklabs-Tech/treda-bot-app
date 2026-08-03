@@ -202,12 +202,13 @@ const AppContent = observer(() => {
                 <ThemeProvider theme={is_dark_mode_on ? 'dark' : 'light'}>
                     {/* <BlocklyLoading /> */}
                     <div className='bot-dashboard bot' data-testid='dt_bot_dashboard'>
-                        <Audio />
+                        <div>welcome</div>
+                        {/* <Audio />
                         <Main />
                         <BotBuilder />
                         <BotStopped />
                         <TransactionDetailsModal />
-                        <ToastContainer limit={3} draggable={false} />
+                        <ToastContainer limit={3} draggable={false} /> */}
                     </div>
                 </ThemeProvider>
             </AuthLoadingWrapper>
