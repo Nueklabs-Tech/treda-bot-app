@@ -20,8 +20,7 @@ import './app-root.scss';
 
 const Layout = lazy(() => import('../components/layout'));
 const AppRoot = lazy(() => import('./app-root'));
-// Its own route so the header's profile icon is a real navigation (back button,
-// deep link) rather than a modal; it renders inside Layout, keeping the header.
+
 const Profile = lazy(() => import('../pages/profile'));
 
 const LanguageHandler = ({ children }: { children: React.ReactNode }) => {

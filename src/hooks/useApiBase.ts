@@ -10,12 +10,18 @@ import {
 import { TAuthData } from '@/types/api-types';
 
 export const useApiBase = () => {
-    const [connectionStatus, setConnectionStatus] = useState<CONNECTION_STATUS>(CONNECTION_STATUS.UNKNOWN);
-    const [isAuthorized, setIsAuthorized] = useState<boolean>(false);
-    const [isAuthorizing, setIsAuthorizing] = useState<boolean>(true); // Will be overridden by observable stream which now starts with true
-    const [accountList, setAccountList] = useState<TAuthData['account_list']>([]);
-    const [authData, setAuthData] = useState<TAuthData | null>(null);
-    const [activeLoginid, setActiveLoginid] = useState<string>('');
+    // These are all BehaviorSubjects, so seed from their current value rather
+    // than waiting for the subscriptions below: the effect only runs after the
+    // first render, and consumers that redirect on a falsy value (e.g. the
+    // profile page's logged-out guard) would fire before it ever arrives.
+    const [connectionStatus, setConnectionStatus] = useState<CONNECTION_STATUS>(
+        () => connectionStatus$.getValue() as CONNECTION_STATUS
+    );
+    const [isAuthorized, setIsAuthorized] = useState<boolean>(() => isAuthorized$.getValue());
+    const [isAuthorizing, setIsAuthorizing] = useState<boolean>(() => isAuthorizing$.getValue());
+    const [accountList, setAccountList] = useState<TAuthData['account_list']>(() => account_list$.getValue());
+    const [authData, setAuthData] = useState<TAuthData | null>(() => authData$.getValue());
+    const [activeLoginid, setActiveLoginid] = useState<string>(() => authData$.getValue()?.loginid ?? '');
 
     useEffect(() => {
         const connectionStatusSubscription = connectionStatus$.subscribe(status => {
