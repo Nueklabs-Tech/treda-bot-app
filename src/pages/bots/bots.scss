@@ -1,0 +1,187 @@
+@use 'components/shared/styles/mixins' as *;
+
+// Bots screen; structural rules come from the shared page shell.
+.bots {
+    &__list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    &__item {
+        display: flex;
+        align-items: center;
+        gap: 1.2rem;
+        padding: 1.4rem 1.6rem;
+        border: 1px solid var(--border-normal);
+        border-radius: 1.2rem;
+        background: var(--general-main-1);
+
+        @include mobile-or-tablet-screen {
+            flex-wrap: wrap;
+        }
+
+        &-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 3.6rem;
+            height: 3.6rem;
+            border-radius: 1rem;
+            background: color-mix(in srgb, var(--brand-primary) 12%, transparent);
+            color: var(--brand-primary);
+            flex-shrink: 0;
+        }
+
+        &-text {
+            flex: 1;
+            min-width: 0;
+        }
+
+        &-name {
+            margin: 0;
+            color: var(--text-prominent);
+            font-size: 1.4rem;
+            font-weight: 600;
+            line-height: 2rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        &-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin: 0.2rem 0 0;
+            color: var(--text-less-prominent);
+            font-size: 1.2rem;
+            line-height: 1.8rem;
+        }
+
+        &-source {
+            padding: 0.1rem 0.8rem;
+            border-radius: 999px;
+            background: color-mix(in srgb, var(--text-less-prominent) 14%, transparent);
+            text-transform: capitalize;
+        }
+
+        &-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-shrink: 0;
+
+            @include mobile-or-tablet-screen {
+                width: 100%;
+                justify-content: flex-end;
+            }
+
+            .page-button {
+                height: 3.4rem;
+                padding: 0 1.2rem;
+                font-size: 1.3rem;
+            }
+        }
+    }
+
+    &__templates {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(24rem, 1fr));
+        gap: 1.2rem;
+    }
+
+    &__template {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+        padding: 1.6rem;
+        border: 1px solid var(--border-normal);
+        border-radius: 1.2rem;
+        background: var(--general-main-1);
+        text-align: start;
+        cursor: pointer;
+        transition:
+            border-color 0.2s ease,
+            transform 0.2s ease;
+
+        &:hover {
+            border-color: var(--brand-primary);
+            transform: translateY(-1px);
+        }
+
+        &:focus-visible {
+            outline: 2px solid var(--brand-primary);
+            outline-offset: 2px;
+        }
+
+        &-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 3.6rem;
+            height: 3.6rem;
+            border-radius: 1rem;
+            background: color-mix(in srgb, var(--brand-primary) 12%, transparent);
+            color: var(--brand-primary);
+        }
+
+        &-title {
+            color: var(--text-prominent);
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 2.2rem;
+        }
+
+        &-description {
+            color: var(--text-less-prominent);
+            font-size: 1.3rem;
+            line-height: 2rem;
+        }
+
+        &-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin-top: 0.4rem;
+            color: var(--brand-primary);
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+    }
+
+    &__note {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1.4rem 1.6rem;
+        border-radius: 1.2rem;
+        background: color-mix(in srgb, var(--brand-primary) 8%, transparent);
+        color: var(--text-general);
+
+        svg {
+            flex-shrink: 0;
+            margin-top: 0.2rem;
+            color: var(--brand-primary);
+        }
+
+        p {
+            margin: 0;
+            font-size: 1.3rem;
+            line-height: 2rem;
+        }
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .bots__template {
+        transition: none;
+
+        &:hover {
+            transform: none;
+        }
+    }
+}

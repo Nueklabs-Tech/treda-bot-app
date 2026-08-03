@@ -10,6 +10,7 @@ import { useStore } from '@/hooks/useStore';
 import { Localize, localize } from '@deriv-com/translations';
 import { Header, useDevice, Wrapper } from '@deriv-com/ui';
 import { AppLogo } from '../app-logo';
+import PrimaryNav from '../primary-nav';
 import { NotificationIcon, ProfileIcon } from './auth-icons';
 import MenuItems from './menu-items';
 import NotificationsPanel, { useNotifications } from './notifications-panel';
@@ -214,6 +215,10 @@ const AppHeader = observer(() => {
             >
                 <Wrapper variant='left'>
                     <AppLogo />
+                    {/* The app used to navigate through a tab strip above the
+                        content; the primary destinations now live here on desktop
+                        and in the fixed bottom bar on mobile. */}
+                    <PrimaryNav />
                     {isDesktop ? <MenuItems /> : renderAccountSection('left')}
                 </Wrapper>
                 <Wrapper variant='right'>{renderAccountSection('right')}</Wrapper>

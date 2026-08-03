@@ -5,8 +5,13 @@
     --drawer-content-height-no-stat: calc(100vh - 233px);
     --drawer-scroll-height: calc(100vh - 365px);
     --drawer-content-height-mobile: calc(100% - 233px);
-    --tab-content-height: calc(100vh - 16.6rem);
-    --tab-content-height-mobile: calc(100vh - 12.6rem);
+    // Height of a full-screen work surface (the Blockly canvas). It used to
+    // subtract the tab strip and the padding around it; with navigation moved to
+    // the header and the bottom bar, only the header, the desktop footer and the
+    // mobile tab bar are left to reserve. --bottom-nav-offset is 0 unless that
+    // bar is on screen.
+    --tab-content-height: calc(100vh - 11.2rem);
+    --tab-content-height-mobile: calc(100vh - 6.6rem - var(--bottom-nav-offset, 0rem));
     --zindex-drawer: 5;
     --zindex-modal: 6;
     --zindex-draggable-modal: 7;

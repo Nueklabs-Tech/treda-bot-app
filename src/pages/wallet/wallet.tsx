@@ -50,6 +50,32 @@ const ICON_PATHS = {
         </>
     ),
     check: <path d='m5 12.5 4.5 4.5L19 7' />,
+    limits: (
+        <>
+            <path d='M4 17a8 8 0 1 1 16 0' />
+            <path d='m14.5 10.5-3 4' />
+        </>
+    ),
+    shield: (
+        <>
+            <path d='M12 3.5 19 6.4v5c0 4.3-2.9 8.2-7 9.6-4.1-1.4-7-5.3-7-9.6v-5l7-2.9Z' />
+            <path d='m9.2 12 2 2 3.6-3.6' />
+        </>
+    ),
+    p2p: (
+        <>
+            <circle cx='8' cy='9' r='3' />
+            <circle cx='16.5' cy='9' r='2.4' />
+            <path d='M3 19c0-2.5 2.2-4.2 5-4.2s5 1.7 5 4.2M14.5 19c0-1.8 1-3.2 2.7-3.7' />
+        </>
+    ),
+    settings: (
+        <>
+            <path d='M4 8h8M17 8h3M4 16h3M12 16h8' />
+            <circle cx='14.5' cy='8' r='2.2' />
+            <circle cx='9.5' cy='16' r='2.2' />
+        </>
+    ),
 } as const;
 
 type TIconName = keyof typeof ICON_PATHS;
@@ -81,7 +107,7 @@ type TReportRow = {
 const Wallet = observer(() => {
     const navigate = useNavigate();
     const { accountList, activeLoginid, authData } = useApiBase();
-    const { client, run_panel } = useStore() ?? {};
+    const { client, run_panel, transactions } = useStore() ?? {};
 
     // Switching accounts drops and re-opens the socket, so it is blocked while a
     // strategy is running — same rule the header's account switcher applies.
@@ -126,6 +152,48 @@ const Wallet = observer(() => {
             client?.checkAndRegenerateWebSocket();
         },
         [activeLoginid, client, is_bot_running]
+    );
+
+    // Trading totals for this browser session, mirrored from the run panel so the
+    // wallet answers "what has the bot done to my balance" without a trip to the
+    // reports pages.
+    const statistics = transactions?.statistics;
+    const win_rate = statistics?.number_of_runs
+        ? Math.round((statistics.won_contracts / statistics.number_of_runs) * 100)
+        : 0;
+    const session_profit = Number(statistics?.total_profit ?? 0);
+
+    const payment_rows: TReportRow[] = useMemo(
+        () => [
+            { key: 'deposit', label: localize('Deposit'), icon: 'deposit', url: standalone_routes.cashier_deposit },
+            { key: 'cashier', label: localize('Withdraw'), icon: 'cashier', url: standalone_routes.cashier },
+            { key: 'p2p', label: localize('Deriv P2P'), icon: 'p2p', url: standalone_routes.cashier_p2p },
+        ],
+        []
+    );
+
+    const account_rows: TReportRow[] = useMemo(
+        () => [
+            {
+                key: 'limits',
+                label: localize('Account limits'),
+                icon: 'limits',
+                url: standalone_routes.account_limits,
+            },
+            {
+                key: 'settings',
+                label: localize('Account settings'),
+                icon: 'settings',
+                url: standalone_routes.account_settings,
+            },
+            {
+                key: 'responsible',
+                label: localize('Responsible trading'),
+                icon: 'shield',
+                url: standalone_routes.responsible,
+            },
+        ],
+        []
     );
 
     const report_rows: TReportRow[] = useMemo(
@@ -216,6 +284,39 @@ const Wallet = observer(() => {
             <div className='wallet__sheet'>
                 <section className='wallet__group'>
                     <h2 className='wallet__group-title'>
+                        <Localize i18n_default_text='This session' />
+                    </h2>
+                    <div className='wallet__stats'>
+                        <div className='wallet__stat'>
+                            <span className='wallet__stat-label'>
+                                <Localize i18n_default_text='Profit / loss' />
+                            </span>
+                            <span
+                                className={`wallet__stat-value wallet__stat-value--${
+                                    session_profit > 0 ? 'win' : session_profit < 0 ? 'loss' : 'flat'
+                                }`}
+                            >
+                                {session_profit >= 0 ? '' : '-'}
+                                {addComma(Math.abs(session_profit).toFixed(getDecimalPlaces(active_account?.currency)))}
+                            </span>
+                        </div>
+                        <div className='wallet__stat'>
+                            <span className='wallet__stat-label'>
+                                <Localize i18n_default_text='Contracts' />
+                            </span>
+                            <span className='wallet__stat-value'>{statistics?.number_of_runs ?? 0}</span>
+                        </div>
+                        <div className='wallet__stat'>
+                            <span className='wallet__stat-label'>
+                                <Localize i18n_default_text='Win rate' />
+                            </span>
+                            <span className='wallet__stat-value'>{win_rate}%</span>
+                        </div>
+                    </div>
+                </section>
+
+                <section className='wallet__group'>
+                    <h2 className='wallet__group-title'>
                         <Localize i18n_default_text='Your accounts' />
                     </h2>
                     {is_bot_running && (
@@ -261,6 +362,23 @@ const Wallet = observer(() => {
 
                 <section className='wallet__group'>
                     <h2 className='wallet__group-title'>
+                        <Localize i18n_default_text='Payments' />
+                    </h2>
+                    <ul className='wallet__list'>
+                        {payment_rows.map(row => (
+                            <li key={row.key}>
+                                <button type='button' className='wallet__row' onClick={() => openExternal(row.url)}>
+                                    <Icon name={row.icon} className='wallet__row-icon' />
+                                    <span className='wallet__row-label'>{row.label}</span>
+                                    <Icon name='chevron' className='wallet__chevron' />
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
+                </section>
+
+                <section className='wallet__group'>
+                    <h2 className='wallet__group-title'>
                         <Localize i18n_default_text='Reports' />
                     </h2>
                     <ul className='wallet__list'>
@@ -275,6 +393,27 @@ const Wallet = observer(() => {
                         ))}
                     </ul>
                 </section>
+
+                <section className='wallet__group'>
+                    <h2 className='wallet__group-title'>
+                        <Localize i18n_default_text='Account and safety' />
+                    </h2>
+                    <ul className='wallet__list'>
+                        {account_rows.map(row => (
+                            <li key={row.key}>
+                                <button type='button' className='wallet__row' onClick={() => openExternal(row.url)}>
+                                    <Icon name={row.icon} className='wallet__row-icon' />
+                                    <span className='wallet__row-label'>{row.label}</span>
+                                    <Icon name='chevron' className='wallet__chevron' />
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
+                </section>
+
+                <p className='wallet__disclaimer'>
+                    <Localize i18n_default_text='Deposits, withdrawals and account settings are handled on Deriv and open in a new tab. Session figures cover this browser session only.' />
+                </p>
             </div>
         </div>
     );

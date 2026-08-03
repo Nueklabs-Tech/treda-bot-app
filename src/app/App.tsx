@@ -119,7 +119,6 @@ const router = createBrowserRouter(
                 </Suspense>
             }
         >
-            <Route index element={<AppRoot />} />
             <Route
                 path='profile'
                 element={
@@ -138,6 +137,13 @@ const router = createBrowserRouter(
             />
             <Route path='preview' element={<AppRoot />} />
             {oauthCallbackRoute && <Route path={oauthCallbackRoute} element={<AppRoot />} />}
+            {/* Home, bots, the builder, the chart and the tutorials are all the
+                same shell — one catch-all match keeps <AppRoot /> (and with it the
+                Blockly workspace and the socket subscriptions) mounted while the
+                user moves between them; a separate <Route> per path would remount
+                the whole tree on every navigation. main.tsx picks the screen from
+                the pathname. It also absorbs unknown URLs, which land on home. */}
+            <Route path='*' element={<AppRoot />} />
         </Route>
     ),
     { basename: routerBasename }

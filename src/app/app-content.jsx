@@ -18,7 +18,6 @@ import { ThemeProvider } from '@deriv-com/quill-ui';
 import { setSmartChartsPublicPath } from '@deriv-com/smartcharts-champion';
 import { localize } from '@deriv-com/translations';
 import Audio from '../components/audio';
-import BlocklyLoading from '../components/blockly-loading';
 import BotStopped from '../components/bot-stopped';
 import BotBuilder from '../pages/bot-builder';
 import Main from '../pages/main';
@@ -202,13 +201,12 @@ const AppContent = observer(() => {
                 <ThemeProvider theme={is_dark_mode_on ? 'dark' : 'light'}>
                     {/* <BlocklyLoading /> */}
                     <div className='bot-dashboard bot' data-testid='dt_bot_dashboard'>
-                        <div>welcome</div>
-                        {/* <Audio />
+                        <Audio />
                         <Main />
                         <BotBuilder />
                         <BotStopped />
                         <TransactionDetailsModal />
-                        <ToastContainer limit={3} draggable={false} /> */}
+                        <ToastContainer limit={3} draggable={false} />
                     </div>
                 </ThemeProvider>
             </AuthLoadingWrapper>

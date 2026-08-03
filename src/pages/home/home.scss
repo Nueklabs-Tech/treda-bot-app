@@ -1,0 +1,290 @@
+@use 'components/shared/styles/mixins' as *;
+
+// Home screen specifics; everything structural comes from the shared page shell
+// (@/components/page-shell).
+.home {
+    &__top {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+        gap: 1.6rem;
+
+        @media (max-width: 900px) {
+            grid-template-columns: minmax(0, 1fr);
+        }
+    }
+
+    &__balance {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        background: linear-gradient(
+            135deg,
+            var(--brand-primary) 0%,
+            color-mix(in srgb, var(--brand-primary) 72%, #000) 100%
+        );
+        border-color: transparent;
+        color: #fff;
+
+        &-label {
+            font-size: 1.2rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            opacity: 0.85;
+        }
+
+        &-value {
+            display: flex;
+            align-items: baseline;
+            gap: 0.8rem;
+            margin: 0.4rem 0 1.6rem;
+            font-size: 3.2rem;
+            font-weight: 700;
+            line-height: 4rem;
+            overflow-wrap: anywhere;
+
+            @include mobile-or-tablet-screen {
+                font-size: 2.8rem;
+                line-height: 3.6rem;
+            }
+        }
+
+        &-currency {
+            font-size: 1.4rem;
+            font-weight: 600;
+            opacity: 0.85;
+        }
+
+        &-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-top: auto;
+
+            // On the coloured card the shared button variants would disappear, so
+            // both are re-skinned against the gradient rather than the surface.
+            .page-button--primary {
+                background: #fff;
+                color: var(--brand-primary);
+
+                &:hover:not(:disabled) {
+                    background: rgb(255 255 255 / 88%);
+                }
+            }
+
+            .page-button--secondary {
+                background: rgb(255 255 255 / 14%);
+                border-color: rgb(255 255 255 / 40%);
+                color: #fff;
+
+                &:hover:not(:disabled) {
+                    background: rgb(255 255 255 / 24%);
+                    border-color: #fff;
+                    color: #fff;
+                }
+            }
+        }
+    }
+
+    &__status {
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+
+        &-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.2rem;
+        }
+
+        &-label {
+            color: var(--text-less-prominent);
+            font-size: 1.2rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        &-strategy {
+            margin: 0;
+            color: var(--text-prominent);
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 2.8rem;
+            overflow-wrap: anywhere;
+        }
+
+        &-hint {
+            margin: 0;
+            color: var(--text-less-prominent);
+            font-size: 1.3rem;
+            line-height: 2rem;
+        }
+
+        &-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-top: auto;
+            padding-top: 0.8rem;
+        }
+    }
+
+    &__bots {
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    &__bot {
+        display: flex;
+        align-items: center;
+        gap: 1.2rem;
+        width: 100%;
+        padding: 1.4rem 1.6rem;
+        border: 1px solid var(--border-normal);
+        border-radius: 1.2rem;
+        background: var(--general-main-1);
+        text-align: start;
+        cursor: pointer;
+        transition: border-color 0.2s ease;
+
+        &:hover:not(:disabled) {
+            border-color: var(--brand-primary);
+        }
+
+        &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        &-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 3.6rem;
+            height: 3.6rem;
+            border-radius: 1rem;
+            background: color-mix(in srgb, var(--brand-primary) 12%, transparent);
+            color: var(--brand-primary);
+            flex-shrink: 0;
+        }
+
+        &-text {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+            min-width: 0;
+            flex: 1;
+        }
+
+        &-name {
+            color: var(--text-prominent);
+            font-size: 1.4rem;
+            font-weight: 600;
+            line-height: 2rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        &-time {
+            color: var(--text-less-prominent);
+            font-size: 1.2rem;
+            line-height: 1.8rem;
+        }
+
+        &-chevron {
+            color: var(--text-less-prominent);
+            flex-shrink: 0;
+        }
+    }
+
+    &__contracts {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid var(--border-normal);
+        border-radius: 1.2rem;
+        background: var(--general-main-1);
+        overflow: hidden;
+    }
+
+    &__contract {
+        display: flex;
+        align-items: center;
+        gap: 1.2rem;
+        padding: 1.4rem 1.6rem;
+
+        & + & {
+            border-top: 1px solid var(--border-divider);
+        }
+
+        &-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 3.2rem;
+            height: 3.2rem;
+            border-radius: 50%;
+            flex-shrink: 0;
+
+            &--win {
+                background: color-mix(in srgb, var(--status-success) 16%, transparent);
+                color: var(--text-profit-success);
+            }
+
+            &--loss {
+                background: color-mix(in srgb, var(--status-danger) 16%, transparent);
+                color: var(--text-loss-danger);
+            }
+        }
+
+        &-text {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+            min-width: 0;
+            flex: 1;
+        }
+
+        &-name {
+            color: var(--text-prominent);
+            font-size: 1.4rem;
+            font-weight: 600;
+            line-height: 2rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        &-meta {
+            color: var(--text-less-prominent);
+            font-size: 1.2rem;
+            line-height: 1.8rem;
+        }
+
+        &-profit {
+            font-size: 1.4rem;
+            font-weight: 700;
+            white-space: nowrap;
+
+            &--win {
+                color: var(--text-profit-success);
+            }
+
+            &--loss {
+                color: var(--text-loss-danger);
+            }
+        }
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .home__bot {
+        transition: none;
+    }
+}

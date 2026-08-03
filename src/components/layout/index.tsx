@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { observer } from 'mobx-react-lite';
 import { Outlet, useLocation } from 'react-router-dom';
+import { STANDALONE_ROUTES } from '@/constants/routes';
 import { api_base } from '@/external/bot-skeleton';
 import { useIsReauthorizing } from '@/hooks/useAuthBootstrap';
 import { useStore } from '@/hooks/useStore';
@@ -23,8 +24,9 @@ const Layout = observer(() => {
     const is_quick_strategy_active = store?.quick_strategy?.is_open;
     const isCallbackPage = window.location.pathname === '/callback';
     // The profile and wallet screens are standalone mobile-app style pages: each
-    // carries its own dark hero and back button, so the app header would double up.
-    const isStandalonePage = ['/profile', '/wallet'].includes(useLocation().pathname);
+    // carries its own dark hero and back button, so on mobile the app header would
+    // double up. On desktop the header is the only navigation there is, so it stays.
+    const isStandalonePage = !isDesktop && STANDALONE_ROUTES.includes(useLocation().pathname);
 
     const checkClientAccount = JSON.parse(localStorage.getItem('clientAccounts') ?? '{}');
     const getQueryParams = new URLSearchParams(window.location.search);
