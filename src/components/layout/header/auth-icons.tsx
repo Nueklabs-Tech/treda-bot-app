@@ -17,22 +17,9 @@ const base = {
 // Bot head with an antenna — the "start the trading bot" CTA.
 export const BotIcon = () => (
     <svg {...base}>
-        <path
-            d='M8 1v2'
-            stroke='currentColor'
-            strokeWidth='1.4'
-            strokeLinecap='round'
-        />
+        <path d='M8 1v2' stroke='currentColor' strokeWidth='1.4' strokeLinecap='round' />
         <circle cx='8' cy='1.2' r='1' fill='currentColor' />
-        <rect
-            x='2.2'
-            y='4.4'
-            width='11.6'
-            height='9'
-            rx='2.6'
-            stroke='currentColor'
-            strokeWidth='1.4'
-        />
+        <rect x='2.2' y='4.4' width='11.6' height='9' rx='2.6' stroke='currentColor' strokeWidth='1.4' />
         <circle cx='5.9' cy='8.6' r='1.15' fill='currentColor' />
         <circle cx='10.1' cy='8.6' r='1.15' fill='currentColor' />
     </svg>
@@ -68,5 +55,45 @@ export const TransferIcon = () => (
             strokeLinecap='round'
             strokeLinejoin='round'
         />
+    </svg>
+);
+
+// The header icon buttons sit on a larger tap target than the pill buttons, so
+// they draw on a 24px grid instead of the 16px one above.
+const action_base = {
+    width: 22,
+    height: 22,
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    xmlns: 'http://www.w3.org/2000/svg',
+    'aria-hidden': true,
+    focusable: false,
+} as const;
+
+// Bust in a circle — opens the profile page.
+export const ProfileIcon = () => (
+    <svg {...action_base}>
+        <circle cx='12' cy='12' r='9.25' stroke='currentColor' strokeWidth='1.6' />
+        <circle cx='12' cy='9.6' r='2.9' stroke='currentColor' strokeWidth='1.6' />
+        <path
+            d='M5.9 19.4a6.6 6.6 0 0 1 12.2 0'
+            stroke='currentColor'
+            strokeWidth='1.6'
+            strokeLinecap='round'
+            strokeLinejoin='round'
+        />
+    </svg>
+);
+
+// Bell — opens the notifications drawer.
+export const NotificationIcon = () => (
+    <svg {...action_base}>
+        <path
+            d='M18 9.4a6 6 0 1 0-12 0c0 4.2-1.2 5.6-1.9 6.3a.7.7 0 0 0 .5 1.2h14.8a.7.7 0 0 0 .5-1.2c-.7-.7-1.9-2.1-1.9-6.3Z'
+            stroke='currentColor'
+            strokeWidth='1.6'
+            strokeLinejoin='round'
+        />
+        <path d='M10 20.1a2.3 2.3 0 0 0 4 0' stroke='currentColor' strokeWidth='1.6' strokeLinecap='round' />
     </svg>
 );

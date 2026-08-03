@@ -255,6 +255,21 @@
     }
 }
 
+// Placeholder shown while the lazily-loaded account switcher chunk is in flight.
+// Matches the switcher's rendered footprint so the header does not reflow.
+.account-info__skeleton {
+    width: 12rem;
+    height: 4rem;
+    border-radius: 8px;
+    background: var(--general-section-1);
+    opacity: 0.5;
+
+    @include mobile-screen {
+        width: 10rem;
+        height: 3.5rem;
+    }
+}
+
 .auth-actions {
     --auth-cta-from: var(--brand-primary, #3b82f6);
     --auth-cta-to: var(--brand-accent, #8b5cf6);
@@ -432,7 +447,86 @@
     }
 }
 
+// Profile + notifications icon buttons. Sized as 40px tap targets (36px on
+// handsets) so they stay comfortable on touch without crowding the 56px header.
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+
+    &__btn {
+        position: relative;
+        display: grid;
+        place-items: center;
+        width: 4rem;
+        height: 4rem;
+        padding: 0;
+        border: none;
+        border-radius: 50%;
+        background: transparent;
+        color: var(--brand-white, #fff);
+        cursor: pointer;
+        transition:
+            background 0.2s ease,
+            transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+
+        &:hover,
+        &--active {
+            background: color-mix(in srgb, var(--brand-white, #fff) 14%, transparent);
+        }
+
+        &:active {
+            transform: scale(0.92);
+        }
+
+        &:focus-visible {
+            outline: 2px solid var(--brand-white, #fff);
+            outline-offset: 2px;
+        }
+
+        svg {
+            display: block;
+        }
+
+        @include mobile-screen {
+            width: 3.6rem;
+            height: 3.6rem;
+
+            svg {
+                width: 2rem;
+                height: 2rem;
+            }
+        }
+    }
+
+    &__badge {
+        position: absolute;
+        top: 0.4rem;
+        inset-inline-end: 0.3rem;
+        min-width: 1.6rem;
+        height: 1.6rem;
+        padding: 0 0.4rem;
+        border-radius: 0.8rem;
+        border: 2px solid var(--brand-dark, #0e0e0e);
+        background: var(--status-danger, #e6190e);
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 700;
+        line-height: 1.2rem;
+        display: grid;
+        place-items: center;
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
+    .header-actions__btn {
+        transition: none;
+
+        &:active {
+            transform: none;
+        }
+    }
+
     .auth-actions__btn.dc-btn {
         transition: none;
 

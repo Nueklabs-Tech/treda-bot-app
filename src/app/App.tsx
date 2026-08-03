@@ -1,7 +1,8 @@
 import { lazy, Suspense, useEffect } from 'react';
 import React from 'react';
 import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider, useNavigate } from 'react-router-dom';
-import AppLoading from '@/components/loader/app-loading';
+import BootLoader from '@/components/loader/boot-loader';
+import CircleLoader from '@/components/loader/circle-loader';
 import LocalStorageSyncWrapper from '@/components/localStorage-sync-wrapper';
 import RoutePromptDialog from '@/components/route-prompt-dialog';
 import { useAccountSwitching } from '@/hooks/useAccountSwitching';
@@ -19,6 +20,9 @@ import './app-root.scss';
 
 const Layout = lazy(() => import('../components/layout'));
 const AppRoot = lazy(() => import('./app-root'));
+// Its own route so the header's profile icon is a real navigation (back button,
+// deep link) rather than a modal; it renders inside Layout, keeping the header.
+const Profile = lazy(() => import('../pages/profile'));
 
 const LanguageHandler = ({ children }: { children: React.ReactNode }) => {
     useLanguageFromURL();
@@ -57,7 +61,7 @@ const AuthBootstrapGate = ({ children }: { children: React.ReactNode }) => {
     const store = useStore();
     const is_auth_ready = useAuthBootstrap(Boolean(store));
 
-    if (!is_auth_ready) return <AppLoading message={localize('Connecting to your trading account')} />;
+    if (!is_auth_ready) return <BootLoader message={localize('Connecting to your trading account')} />;
 
     return (
         <>
@@ -97,7 +101,7 @@ const router = createBrowserRouter(
         <Route
             path='/'
             element={
-                <Suspense fallback={<AppLoading />}>
+                <Suspense fallback={<BootLoader />}>
                     <TranslationProvider defaultLang='EN' i18nInstance={i18nInstance}>
                         <LanguageHandler>
                             <StoreProvider>
@@ -116,6 +120,14 @@ const router = createBrowserRouter(
             }
         >
             <Route index element={<AppRoot />} />
+            <Route
+                path='profile'
+                element={
+                    <Suspense fallback={<CircleLoader message={localize('Loading')} />}>
+                        <Profile />
+                    </Suspense>
+                }
+            />
             <Route path='preview' element={<AppRoot />} />
             {oauthCallbackRoute && <Route path={oauthCallbackRoute} element={<AppRoot />} />}
         </Route>

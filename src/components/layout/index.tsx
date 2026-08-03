@@ -14,7 +14,7 @@ import AppHeader from './header';
 import Body from './main-body';
 import './layout.scss';
 
-import AppLoading from '../loader/app-loading';
+import BootLoader from '../loader/boot-loader';
 
 const Layout = observer(() => {
     const { isDesktop } = useDevice();
@@ -129,7 +129,7 @@ const Layout = observer(() => {
         }
     }, [isClientAccountsPopulated, isCallbackPage, clientHasCurrency, currency]);
 
-    if (is_reauthorizing) return <AppLoading message={localize('Switching account')} />;
+    if (is_reauthorizing) return <BootLoader message={localize('Switching account')} />;
 
     return (
         <div

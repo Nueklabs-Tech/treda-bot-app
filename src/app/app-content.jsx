@@ -43,9 +43,6 @@ const AppContent = observer(() => {
     const msg_listener = React.useRef(null);
     const { connectionStatus, isAuthorizing, activeLoginid } = useApiBase();
 
-    // An OAuth callback (?code=…&state=…) is still an authenticated session in
-    // progress — App.tsx exchanges the code before the client store is filled in,
-    // so without this the welcome page would flash mid-login.
     const [is_oauth_pending, setIsOAuthPending] = React.useState(() => {
         const params = new URLSearchParams(window.location.search);
         return Boolean(params.get('code') && params.get('state'));
@@ -72,10 +69,6 @@ const AppContent = observer(() => {
 
     useLiveChat(livechat_client_information);
 
-    // NOTE: Disabled Intercom until further notice
-    // const token = V2GetActiveToken() ?? null;
-    // useIntercom(token);
-
     useEffect(() => {
         if (!is_oauth_pending) return;
 
@@ -84,7 +77,6 @@ const AppContent = observer(() => {
             return;
         }
 
-        // Safety net: never keep the user on a blank loading screen forever.
         const timer = setTimeout(() => setIsOAuthPending(false), 30_000);
         return () => clearTimeout(timer);
     }, [is_oauth_pending, activeLoginid, client.is_logged_in]);
@@ -125,9 +117,6 @@ const AppContent = observer(() => {
     }, []);
 
     React.useEffect(() => {
-        // Check if api is initialized and then subscribe to the api messages
-        // Also we should only subscribe to the messages once user is logged in
-        // And is not already subscribed to the messages
         if (!is_subscribed_to_msg_listener.current && client.is_logged_in && is_api_initialized && api_base?.api) {
             is_subscribed_to_msg_listener.current = true;
             msg_listener.current = api_base.api.onMessage()?.subscribe(handleMessage);
@@ -158,9 +147,6 @@ const AppContent = observer(() => {
             active_symbols
                 .retrieveActiveSymbols(true)
                 .catch(error => {
-                    // The active-symbol service records its error state; prevent a
-                    // transient API failure from leaving an unhandled rejection or
-                    // a permanently blocked loading screen.
                     console.error('Unable to load active symbols:', error);
                 })
                 .finally(() => {
@@ -171,8 +157,6 @@ const AppContent = observer(() => {
         if (ApiHelpers?.instance?.active_symbols) {
             retrieveActiveSymbols();
         } else {
-            // This is a workaround to fix the issue where the active symbols are not loaded immediately
-            // when the API is initialized. Should be replaced with RxJS pubsub
             const intervalId = setInterval(() => {
                 if (ApiHelpers?.instance?.active_symbols) {
                     clearInterval(intervalId);
@@ -216,9 +200,7 @@ const AppContent = observer(() => {
         return (
             <AuthLoadingWrapper>
                 <ThemeProvider theme={is_dark_mode_on ? 'dark' : 'light'}>
-                    <div className='app-root__placeholder'>Welcome Home</div>
-
-                    {/* <BlocklyLoading />
+                    {/* <BlocklyLoading /> */}
                     <div className='bot-dashboard bot' data-testid='dt_bot_dashboard'>
                         <Audio />
                         <Main />
@@ -226,7 +208,7 @@ const AppContent = observer(() => {
                         <BotStopped />
                         <TransactionDetailsModal />
                         <ToastContainer limit={3} draggable={false} />
-                    </div> */}
+                    </div>
                 </ThemeProvider>
             </AuthLoadingWrapper>
         );

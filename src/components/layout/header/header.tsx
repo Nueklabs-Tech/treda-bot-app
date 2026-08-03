@@ -1,40 +1,49 @@
-import { useCallback, useState } from 'react';
+import { lazy, Suspense, useCallback, useState } from 'react';
 import clsx from 'clsx';
 import { observer } from 'mobx-react-lite';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { generateOAuthURL } from '@/components/shared';
 import Button from '@/components/shared_ui/button';
 import useActiveAccount from '@/hooks/api/account/useActiveAccount';
 import { useApiBase } from '@/hooks/useApiBase';
 import { useStore } from '@/hooks/useStore';
-import { navigateToTransfer } from '@/utils/transfer-utils';
-import { Localize } from '@deriv-com/translations';
+import { Localize, localize } from '@deriv-com/translations';
 import { Header, useDevice, Wrapper } from '@deriv-com/ui';
 import { AppLogo } from '../app-logo';
-import AccountSwitcher from './account-switcher';
-import { TransferIcon } from './auth-icons';
+import { NotificationIcon, ProfileIcon } from './auth-icons';
 import MenuItems from './menu-items';
-import MobileMenu from './mobile-menu';
+import NotificationsPanel, { useNotifications } from './notifications-panel';
 // @ts-ignore: Allow side-effect import of SCSS without type declarations
 import './header.scss';
-import { useLogout } from '@/hooks/useLogout';
+
+// Only ever rendered for an authenticated session, and it drags in its own large
+// stylesheet plus the account/balance formatting helpers — so it is split out of
+// the header chunk and fetched on demand once a login is present.
+const AccountSwitcher = lazy(() => import('./account-switcher'));
+
+// Reserves the switcher's footprint while its chunk loads so the header doesn't
+// reflow around it.
+const AccountSwitcherSkeleton = () => <div className='account-info__skeleton' aria-hidden='true' />;
 
 // The session is fully resolved by AuthBootstrapGate before this component ever
 // mounts (see @/services/auth-bootstrap), so `activeLoginid` is authoritative
 // here: there is no in-between state left to render a spinner for.
 const AppHeader = observer(() => {
     const { isDesktop } = useDevice();
-    const { activeLoginid, setIsAuthorizing, authData } = useApiBase();
+    const { activeLoginid, setIsAuthorizing } = useApiBase();
     const { client } = useStore() ?? {};
+    const navigate = useNavigate();
+    const { pathname } = useLocation();
     // Tracks the OAuth URL round-trip so both auth buttons stay disabled while
     // one of them is redirecting.
     const [isRedirecting, setIsRedirecting] = useState(false);
+    const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+    const { unread_count } = useNotifications();
 
     const { data: activeAccount } = useActiveAccount({
         allBalanceData: client?.all_accounts_balance,
         directBalance: client?.balance,
     });
-
-    const handleLogout = useLogout();
 
     const handleSignup = useCallback(async () => {
         try {
@@ -76,14 +85,16 @@ const AppHeader = observer(() => {
         }
     }, [setIsAuthorizing]);
 
-    const handleTransfer = useCallback(() => {
-        const transferCurrency = authData?.currency;
-        if (!transferCurrency) {
-            console.error('No currency available for transfer');
-            return;
-        }
-        navigateToTransfer(transferCurrency);
-    }, [authData?.currency]);
+    // The profile icon is a route, not a menu: tapping it opens the full profile
+    // page (and tapping it again from there goes back to the bot).
+    const handleProfile = useCallback(() => {
+        setIsNotificationsOpen(false);
+        navigate(pathname === '/profile' ? '/' : '/profile');
+    }, [navigate, pathname]);
+
+    const toggleNotifications = useCallback(() => setIsNotificationsOpen(open => !open), []);
+
+    const closeNotifications = useCallback(() => setIsNotificationsOpen(false), []);
 
     const renderAccountSection = useCallback(
         (position: 'left' | 'right' = 'right') => {
@@ -91,32 +102,57 @@ const AppHeader = observer(() => {
             if (activeLoginid) {
                 if (position === 'left' && !isDesktop) {
                     // For mobile left section - only account switcher
-                    return (
-                        <div className='auth-actions'>
-                            <div className='account-info'>
-                                <AccountSwitcher activeAccount={activeAccount} />
-                            </div>
-                        </div>
-                    );
+                    // return (
+                    //     <div className='auth-actions'>
+                    //         <div className='account-info'>
+                    //             <Suspense fallback={<AccountSwitcherSkeleton />}>
+                    //                 <AccountSwitcher activeAccount={activeAccount} />
+                    //             </Suspense>
+                    //         </div>
+                    //     </div>
+                    // );
                 } else if (position === 'right') {
-                    // For right section - transfer button (and account switcher on desktop)
+                    // For right section - profile / notification icons (and the
+                    // account switcher on desktop). Transfer moved onto the
+                    // profile page's quick actions.
                     return (
                         <div className='auth-actions'>
-                            {isDesktop && (
+                            {/* {isDesktop && (
                                 <div className='account-info'>
-                                    <AccountSwitcher activeAccount={activeAccount} />
+                                    <Suspense fallback={<AccountSwitcherSkeleton />}>
+                                        <AccountSwitcher activeAccount={activeAccount} />
+                                    </Suspense>
                                 </div>
-                            )}
-                            <Button
-                                primary
-                                type='button'
-                                icon={<TransferIcon />}
-                                className='auth-actions__btn auth-actions__btn--cta'
-                                disabled={client?.is_logging_out || !authData?.currency}
-                                onClick={handleTransfer}
-                            >
-                                <Localize i18n_default_text='Transfer' />
-                            </Button>
+                            )} */}
+                            <div className='header-actions'>
+                                <button
+                                    type='button'
+                                    className={clsx('header-actions__btn', {
+                                        'header-actions__btn--active': pathname === '/profile',
+                                    })}
+                                    onClick={handleProfile}
+                                    aria-label={localize('Profile')}
+                                    aria-current={pathname === '/profile' ? 'page' : undefined}
+                                >
+                                    <ProfileIcon />
+                                </button>
+                                <button
+                                    type='button'
+                                    className={clsx('header-actions__btn', {
+                                        'header-actions__btn--active': isNotificationsOpen,
+                                    })}
+                                    onClick={toggleNotifications}
+                                    aria-label={localize('Notifications')}
+                                    aria-expanded={isNotificationsOpen}
+                                >
+                                    <NotificationIcon />
+                                    {unread_count > 0 && (
+                                        <span className='header-actions__badge' aria-hidden='true'>
+                                            {unread_count > 9 ? '9+' : unread_count}
+                                        </span>
+                                    )}
+                                </button>
+                            </div>
                         </div>
                     );
                 }
@@ -154,13 +190,15 @@ const AppHeader = observer(() => {
         [
             isDesktop,
             activeLoginid,
-            client,
             activeAccount,
-            authData,
             isRedirecting,
+            isNotificationsOpen,
+            unread_count,
+            pathname,
             handleLogin,
             handleSignup,
-            handleTransfer,
+            handleProfile,
+            toggleNotifications,
         ]
     );
 
@@ -180,6 +218,7 @@ const AppHeader = observer(() => {
                 </Wrapper>
                 <Wrapper variant='right'>{renderAccountSection('right')}</Wrapper>
             </Header>
+            {activeLoginid && <NotificationsPanel is_open={isNotificationsOpen} onClose={closeNotifications} />}
         </>
     );
 });
