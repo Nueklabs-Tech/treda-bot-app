@@ -25,7 +25,8 @@ type TTabsProps = {
     has_active_line?: boolean;
     has_bottom_line?: boolean;
     header_fit_content?: boolean;
-    history: History;
+    /** Only read when `should_update_hash` is set, which no call site does. */
+    history?: History;
     icon_color?: string;
     icon_size?: number;
     is_100vw?: boolean;

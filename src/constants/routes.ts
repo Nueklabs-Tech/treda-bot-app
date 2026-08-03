@@ -2,14 +2,15 @@ import { PREVIEW_BASE_PATH } from '@/utils/is-preview-mode';
 import { DBOT_TABS, TAB_HASHES } from './bot-contents';
 
 /**
- * Every screen the app owns. The four primary destinations (home, bots, chart,
+ * Every screen the app owns. The four primary destinations (home, bots, trade,
  * wallet) are what the nav bars expose; the rest are reachable from inside them.
  */
 export const APP_ROUTES = Object.freeze({
     HOME: '/',
     BOTS: '/bots',
     BUILDER: '/bots/builder',
-    CHART: '/chart',
+    TRADE: '/trade',
+    POSITIONS: '/positions',
     TUTORIALS: '/tutorials',
     WALLET: '/wallet',
     PROFILE: '/profile',
@@ -33,7 +34,7 @@ const TAB_BY_ROUTE: Record<string, number> = {
     [APP_ROUTES.HOME]: DBOT_TABS.DASHBOARD,
     [APP_ROUTES.BOTS]: DBOT_TABS.BOTS,
     [APP_ROUTES.BUILDER]: DBOT_TABS.BOT_BUILDER,
-    [APP_ROUTES.CHART]: DBOT_TABS.CHART,
+    [APP_ROUTES.TRADE]: DBOT_TABS.CHART,
     [APP_ROUTES.TUTORIALS]: DBOT_TABS.TUTORIAL,
 };
 
@@ -42,11 +43,20 @@ const ROUTE_BY_TAB: Record<number, string> = Object.entries(TAB_BY_ROUTE).reduce
     {}
 );
 
+/**
+ * Paths this app used to serve, kept resolving so old bookmarks and shared
+ * links do not silently fall back to the dashboard. `/chart` is the trade
+ * screen's former URL.
+ */
+const LEGACY_ROUTE_ALIASES: Record<string, string> = {
+    '/chart': APP_ROUTES.TRADE,
+};
+
 /** Trailing slashes and the preview basename are noise for route matching. */
 const normalizePath = (pathname: string): string => {
     const path = pathname.replace(PREVIEW_BASE_PATH, '').replace(/\/+$/, '');
 
-    return path || APP_ROUTES.HOME;
+    return LEGACY_ROUTE_ALIASES[path] || path || APP_ROUTES.HOME;
 };
 
 /**

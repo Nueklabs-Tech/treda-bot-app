@@ -281,9 +281,9 @@ const Home = observer(() => {
                     />
                     <ActionTile
                         icon={<Icon name='candles' />}
-                        title={<Localize i18n_default_text='Charts' />}
+                        title={<Localize i18n_default_text='Trade' />}
                         description={<Localize i18n_default_text='Study a market before you trade' />}
-                        onClick={() => navigate(APP_ROUTES.CHART)}
+                        onClick={() => navigate(APP_ROUTES.TRADE)}
                     />
                     <ActionTile
                         icon={<Icon name='book' />}

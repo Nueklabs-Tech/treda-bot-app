@@ -53,6 +53,13 @@
         font-size: 1.2rem;
         font-weight: 600;
         line-height: 1.6rem;
+
+        // Five destinations share the bar; a long label in a narrow viewport
+        // truncates rather than wrapping the whole cell onto two lines.
+        max-width: 100%;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
     }
 }
 

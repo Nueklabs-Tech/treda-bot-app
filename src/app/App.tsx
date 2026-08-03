@@ -23,6 +23,7 @@ const AppRoot = lazy(() => import('./app-root'));
 
 const Profile = lazy(() => import('../pages/profile'));
 const Wallet = lazy(() => import('../pages/wallet'));
+const Positions = lazy(() => import('../pages/positions'));
 
 const LanguageHandler = ({ children }: { children: React.ReactNode }) => {
     useLanguageFromURL();
@@ -114,6 +115,14 @@ const router = createBrowserRouter(
                 element={
                     <Suspense fallback={<SkeletonLoader message={localize('Loading')} />}>
                         <Wallet />
+                    </Suspense>
+                }
+            />
+            <Route
+                path='positions'
+                element={
+                    <Suspense fallback={<SkeletonLoader message={localize('Loading')} />}>
+                        <Positions />
                     </Suspense>
                 }
             />

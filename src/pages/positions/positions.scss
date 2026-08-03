@@ -1,0 +1,53 @@
+.positions-page {
+    /**
+     * The run-panel tabs were written for a fixed-height drawer: Transactions and
+     * the virtualised journal list both measure a parent that already has one, so
+     * the page has to supply that height rather than letting the content size it.
+     */
+    &__panel {
+        display: flex;
+        flex-direction: column;
+        height: clamp(38rem, 60vh, 68rem);
+        overflow: hidden;
+        background: var(--general-main-1);
+        border: 1px solid var(--general-section-1);
+        border-radius: 1.2rem;
+
+        .dc-tabs {
+            height: 100%;
+            min-height: 0;
+        }
+
+        .dc-tabs__content {
+            min-height: 0;
+            overflow: hidden;
+
+            // The per-tab wrapper divs Tabs renders through.
+            > div {
+                height: 100%;
+            }
+        }
+
+        .journal,
+        .transactions,
+        .summary {
+            height: 100%;
+        }
+
+        .journal {
+            display: flex;
+            flex-direction: column;
+
+            &__item-list {
+                flex: 1;
+                min-height: 0;
+            }
+        }
+
+        // Without the drawer's statistics block underneath, the list gets the
+        // space that rule reserves for it.
+        .transactions__content {
+            height: calc(100% - 8.4rem);
+        }
+    }
+}

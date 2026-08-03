@@ -2,22 +2,19 @@
 import React from 'react';
 import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
-import Journal from '@/components/journal';
 import Button from '@/components/shared_ui/button';
 import Drawer from '@/components/shared_ui/drawer';
 import Modal from '@/components/shared_ui/modal';
 import Money from '@/components/shared_ui/money';
-import Tabs from '@/components/shared_ui/tabs';
 import Text from '@/components/shared_ui/text';
-import Summary from '@/components/summary';
 import TradeAnimation from '@/components/trade-animation';
-import Transactions from '@/components/transactions';
 import { DBOT_TABS } from '@/constants/bot-contents';
 import { popover_zindex } from '@/constants/z-indexes';
 import { useStore } from '@/hooks/useStore';
 import { Localize, localize } from '@deriv-com/translations';
 import { useDevice } from '@deriv-com/ui';
 import ThemedScrollbars from '../shared_ui/themed-scrollbars';
+import RunPanelTabs from './run-panel-tabs';
 
 type TStatisticsTile = {
     content: React.ElementType | string;
@@ -147,17 +144,11 @@ const DrawerContent = ({ active_index, is_drawer_open, active_tour, setActiveTab
 
     return (
         <>
-            <Tabs active_index={active_index} onTabItemClick={setActiveTabIndex} top>
-                <div id='db-run-panel-tab__summary' label={<Localize i18n_default_text='Summary' />}>
-                    <Summary is_drawer_open={is_drawer_open} />
-                </div>
-                <div id='db-run-panel-tab__transactions' label={<Localize i18n_default_text='Transactions' />}>
-                    <Transactions is_drawer_open={is_drawer_open} />
-                </div>
-                <div id='db-run-panel-tab__journal' label={<Localize i18n_default_text='Journal' />}>
-                    <Journal />
-                </div>
-            </Tabs>
+            <RunPanelTabs
+                active_index={active_index}
+                setActiveTabIndex={setActiveTabIndex}
+                is_drawer_open={is_drawer_open}
+            />
             {((is_drawer_open && active_index !== 2) || active_tour) && <StatisticsSummary {...props} />}
         </>
     );

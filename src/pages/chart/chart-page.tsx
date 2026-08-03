@@ -66,7 +66,7 @@ const ChartPage = observer(() => {
     return (
         <PageShell
             className='chart-page'
-            title={<Localize i18n_default_text='Chart' />}
+            title={<Localize i18n_default_text='Trade' />}
             subtitle={
                 <Localize i18n_default_text='Live prices for the market your bot trades, with the same feed the trade engine uses.' />
             }

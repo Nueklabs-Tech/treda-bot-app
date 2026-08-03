@@ -7,13 +7,18 @@ describe('routes', () => {
             expect(getTabForPath(APP_ROUTES.HOME)).toBe(DBOT_TABS.DASHBOARD);
             expect(getTabForPath(APP_ROUTES.BOTS)).toBe(DBOT_TABS.BOTS);
             expect(getTabForPath(APP_ROUTES.BUILDER)).toBe(DBOT_TABS.BOT_BUILDER);
-            expect(getTabForPath(APP_ROUTES.CHART)).toBe(DBOT_TABS.CHART);
+            expect(getTabForPath(APP_ROUTES.TRADE)).toBe(DBOT_TABS.CHART);
             expect(getTabForPath(APP_ROUTES.TUTORIALS)).toBe(DBOT_TABS.TUTORIAL);
         });
 
         it('ignores trailing slashes and the preview basename', () => {
-            expect(getTabForPath('/chart/')).toBe(DBOT_TABS.CHART);
+            expect(getTabForPath('/trade/')).toBe(DBOT_TABS.CHART);
             expect(getTabForPath('/bot/preview/bots')).toBe(DBOT_TABS.BOTS);
+        });
+
+        it('still resolves the trade screen from its old /chart URL', () => {
+            expect(getTabForPath('/chart')).toBe(DBOT_TABS.CHART);
+            expect(getTabForPath('/chart/')).toBe(DBOT_TABS.CHART);
         });
 
         it('opens the builder in the App Builder preview', () => {
@@ -27,7 +32,7 @@ describe('routes', () => {
 
     describe('getPathForTab', () => {
         it('round-trips with getTabForPath', () => {
-            [APP_ROUTES.HOME, APP_ROUTES.BOTS, APP_ROUTES.BUILDER, APP_ROUTES.CHART, APP_ROUTES.TUTORIALS].forEach(
+            [APP_ROUTES.HOME, APP_ROUTES.BOTS, APP_ROUTES.BUILDER, APP_ROUTES.TRADE, APP_ROUTES.TUTORIALS].forEach(
                 route => {
                     expect(getPathForTab(getTabForPath(route))).toBe(route);
                 }
@@ -42,19 +47,19 @@ describe('routes', () => {
     describe('isRouteActive', () => {
         it('treats home as an exact match only', () => {
             expect(isRouteActive('/', APP_ROUTES.HOME)).toBe(true);
-            expect(isRouteActive('/chart', APP_ROUTES.HOME)).toBe(false);
+            expect(isRouteActive('/trade', APP_ROUTES.HOME)).toBe(false);
         });
 
         it('keeps the parent destination active on a nested route', () => {
             expect(isRouteActive(APP_ROUTES.BUILDER, APP_ROUTES.BOTS)).toBe(true);
-            expect(isRouteActive(APP_ROUTES.CHART, APP_ROUTES.BOTS)).toBe(false);
+            expect(isRouteActive(APP_ROUTES.TRADE, APP_ROUTES.BOTS)).toBe(false);
         });
     });
 
     describe('getRouteForLegacyHash', () => {
         it('translates the pre-router tab hashes', () => {
             expect(getRouteForLegacyHash('#bot_builder')).toBe(APP_ROUTES.BUILDER);
-            expect(getRouteForLegacyHash('chart')).toBe(APP_ROUTES.CHART);
+            expect(getRouteForLegacyHash('chart')).toBe(APP_ROUTES.TRADE);
         });
 
         it('returns null when there is nothing to translate', () => {
