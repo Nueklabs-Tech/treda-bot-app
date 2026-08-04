@@ -1,0 +1,9 @@
+{
+    "permissions": {
+        "deny": [
+            "Edit(./src/app/**)",
+            "Write(./src/app/**)",
+            "NotebookEdit(./src/app/**)"
+        ]
+    }
+}

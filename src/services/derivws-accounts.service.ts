@@ -1,4 +1,5 @@
 import { isProduction } from '@/components/shared';
+import { toProxiedDerivApiUrl } from '@/utils/deriv-api-proxy';
 import brandConfig from '../../brand.config.json';
 
 /**
@@ -52,12 +53,17 @@ export class DerivWSAccountsService {
     private static otpFetchPromises: Map<string, Promise<string>> = new Map();
 
     /**
-     * Gets the DerivWS base URL based on environment
-     * @returns DerivWS base URL (e.g., "https://api.derivws.com/trading/v1/")
+     * Gets the DerivWS base URL based on environment.
+     *
+     * In development this is rewritten onto the dev server's same-origin proxy, so the
+     * Authorization header never triggers a CORS preflight — see toProxiedDerivApiUrl.
+     *
+     * @returns DerivWS base URL (e.g., "https://api.derivws.com/trading/v1/", or
+     *          "/deriv-api/trading/v1/" when proxied)
      */
     private static getDerivWSBaseURL(): string {
         const environment = isProduction() ? 'production' : 'staging';
-        return brandConfig.platform.derivws.url[environment];
+        return toProxiedDerivApiUrl(brandConfig.platform.derivws.url[environment]);
     }
 
     /**

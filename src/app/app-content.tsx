@@ -84,7 +84,7 @@ const AppContent = observer(() => {
         if (connectionStatus === CONNECTION_STATUS.OPENED) {
             setIsApiInitialized(true);
             common.setSocketOpened(true);
-        } else if (connectionStatus !== CONNECTION_STATUS.OPENED) {
+        } else {
             common.setSocketOpened(false);
         }
     }, [common, connectionStatus]);

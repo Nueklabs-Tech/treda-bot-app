@@ -23,7 +23,6 @@ import { getOAuthRedirectPath } from '@/utils/oauth-redirect';
 import { localize, TranslationProvider } from '@deriv-com/translations';
 import CoreStoreProvider from './CoreStoreProvider';
 import i18nInstance from './i18n';
-// @ts-ignore TS: side-effect SCSS import handled by bundler
 import './app-root.scss';
 
 const Layout = lazy(() => import('../components/layout'));

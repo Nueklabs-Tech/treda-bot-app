@@ -71,6 +71,12 @@ class APIBase {
     private readonly ACTIVE_SYMBOLS_TIMEOUT_MS = 10000; // 10 seconds
     private readonly ENRICHMENT_TIMEOUT_MS = 10000; // 10 seconds
     private readonly MAX_RECONNECTION_ATTEMPTS = 5; // Maximum number of reconnection attempts before session reset
+    private readonly SOCKET_OPEN_TIMEOUT_MS = 15000; // How long to wait for the socket before giving up on a request
+    private readonly ACTIVE_SYMBOLS_MAX_ATTEMPTS = 3; // Attempts before the active-symbols fetch is reported as failed
+    private readonly ACTIVE_SYMBOLS_RETRY_DELAY_MS = 1000; // Base delay between active-symbols attempts
+
+    // In-flight active-symbols request, so concurrent callers share one API call.
+    private active_symbols_request: Promise<any[]> | null = null;
 
     unsubscribeAllSubscriptions = () => {
         this.current_auth_subscriptions?.forEach(subscription_promise => {
@@ -192,7 +198,7 @@ class APIBase {
         const hasAccountID = V2GetActiveAccountId();
 
         if (!this.has_active_symbols && !hasAccountID) {
-            this.active_symbols_promise = this.getActiveSymbols().then(() => undefined);
+            this.requestActiveSymbols();
         }
 
         this.initEventListeners();
@@ -360,7 +366,7 @@ class APIBase {
             if (this.has_active_symbols) {
                 this.toggleRunButton(false);
             } else {
-                this.active_symbols_promise = this.getActiveSymbols();
+                this.requestActiveSymbols();
             }
             this.subscribe();
         } catch (e) {
@@ -406,57 +412,149 @@ class APIBase {
         await Promise.all(streamsToSubscribe.map(subscribeToStream));
     }
 
-    getActiveSymbols = async () => {
+    /**
+     * Races a promise against a timer, always clearing the timer so a slow-but-successful
+     * request does not leave a pending timeout behind.
+     */
+    private withTimeout = (promise, timeout_ms: number, message: string) => {
+        let timer: ReturnType<typeof setTimeout>;
+
+        const timeout = new Promise<never>((_, reject) => {
+            timer = setTimeout(() => reject(new Error(message)), timeout_ms);
+        });
+
+        return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+    };
+
+    /**
+     * Resolves once the socket is OPEN. `init()` kicks off requests while the connection
+     * may still be CONNECTING, and sending then would burn the request timeout on
+     * connection setup rather than on the request itself.
+     */
+    private waitForSocketOpen = (timeout_ms = this.SOCKET_OPEN_TIMEOUT_MS) => {
+        if (this.api?.connection?.readyState === 1) return Promise.resolve();
+
+        return new Promise<void>((resolve, reject) => {
+            const started_at = Date.now();
+
+            const poll = setInterval(() => {
+                // Polling rather than an 'open' listener: `this.api` may be swapped for a
+                // fresh instance mid-wait, and the listener would be left on the old one.
+                if (this.api?.connection?.readyState === 1) {
+                    clearInterval(poll);
+                    resolve();
+                } else if (Date.now() - started_at >= timeout_ms) {
+                    clearInterval(poll);
+                    reject(new Error('WebSocket connection timeout while waiting to fetch active symbols'));
+                }
+            }, 100);
+        });
+    };
+
+    private processActiveSymbolsResponse = async (active_symbols: any[]) => {
+        this.has_active_symbols = true;
+
+        // Process active symbols using the dedicated service with fallback
+        try {
+            const processedResult = await this.withTimeout(
+                activeSymbolsProcessorService.processActiveSymbols(active_symbols),
+                this.ENRICHMENT_TIMEOUT_MS,
+                'Enrichment timeout'
+            );
+
+            this.active_symbols = processedResult.enrichedSymbols;
+            this.pip_sizes = processedResult.pipSizes;
+        } catch (enrichmentError) {
+            console.warn('Symbol enrichment failed, using raw symbols:', enrichmentError);
+            // Fallback to raw symbols if enrichment fails
+            this.active_symbols = active_symbols;
+            this.pip_sizes = {};
+        }
+
+        this.toggleRunButton(false);
+        return this.active_symbols;
+    };
+
+    private fetchActiveSymbols = async () => {
         if (!this.api) {
             throw new Error('API connection not available for fetching active symbols');
         }
 
-        try {
-            // Add timeout to prevent hanging
-            const timeout = new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('Active symbols fetch timeout')), this.ACTIVE_SYMBOLS_TIMEOUT_MS)
-            );
+        await this.waitForSocketOpen();
 
-            const activeSymbolsPromise = doUntilDone(() => this.api?.send({ active_symbols: 'brief' }), [], this);
+        let last_error;
 
-            const apiResult = await Promise.race([activeSymbolsPromise, timeout]);
-
-            const { active_symbols = [], error = {} } = apiResult as any;
-
-            if (error && Object.keys(error).length > 0) {
-                throw new Error(`Active symbols API error: ${error.message || 'Unknown error'}`);
-            }
-
-            if (!active_symbols.length) {
-                throw new Error('No active symbols received from API');
-            }
-
-            this.has_active_symbols = true;
-
-            // Process active symbols using the dedicated service with fallback
+        for (let attempt = 1; attempt <= this.ACTIVE_SYMBOLS_MAX_ATTEMPTS; attempt++) {
             try {
-                const enrichmentTimeout = new Promise<never>((_, reject) =>
-                    setTimeout(() => reject(new Error('Enrichment timeout')), this.ENRICHMENT_TIMEOUT_MS)
+                const apiResult = await this.withTimeout(
+                    doUntilDone(() => this.api?.send({ active_symbols: 'brief' }), [], this),
+                    this.ACTIVE_SYMBOLS_TIMEOUT_MS,
+                    'Active symbols fetch timeout'
                 );
 
-                const enrichmentPromise = activeSymbolsProcessorService.processActiveSymbols(active_symbols);
-                const processedResult = await Promise.race([enrichmentPromise, enrichmentTimeout]);
+                const { active_symbols = [], error = {} } = (apiResult ?? {}) as any;
 
-                this.active_symbols = processedResult.enrichedSymbols;
-                this.pip_sizes = processedResult.pipSizes;
-            } catch (enrichmentError) {
-                console.warn('Symbol enrichment failed, using raw symbols:', enrichmentError);
-                // Fallback to raw symbols if enrichment fails
-                this.active_symbols = active_symbols;
-                this.pip_sizes = {};
+                if (error && Object.keys(error).length > 0) {
+                    throw new Error(`Active symbols API error: ${error.message || 'Unknown error'}`);
+                }
+
+                if (!active_symbols.length) {
+                    throw new Error('No active symbols received from API');
+                }
+
+                return await this.processActiveSymbolsResponse(active_symbols);
+            } catch (error) {
+                last_error = error;
+
+                if (attempt < this.ACTIVE_SYMBOLS_MAX_ATTEMPTS) {
+                    console.warn(
+                        `Active symbols fetch attempt ${attempt}/${this.ACTIVE_SYMBOLS_MAX_ATTEMPTS} failed, retrying:`,
+                        error
+                    );
+                    await new Promise(resolve => setTimeout(resolve, this.ACTIVE_SYMBOLS_RETRY_DELAY_MS * attempt));
+                    await this.waitForSocketOpen();
+                }
             }
-
-            this.toggleRunButton(false);
-            return this.active_symbols;
-        } catch (error) {
-            console.error('Failed to fetch and process active symbols:', error);
-            throw error;
         }
+
+        console.error('Failed to fetch and process active symbols:', last_error);
+        throw last_error;
+    };
+
+    getActiveSymbols = () => {
+        // Several call sites (init, authorize, the chart and the trade page) can ask for
+        // symbols at once; they share a single request instead of racing duplicates.
+        if (!this.active_symbols_request) {
+            this.active_symbols_request = this.fetchActiveSymbols().finally(() => {
+                this.active_symbols_request = null;
+            });
+        }
+
+        return this.active_symbols_request;
+    };
+
+    /**
+     * Starts a symbols fetch and publishes it as `active_symbols_promise` for other
+     * callers to await. The failure handler is attached here so an unobserved failure
+     * never surfaces as an "Uncaught (in promise)" — awaiters of the same promise still
+     * see the rejection.
+     */
+    private requestActiveSymbols = () => {
+        const request = this.getActiveSymbols();
+
+        this.active_symbols_promise = request;
+
+        request.catch(error => {
+            console.warn('Active symbols are unavailable:', error);
+
+            // Drop the rejected promise so the next caller starts a fresh request
+            // instead of re-awaiting a failure.
+            if (this.active_symbols_promise === request) {
+                this.active_symbols_promise = null;
+            }
+        });
+
+        return request;
     };
 
     toggleRunButton = (toggle: boolean) => {
