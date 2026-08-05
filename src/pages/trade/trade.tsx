@@ -2,6 +2,11 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react
 import { observer } from 'mobx-react-lite';
 import RectangleSkeleton from '@/components/loader/rectangle-skeleton';
 import { generateOAuthURL } from '@/components/shared';
+import ActiveContract from '@/components/trade/active-contract';
+import { TDuration } from '@/components/trade/duration-sheet';
+import MarketTabs from '@/components/trade/market-tabs';
+import SymbolSheet from '@/components/trade/symbol-sheet';
+import TradePanel from '@/components/trade/trade-panel';
 import {
     getChartType,
     getGranularity,
@@ -19,11 +24,6 @@ import { useStore } from '@/hooks/useStore';
 import { useTradeUrlParams } from '@/hooks/useTradeUrlParams';
 import { TApiError } from '@/utils/api-subscription';
 import { localize } from '@deriv-com/translations';
-import ActiveContract from './components/active-contract';
-import { TDuration } from './components/duration-sheet';
-import MarketTabs from './components/market-tabs';
-import SymbolSheet from './components/symbol-sheet';
-import TradePanel from './components/trade-panel';
 import { getSymbolCode, TActiveSymbol } from './types';
 // @ts-ignore: Allow side-effect import of SCSS without type declarations
 import './trade.scss';
@@ -232,7 +232,7 @@ const Trade = observer(() => {
                 onSelect={symbol => setParams({ symbol })}
             />
 
-            {/*  <TradePanel
+              <TradePanel
                 config={config}
                 contract_type={contract_type}
                 onContractTypeChange={setContractType}
@@ -253,7 +253,7 @@ const Trade = observer(() => {
                 onToggleExpanded={() => setIsPanelExpanded(value => !value)}
                 onBuy={handleBuy}
                 onLogin={handleLogin}
-            /> */}
+            /> 
         </div>
     );
 });

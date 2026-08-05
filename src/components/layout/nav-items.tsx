@@ -42,8 +42,8 @@ export type TNavItem = {
 /** Built per render so the labels pick up the active language. */
 export const getNavItems = (): TNavItem[] => [
     { key: 'home', label: localize('Home'), path: APP_ROUTES.HOME },
-    { key: 'bots', label: localize('Bots'), path: APP_ROUTES.BOTS },
     { key: 'trade', label: localize('Trade'), path: APP_ROUTES.TRADE },
+    { key: 'bots', label: localize('Bots'), path: APP_ROUTES.BOTS },
     { key: 'positions', label: localize('Positions'), path: APP_ROUTES.POSITIONS },
     { key: 'wallet', label: localize('Wallet'), path: APP_ROUTES.WALLET },
 ];

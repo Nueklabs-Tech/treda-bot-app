@@ -2,8 +2,8 @@ import { useMemo, useState } from 'react';
 import clsx from 'clsx';
 import BottomSheet from '@/components/bottom-sheet';
 import { MarketIcon } from '@/components/market/market-icon';
+import { getSymbolCode, TActiveSymbol } from '@/pages/trade/types';
 import { Localize, localize } from '@deriv-com/translations';
-import { getSymbolCode, TActiveSymbol } from '../types';
 
 type TSymbolSheetProps = {
     is_open: boolean;
