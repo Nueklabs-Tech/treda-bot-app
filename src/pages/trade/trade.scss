@@ -24,7 +24,9 @@
         position: relative;
         flex: 1;
         min-height: 18rem;
-        border-radius: 1.2rem;
+        // Bleeds to the screen edges like a native chart surface, matching the
+        // ticket's own edge-to-edge bleed below it.
+        margin: 0 -1.2rem;
         background: var(--general-main-1);
         overflow: hidden;
 
@@ -55,7 +57,7 @@
         overflow-y: auto;
 
         > .trade-types,
-        > .symbol-header,
+        > .trade__market-tabs,
         > .trade__chart,
         > .active-contract,
         > .trade__bot-notice {
@@ -75,6 +77,8 @@
 
         &__chart {
             min-height: 46rem;
+            margin: 0;
+            border-radius: 1.2rem;
         }
     }
 }
@@ -128,25 +132,69 @@
     }
 }
 
-/* -------------------------------------------------------------- symbol header */
+/* --------------------------------------------------------------- market tabs */
 
-.symbol-header {
-    display: flex;
-    align-items: center;
-    gap: 1.2rem;
+.trade__market-tabs {
     flex-shrink: 0;
+}
 
-    &__asset {
+.market-tabs {
+    display: flex;
+    align-items: stretch;
+    gap: 0.8rem;
+
+    &__add {
         display: flex;
+        flex-shrink: 0;
         align-items: center;
-        gap: 1.2rem;
+        justify-content: center;
+        width: 4.4rem;
+        border: none;
+        border-radius: 1.2rem;
+        background: var(--general-main-1);
+        color: var(--text-prominent);
+        cursor: pointer;
+
+        &:hover {
+            background: var(--general-hover);
+        }
+    }
+
+    &__list {
+        display: flex;
+        gap: 0.8rem;
         flex: 1;
         min-width: 0;
-        padding: 0.4rem 0;
-        border: none;
-        background: none;
-        text-align: start;
-        cursor: pointer;
+        overflow-x: auto;
+        scrollbar-width: none;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+    }
+}
+
+.market-tab {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-shrink: 0;
+    min-width: 0;
+    max-width: 100%;
+    padding: 0.8rem 1.2rem;
+    border: none;
+    border-radius: 1.2rem;
+    background: none;
+    text-align: start;
+    cursor: pointer;
+
+    &:hover {
+        background: var(--general-hover);
+    }
+
+    &--active {
+        background: var(--general-main-1);
+        box-shadow: 0 1px 4px rgb(0 0 0 / 10%);
     }
 
     &__icon {
@@ -156,8 +204,6 @@
         justify-content: center;
         width: 3.6rem;
         height: 3.6rem;
-        border-radius: 50%;
-        background: var(--general-main-1);
     }
 
     &__text {
@@ -168,76 +214,58 @@
     }
 
     &__name {
-        display: flex;
-        align-items: center;
-        gap: 0.4rem;
         min-width: 0;
+        overflow: hidden;
         color: var(--text-prominent);
         font-size: 1.6rem;
         font-weight: 700;
         line-height: 2.4rem;
-
-        // The name is the long part; the chevron must not be pushed off-screen.
-        > :first-child {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
-    &__chevron {
-        flex-shrink: 0;
-        color: var(--text-less-prominent);
-    }
-
-    &__price {
-        display: flex;
-        align-items: center;
-        gap: 0.8rem;
+    &__subtitle {
         color: var(--text-less-prominent);
         font-size: 1.4rem;
-        font-weight: 600;
+        font-weight: 500;
         line-height: 2rem;
-        font-variant-numeric: tabular-nums;
-        transition: color 0.2s ease;
-
-        &--up {
-            color: var(--status-success);
-        }
-
-        &--down {
-            color: var(--status-danger);
-        }
 
         &--closed {
             color: var(--status-warning);
         }
     }
 
-    &__submarket {
-        color: var(--text-less-prominent);
-        font-weight: 400;
-        overflow: hidden;
-        text-overflow: ellipsis;
+    &__price {
+        display: flex;
+        align-items: baseline;
+        gap: 0.6rem;
+        min-width: 0;
+        font-size: 1.4rem;
+        line-height: 2rem;
+    }
+
+    &__price--up &__change {
+        color: var(--status-success);
+    }
+
+    &__price--down &__change {
+        color: var(--status-danger);
+    }
+
+    &__quote {
+        color: var(--text-prominent);
+        font-weight: 700;
+    }
+
+    &__change {
+        display: flex;
+        align-items: center;
+        gap: 0.2rem;
         white-space: nowrap;
     }
 
-    &__positions {
-        display: flex;
-        flex-shrink: 0;
-        align-items: center;
-        justify-content: center;
-        width: 4rem;
-        height: 4rem;
-        border: none;
-        border-radius: 50%;
-        background: var(--general-main-1);
-        color: var(--text-prominent);
-        cursor: pointer;
-
-        &:hover {
-            background: var(--general-hover);
-        }
+    &__arrow {
+        font-size: 1rem;
     }
 }
 
@@ -262,19 +290,17 @@
         align-items: center;
         justify-content: center;
         width: 4.8rem;
-        height: 2.4rem;
+        height: 2rem;
         border: none;
         background: none;
-        color: var(--text-less-prominent);
         cursor: pointer;
 
-        svg {
-            transition: transform 0.25s ease;
+        &-bar {
+            width: 3.6rem;
+            height: 0.4rem;
+            border-radius: 999px;
+            background: var(--border-normal);
         }
-    }
-
-    &--expanded &__handle svg {
-        transform: rotate(180deg);
     }
 
     &__sides {
@@ -657,6 +683,36 @@
         }
     }
 
+    &__filters {
+        display: flex;
+        gap: 0.8rem;
+        margin-top: 1.2rem;
+        overflow-x: auto;
+        scrollbar-width: none;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+    }
+
+    &__filter {
+        flex-shrink: 0;
+        padding: 0.8rem 1.6rem;
+        border: 1px solid var(--border-normal);
+        border-radius: 2.4rem;
+        background: var(--general-main-1);
+        color: var(--text-prominent);
+        font-size: 1.4rem;
+        font-weight: 600;
+        white-space: nowrap;
+        cursor: pointer;
+
+        &--active {
+            border-color: var(--text-prominent);
+            background: var(--general-section-1);
+        }
+    }
+
     &__empty {
         margin: 2.4rem 0;
         color: var(--text-less-prominent);
@@ -731,12 +787,6 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-        }
-
-        &-meta {
-            color: var(--text-less-prominent);
-            font-size: 1.2rem;
-            line-height: 1.6rem;
         }
 
         &-closed {

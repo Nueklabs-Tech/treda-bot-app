@@ -1,6 +1,6 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import AppLoading from '@/components/loader/app-loading';
+import RectangleSkeleton from '@/components/loader/rectangle-skeleton';
 import { generateOAuthURL } from '@/components/shared';
 import {
     getChartType,
@@ -16,16 +16,14 @@ import { useApiBase } from '@/hooks/useApiBase';
 import { useOpenContract } from '@/hooks/useOpenContract';
 import { useProposal } from '@/hooks/useProposal';
 import { useStore } from '@/hooks/useStore';
-import { useTickStream } from '@/hooks/useTickStream';
 import { useTradeUrlParams } from '@/hooks/useTradeUrlParams';
 import { TApiError } from '@/utils/api-subscription';
 import { localize } from '@deriv-com/translations';
 import ActiveContract from './components/active-contract';
 import { TDuration } from './components/duration-sheet';
-import SymbolHeader from './components/symbol-header';
+import MarketTabs from './components/market-tabs';
 import SymbolSheet from './components/symbol-sheet';
 import TradePanel from './components/trade-panel';
-import TradeTypeTabs from './components/trade-type-tabs';
 import { getSymbolCode, TActiveSymbol } from './types';
 // @ts-ignore: Allow side-effect import of SCSS without type declarations
 import './trade.scss';
@@ -138,8 +136,6 @@ const Trade = observer(() => {
     );
     const is_market_open = active_symbol?.exchange_is_open !== 0;
 
-    const spot = useTickStream(is_market_open ? params.symbol : '');
-
     const amount = Number(stake);
     const is_stake_valid = !Number.isNaN(amount) && amount >= STAKE_LIMITS.min && amount <= STAKE_LIMITS.max;
 
@@ -204,19 +200,16 @@ const Trade = observer(() => {
 
     return (
         <div className='trade'>
-            <TradeTypeTabs value={params.trade_type} onSelect={trade_type => setParams({ trade_type })} />
-
-            <SymbolHeader
+            <MarketTabs
                 symbol={params.symbol}
                 display_name={active_symbol?.display_name || params.symbol}
-                submarket_name={active_symbol?.submarket_display_name}
+                trade_type_label={config.label}
                 is_market_open={is_market_open}
-                spot={spot}
                 onOpenSymbolPicker={() => setIsSymbolSheetOpen(true)}
             />
 
             <div className='trade__chart'>
-                <Suspense fallback={<AppLoading message={localize('Please wait, loading chart...')} />}>
+                <Suspense fallback={<RectangleSkeleton width='100%' height='60vh' />}>
                     <ChartWrapper prefix='trade-chart' show_digits_stats={false} show_top_widgets={false} />
                 </Suspense>
             </div>
@@ -231,7 +224,15 @@ const Trade = observer(() => {
                 </p>
             )}
 
-            <TradePanel
+            <SymbolSheet
+                is_open={is_symbol_sheet_open}
+                onClose={() => setIsSymbolSheetOpen(false)}
+                symbols={active_symbols}
+                active_symbol={params.symbol}
+                onSelect={symbol => setParams({ symbol })}
+            />
+
+            {/*  <TradePanel
                 config={config}
                 contract_type={contract_type}
                 onContractTypeChange={setContractType}
@@ -252,15 +253,7 @@ const Trade = observer(() => {
                 onToggleExpanded={() => setIsPanelExpanded(value => !value)}
                 onBuy={handleBuy}
                 onLogin={handleLogin}
-            />
-
-            <SymbolSheet
-                is_open={is_symbol_sheet_open}
-                onClose={() => setIsSymbolSheetOpen(false)}
-                symbols={active_symbols}
-                active_symbol={params.symbol}
-                onSelect={symbol => setParams({ symbol })}
-            />
+            /> */}
         </div>
     );
 });

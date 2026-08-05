@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
 /* [AI] - Analytics removed - rudderstack event tracking removed */
 /* [/AI] */
-import AppLoading from '@/components/loader/app-loading';
+import RectangleSkeleton from '@/components/loader/rectangle-skeleton';
 import chart_api from '@/external/bot-skeleton/services/api/chart-api';
 import { useSmartChartAdaptor } from '@/hooks/useSmartChartAdaptor';
 import { useStore } from '@/hooks/useStore';
@@ -91,7 +91,7 @@ const Chart = observer(({ show_digits_stats, show_top_widgets = true }: TChartPr
     };
 
     if (!symbol || chartData.activeSymbols.length === 0) {
-        return <AppLoading />;
+        return <RectangleSkeleton width='100%' height='60vh' />;
     }
 
     return (
@@ -129,7 +129,7 @@ const Chart = observer(({ show_digits_stats, show_top_widgets = true }: TChartPr
                 chartData={{ activeSymbols: chartData.activeSymbols, tradingTimes: chartData.tradingTimes }}
                 settings={settings}
                 symbol={symbol}
-                topWidgets={show_top_widgets ? () => <ChartTitle onChange={onSymbolChange} /> : undefined}
+                topWidgets={show_top_widgets ? () => <ChartTitle onChange={onSymbolChange} /> : () => null}
                 isConnectionOpened={is_connection_opened}
                 getMarketsOrder={getMarketsOrder}
                 isLive

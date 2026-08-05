@@ -115,19 +115,7 @@ const TradePanel = ({
                 aria-expanded={is_expanded}
                 aria-label={is_expanded ? localize('Hide trade parameters') : localize('Show trade parameters')}
             >
-                <svg
-                    width='24'
-                    height='24'
-                    viewBox='0 0 24 24'
-                    fill='none'
-                    stroke='currentColor'
-                    strokeWidth='2'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    aria-hidden='true'
-                >
-                    <path d='m6 15 6-6 6 6' />
-                </svg>
+                <span className='trade-panel__handle-bar' aria-hidden='true' />
             </button>
 
             <div className='trade-panel__sides' role='group' aria-label={localize('Contract direction')}>
@@ -191,7 +179,7 @@ const TradePanel = ({
                     disabled={!can_buy}
                 >
                     <span className='trade-panel__buy-label'>
-                        {is_buying ? <Localize i18n_default_text='Buying…' /> : side.label}
+                        {is_buying ? <Localize i18n_default_text='Buying…' /> : <Localize i18n_default_text='Buy' />}
                     </span>
                     <span className='trade-panel__buy-payout'>{renderPayout()}</span>
                 </button>

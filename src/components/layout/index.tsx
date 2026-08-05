@@ -4,29 +4,33 @@ import clsx from 'clsx';
 import { observer } from 'mobx-react-lite';
 import { Outlet, useLocation } from 'react-router-dom';
 import { STANDALONE_ROUTES } from '@/constants/routes';
-import { api_base } from '@/external/bot-skeleton';
+import { api_base, ApiHelpers, ServerTime } from '@/external/bot-skeleton';
+import { CONNECTION_STATUS } from '@/external/bot-skeleton/services/api/observables/connection-status-stream';
+import { useApiBase } from '@/hooks/useApiBase';
 import { useIsReauthorizing } from '@/hooks/useAuthBootstrap';
 import { useStore } from '@/hooks/useStore';
+import { setSmartChartsPublicPath } from '@deriv-com/smartcharts-champion';
 import { localize } from '@deriv-com/translations';
 import { useDevice } from '@deriv-com/ui';
-import { crypto_currencies_display_order, fiat_currencies_display_order } from '../shared';
+import BootLoader from '../loader/boot-loader';
+import { crypto_currencies_display_order, fiat_currencies_display_order, getUrlBase } from '../shared';
 import BottomNav from './bottom-nav';
 import Footer from './footer';
 import AppHeader from './header';
 import Body from './main-body';
 import './layout.scss';
 
-import BootLoader from '../loader/boot-loader';
-
 const Layout = observer(() => {
     const { isDesktop } = useDevice();
     const store = useStore();
+    const { connectionStatus } = useApiBase();
     const is_quick_strategy_active = store?.quick_strategy?.is_open;
     const isCallbackPage = window.location.pathname === '/callback';
     // The profile and wallet screens are standalone mobile-app style pages: each
     // carries its own dark hero and back button, so on mobile the app header would
     // double up. On desktop the header is the only navigation there is, so it stays.
-    const isStandalonePage = !isDesktop && STANDALONE_ROUTES.includes(useLocation().pathname);
+    const { pathname } = useLocation();
+    const isStandalonePage = !isDesktop && STANDALONE_ROUTES.includes(pathname);
 
     const checkClientAccount = JSON.parse(localStorage.getItem('clientAccounts') ?? '{}');
     const getQueryParams = new URLSearchParams(window.location.search);
@@ -43,6 +47,33 @@ const Layout = observer(() => {
     // loading state left here is an account switch, which drops the socket and
     // re-authorizes.
     const is_reauthorizing = useIsReauthorizing(store?.client?.is_account_regenerating);
+
+    // Standalone routes never mount AppContent either, which is the only other
+    // place SmartCharts' public path gets set. Without it, the library's lazily
+    // loaded chunks (e.g. flutter-chart-loader, lz-string) resolve against the
+    // page's own origin instead of /js/smartcharts/, 404 into the SPA's HTML
+    // fallback, and fail to parse as JS.
+    useEffect(() => {
+        setSmartChartsPublicPath(getUrlBase('/js/smartcharts/'));
+    }, []);
+
+    // Standalone routes (trade, profile, wallet, positions) render directly
+    // under this Layout and never mount AppContent, which is the only other
+    // place that bootstraps ApiHelpers/ServerTime for the bot-skeleton services
+    // the SmartCharts adapter depends on. Without this, a route reached without
+    // first visiting the dashboard fails chart data fetching forever with
+    // "ApiHelpers not initialized". Every call here is idempotent, so this is
+    // safe to run alongside AppContent's own copy on the dashboard route.
+    useEffect(() => {
+        if (connectionStatus !== CONNECTION_STATUS.OPENED) return;
+
+        const { app, common } = store;
+        if (!app || !common) return;
+
+        ServerTime.init(common);
+        app.setDBotEngineStores();
+        ApiHelpers.setInstance(app.api_helpers_store);
+    }, [connectionStatus, store]);
 
     useEffect(() => {
         (window as any).setClientHasCurrency = setClientHasCurrency;

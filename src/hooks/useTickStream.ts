@@ -14,6 +14,9 @@ export type TSpot = {
     quote: number | null;
     /** `quote` formatted to the symbol's pip size, ready to render. */
     display: string;
+    /** Change from the first quote seen this subscription — a session reference, not a prior close. */
+    change: number | null;
+    change_percentage: number | null;
     /** Direction of the last move, for colouring the price. */
     direction: 'up' | 'down' | 'none';
     decimals: number;
@@ -30,8 +33,10 @@ export type TSpot = {
 export const useTickStream = (symbol: string): TSpot => {
     const { connectionStatus } = useApiBase();
     const [quote, setQuote] = useState<number | null>(null);
+    const [change, setChange] = useState<{ amount: number; percentage: number } | null>(null);
     const [direction, setDirection] = useState<'up' | 'down' | 'none'>('none');
     const previous_quote = useRef<number | null>(null);
+    const reference_quote = useRef<number | null>(null);
 
     const decimals = useMemo(() => {
         const active_symbol = (api_base?.active_symbols ?? []).find(
@@ -45,7 +50,9 @@ export const useTickStream = (symbol: string): TSpot => {
         if (!symbol || connectionStatus !== CONNECTION_STATUS.OPENED) return;
 
         setQuote(null);
+        setChange(null);
         previous_quote.current = null;
+        reference_quote.current = null;
         setDirection('none');
 
         return subscribeToStream<TTick>({
@@ -53,6 +60,8 @@ export const useTickStream = (symbol: string): TSpot => {
             msg_type: 'tick',
             onData: tick => {
                 if (typeof tick?.quote !== 'number') return;
+
+                if (reference_quote.current === null) reference_quote.current = tick.quote;
 
                 setDirection(() => {
                     const previous = previous_quote.current;
@@ -63,14 +72,26 @@ export const useTickStream = (symbol: string): TSpot => {
                     return tick.quote > previous ? 'up' : 'down';
                 });
                 setQuote(tick.quote);
+
+                const reference = reference_quote.current;
+                setChange(
+                    reference
+                        ? { amount: tick.quote - reference, percentage: ((tick.quote - reference) / reference) * 100 }
+                        : null
+                );
             },
-            onError: () => setQuote(null),
+            onError: () => {
+                setQuote(null);
+                setChange(null);
+            },
         });
     }, [symbol, connectionStatus]);
 
     return {
         quote,
         display: quote === null ? '' : quote.toFixed(decimals),
+        change: change?.amount ?? null,
+        change_percentage: change?.percentage ?? null,
         direction,
         decimals,
         is_loading: quote === null,

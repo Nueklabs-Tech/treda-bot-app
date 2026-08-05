@@ -23,6 +23,7 @@ import { getOAuthRedirectPath } from '@/utils/oauth-redirect';
 import { localize, TranslationProvider } from '@deriv-com/translations';
 import CoreStoreProvider from './CoreStoreProvider';
 import i18nInstance from './i18n';
+//@ts-ignore
 import './app-root.scss';
 
 const Layout = lazy(() => import('../components/layout'));
@@ -51,8 +52,6 @@ const OAuthReturnRedirect = () => {
 };
 
 const AuthBootstrapGate = ({ children }: { children: React.ReactNode }) => {
-    // The root store registers itself with api_base on construction, so wait for
-    // it before opening the connection.
     const store = useStore();
     const is_auth_ready = useAuthBootstrap(Boolean(store));
 
@@ -71,20 +70,15 @@ const routerBasename = isPreviewMode() ? PREVIEW_BASE_PATH : undefined;
 const getOAuthCallbackRoute = (): string | null => {
     let path = getOAuthRedirectPath();
 
-    // Route paths are relative to the basename, so drop it before comparing.
     if (routerBasename && path.startsWith(routerBasename)) path = path.slice(routerBasename.length);
 
     const route = path.replace(/^\/+|\/+$/g, '');
 
-    // Empty means the redirect lands on the app root, already covered by the
-    // index route; 'preview' is likewise already declared below.
     return route && route !== 'preview' ? route : null;
 };
 
 const oauthCallbackRoute = getOAuthCallbackRoute();
 
-// One element shared by every route that renders the app shell, so React
-// reconciles it across those routes instead of tearing the tree down.
 const appRootRoute = <AppRoot />;
 
 const router = createBrowserRouter(
@@ -143,7 +137,6 @@ const router = createBrowserRouter(
                     </Suspense>
                 }
             />
-            {/* `/chart` was this screen's URL before it became the trade screen. */}
             <Route
                 path='chart'
                 element={<Navigate to={{ pathname: APP_ROUTES.TRADE, search: window.location.search }} replace />}

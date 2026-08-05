@@ -13,13 +13,13 @@ type TSymbolSheetProps = {
     onSelect: (symbol: string) => void;
 };
 
-/** Groups stay in the order the API returns them — markets first, then submarkets. */
-const groupByMarket = (symbols: TActiveSymbol[]) => {
+/** Groups stay in the order the API returns them. */
+const groupBy = (symbols: TActiveSymbol[], key: 'market_display_name' | 'submarket_display_name') => {
     const groups = new Map<string, TActiveSymbol[]>();
 
     symbols.forEach(symbol => {
-        const market = symbol.market_display_name || localize('Other');
-        groups.set(market, [...(groups.get(market) ?? []), symbol]);
+        const group = symbol[key] || localize('Other');
+        groups.set(group, [...(groups.get(group) ?? []), symbol]);
     });
 
     return [...groups.entries()];
@@ -32,19 +32,40 @@ const groupByMarket = (symbols: TActiveSymbol[]) => {
  */
 const SymbolSheet = ({ is_open, onClose, symbols, active_symbol, onSelect }: TSymbolSheetProps) => {
     const [query, setQuery] = useState('');
+    const [active_market, setActiveMarket] = useState<string | null>(null);
+
+    // Derived from the full symbol list, not the filtered one, so the pill row doesn't
+    // reshuffle as the user types a search.
+    const markets = useMemo(() => {
+        const seen = new Set<string>();
+
+        return symbols.reduce<string[]>((list, symbol) => {
+            const market = symbol.market_display_name;
+            if (market && !seen.has(market)) {
+                seen.add(market);
+                list.push(market);
+            }
+            return list;
+        }, []);
+    }, [symbols]);
+
+    // Default to the first market pill, and fall back to it again if the account's
+    // markets change (e.g. switching between real/demo) and the current pick disappears.
+    const selected_market = active_market && markets.includes(active_market) ? active_market : (markets[0] ?? null);
 
     const groups = useMemo(() => {
         const search = query.trim().toLowerCase();
-        const matches = search
-            ? symbols.filter(symbol => {
-                  const code = getSymbolCode(symbol).toLowerCase();
 
-                  return (symbol.display_name || '').toLowerCase().includes(search) || code.includes(search);
-              })
-            : symbols;
+        const matches = symbols.filter(symbol => {
+            if (selected_market && symbol.market_display_name !== selected_market) return false;
+            if (!search) return true;
 
-        return groupByMarket(matches);
-    }, [symbols, query]);
+            const code = getSymbolCode(symbol).toLowerCase();
+            return (symbol.display_name || '').toLowerCase().includes(search) || code.includes(search);
+        });
+
+        return groupBy(matches, 'submarket_display_name');
+    }, [symbols, query, selected_market]);
 
     const handleSelect = (symbol: string) => {
         onSelect(symbol);
@@ -69,17 +90,36 @@ const SymbolSheet = ({ is_open, onClose, symbols, active_symbol, onSelect }: TSy
                 onChange={event => setQuery(event.target.value)}
             />
 
+            {markets.length > 1 && (
+                <div className='symbol-sheet__filters' role='tablist' aria-label={localize('Market')}>
+                    {markets.map(market => (
+                        <button
+                            key={market}
+                            type='button'
+                            role='tab'
+                            aria-selected={market === selected_market}
+                            className={clsx('symbol-sheet__filter', {
+                                'symbol-sheet__filter--active': market === selected_market,
+                            })}
+                            onClick={() => setActiveMarket(market)}
+                        >
+                            {market}
+                        </button>
+                    ))}
+                </div>
+            )}
+
             {groups.length === 0 && (
                 <p className='symbol-sheet__empty'>
                     <Localize i18n_default_text='No assets match that search.' />
                 </p>
             )}
 
-            {groups.map(([market, market_symbols]) => (
-                <section className='symbol-sheet__group' key={market}>
-                    <h3 className='symbol-sheet__group-title'>{market}</h3>
+            {groups.map(([submarket, submarket_symbols]) => (
+                <section className='symbol-sheet__group' key={submarket}>
+                    <h3 className='symbol-sheet__group-title'>{submarket}</h3>
                     <ul className='symbol-sheet__list'>
-                        {market_symbols.map(symbol => {
+                        {submarket_symbols.map(symbol => {
                             const code = getSymbolCode(symbol);
                             const is_closed = symbol.exchange_is_open === 0;
 
@@ -98,9 +138,6 @@ const SymbolSheet = ({ is_open, onClose, symbols, active_symbol, onSelect }: TSy
                                         <span className='symbol-sheet__row-text'>
                                             <span className='symbol-sheet__row-name'>
                                                 {symbol.display_name || code}
-                                            </span>
-                                            <span className='symbol-sheet__row-meta'>
-                                                {symbol.submarket_display_name}
                                             </span>
                                         </span>
                                         {is_closed && (

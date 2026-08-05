@@ -1,14 +1,5 @@
 import { localize } from '@deriv-com/translations';
 
-/**
- * The `/trade` screen is URL-driven: `?chart_type=…&interval=…&symbol=…&trade_type=…`
- * is the whole state of the screen, so a link reproduces exactly what the sender
- * was looking at (the same contract Deriv's own Derivatives Trader keeps).
- *
- * This module is the vocabulary of that URL — the accepted values, what they mean
- * to SmartCharts, and what they mean to the `proposal`/`buy` calls.
- */
-
 export const TRADE_PARAMS = {
     CHART_TYPE: 'chart_type',
     INTERVAL: 'interval',
@@ -16,7 +7,6 @@ export const TRADE_PARAMS = {
     TRADE_TYPE: 'trade_type',
 } as const;
 
-/** What a visit to `/trade` with no query of its own is rewritten to. */
 export const DEFAULT_TRADE_PARAMS = Object.freeze({
     chart_type: 'area',
     interval: '1t',
@@ -24,11 +14,6 @@ export const DEFAULT_TRADE_PARAMS = Object.freeze({
     trade_type: 'rise_fall',
 });
 
-/**
- * URL chart type -> SmartCharts id. SmartCharts calls its shaded line chart
- * `line` and labels it "Area" in the UI, hence the rename here: the URL uses the
- * word the user sees.
- */
 export const CHART_TYPES: Record<string, string> = {
     area: 'line',
     candle: 'candles',
@@ -41,7 +26,6 @@ const CHART_TYPE_BY_SMARTCHART_ID: Record<string, string> = Object.entries(CHART
     {}
 );
 
-/** URL interval -> SmartCharts granularity in seconds (0 is the tick chart). */
 export const INTERVALS: Record<string, number> = {
     '1t': 0,
     '1m': 60,
@@ -66,10 +50,8 @@ const INTERVAL_BY_GRANULARITY: Record<number, string> = Object.entries(INTERVALS
 export type TDurationUnit = 't' | 's' | 'm' | 'h' | 'd';
 
 export type TContractSide = {
-    /** Contract type sent to the API, e.g. `CALL`. */
     value: string;
     label: string;
-    /** Colours the segmented control and the buy button. */
     tone: 'up' | 'down';
 };
 
@@ -78,7 +60,6 @@ export type TDurationRange = {
     label: string;
     min: number;
     max: number;
-    /** Used when the trade type is selected or the unit is switched. */
     default: number;
 };
 
@@ -87,13 +68,8 @@ export type TTradeTypeConfig = {
     label: string;
     sides: [TContractSide, TContractSide];
     durations: TDurationRange[];
-    /**
-     * `digit` renders the 0-9 picker (matches/differs, over/under); `offset`
-     * renders the +/- price offset (higher/lower). Both travel as `barrier`.
-     */
     barrier?: 'digit' | 'offset';
     default_barrier?: string;
-    /** Shown under the trade type name in the picker. */
     description: string;
 };
 
@@ -146,16 +122,6 @@ export const TRADE_TYPES: TTradeTypeConfig[] = [
         default_barrier: '5',
     },
     {
-        value: 'even_odd',
-        label: localize('Even/Odd'),
-        description: localize('Will the last digit be even or odd?'),
-        sides: [
-            { value: 'DIGITEVEN', label: localize('Even'), tone: 'up' },
-            { value: 'DIGITODD', label: localize('Odd'), tone: 'down' },
-        ],
-        durations: [TICKS],
-    },
-    {
         value: 'over_under',
         label: localize('Over/Under'),
         description: localize('Will the last digit be over or under the one you pick?'),
@@ -166,6 +132,16 @@ export const TRADE_TYPES: TTradeTypeConfig[] = [
         durations: [TICKS],
         barrier: 'digit',
         default_barrier: '5',
+    },
+    {
+        value: 'even_odd',
+        label: localize('Even/Odd'),
+        description: localize('Will the last digit be even or odd?'),
+        sides: [
+            { value: 'DIGITEVEN', label: localize('Even'), tone: 'up' },
+            { value: 'DIGITODD', label: localize('Odd'), tone: 'down' },
+        ],
+        durations: [TICKS],
     },
 ];
 

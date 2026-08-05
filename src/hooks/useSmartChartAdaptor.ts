@@ -63,6 +63,7 @@ export const useSmartChartAdaptor = (): UseSmartChartAdaptorReturn => {
     const isMountedRef = useRef(true);
     const cleanupFunctionsRef = useRef<Array<() => void>>([]);
     const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null); // Ref to store timeout for cleanup
+    const initRetryTimeoutRef = useRef<NodeJS.Timeout | null>(null); // Ref to store adapter-init poll timeout
 
     // Track mounted state
     useEffect(() => {
@@ -78,9 +79,35 @@ export const useSmartChartAdaptor = (): UseSmartChartAdaptorReturn => {
         };
     }, []);
 
-    // Initialize adapter - runs once when chart_api.api is available
+    // Initialize adapter once chart_api.api is available. api_base.init() kicks
+    // off chart_api.init() without awaiting it, so chart_api.api can still be
+    // mid-connect for a beat after this hook mounts — poll for it rather than
+    // checking once, or a lost race leaves the chart stuck on its loading state
+    // forever (adapterInitialized never flips, so a one-shot effect never fires
+    // again).
     useEffect(() => {
-        if (!adapterInitialized && chart_api.api) {
+        if (adapterInitialized) return;
+
+        let cancelled = false;
+        const maxRetries = 25;
+        const delayMs = 200;
+
+        const tryInitialize = (retryCount = 0) => {
+            if (cancelled) return;
+
+            if (!chart_api.api) {
+                if (retryCount >= maxRetries) {
+                    if (isMountedRef.current) {
+                        setError(new Error('Chart API did not become available in time'));
+                        setIsLoading(false);
+                    }
+                    return;
+                }
+
+                initRetryTimeoutRef.current = setTimeout(() => tryInitialize(retryCount + 1), delayMs);
+                return;
+            }
+
             try {
                 const transport = createTransport();
                 const services = createServices();
@@ -100,7 +127,17 @@ export const useSmartChartAdaptor = (): UseSmartChartAdaptorReturn => {
                     setIsLoading(false);
                 }
             }
-        }
+        };
+
+        tryInitialize();
+
+        return () => {
+            cancelled = true;
+            if (initRetryTimeoutRef.current) {
+                clearTimeout(initRetryTimeoutRef.current);
+                initRetryTimeoutRef.current = null;
+            }
+        };
     }, [adapterInitialized]);
 
     // Load chart data when adapter is initialized
