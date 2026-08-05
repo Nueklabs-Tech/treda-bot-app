@@ -62,6 +62,17 @@
     color: var(--text-general, #333);
     text-align: center;
 
+    // In light mode --general-section-1 is a visibly distinct off-white, so cards
+    // read as raised above the page. In dark mode --general-section-1 is brand-navy
+    // (pure black) same as the page background, so cards would flatten into it with
+    // only their border showing — --general-section-3 adds a touch of brand-primary
+    // to keep the same raised-card look in either theme.
+    --welcome-card-bg: var(--general-section-1, rgb(127 138 148 / 6%));
+
+    .theme--dark & {
+        --welcome-card-bg: var(--general-section-3, rgb(127 138 148 / 12%));
+    }
+
     &__glow {
         position: absolute;
         inset-block-start: -30rem;
@@ -233,7 +244,7 @@
         padding: 2rem 1.6rem;
         border: 1px solid var(--border-normal, rgb(127 138 148 / 24%));
         border-radius: 1.2rem;
-        background: var(--general-section-1, rgb(127 138 148 / 6%));
+        background: var(--welcome-card-bg);
     }
 
     &__stat-value {
@@ -289,7 +300,7 @@
         padding: 2.4rem;
         border: 1px solid var(--border-normal, rgb(127 138 148 / 24%));
         border-radius: 1.2rem;
-        background: var(--general-section-1, rgb(127 138 148 / 6%));
+        background: var(--welcome-card-bg);
         text-align: start;
     }
 
@@ -385,7 +396,7 @@
     &__faq {
         border: 1px solid var(--border-normal, rgb(127 138 148 / 24%));
         border-radius: 1.2rem;
-        background: var(--general-section-1, rgb(127 138 148 / 6%));
+        background: var(--welcome-card-bg);
         padding: 0 2rem;
 
         &[open] .welcome__faq-question {
@@ -435,7 +446,7 @@
         max-width: 72rem;
         padding: 4rem 2.4rem;
         border-radius: 1.6rem;
-        background: var(--general-section-1, rgb(59 130 246 / 6%));
+        background: var(--welcome-card-bg);
         border: 1px solid var(--border-normal, rgb(59 130 246 / 20%));
     }
 
