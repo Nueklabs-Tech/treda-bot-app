@@ -15,7 +15,6 @@ import {
 } from '@/components/page-shell';
 import { Icon } from '@/components/page-shell/icons';
 import { addComma, getCurrencyDisplayCode, getDecimalPlaces } from '@/components/shared';
-import { standalone_routes } from '@/components/shared/utils/routes/routes';
 import { DBOT_TABS } from '@/constants/bot-contents';
 import { APP_ROUTES } from '@/constants/routes';
 import { transaction_elements } from '@/constants/transactions';
@@ -25,6 +24,7 @@ import useActiveAccount from '@/hooks/api/account/useActiveAccount';
 import { useApiBase } from '@/hooks/useApiBase';
 import { useStore } from '@/hooks/useStore';
 import { TStrategy } from '@/types';
+import { navigateToTransfer } from '@/utils/transfer-utils';
 import { Localize, localize } from '@deriv-com/translations';
 // @ts-ignore: Allow side-effect import of SCSS without type declarations
 import './home.scss';
@@ -160,12 +160,7 @@ const Home = observer(() => {
                         <span className='home__balance-currency'>{getCurrencyDisplayCode(currency)}</span>
                     </p>
                     <div className='home__balance-actions'>
-                        <PageButton
-                            variant='primary'
-                            onClick={() =>
-                                window.open(standalone_routes.cashier_deposit, '_blank', 'noopener,noreferrer')
-                            }
-                        >
+                        <PageButton variant='primary' onClick={() => navigateToTransfer(currency)}>
                             <Localize i18n_default_text='Deposit' />
                         </PageButton>
                         <PageButton onClick={() => navigate(APP_ROUTES.WALLET)}>

@@ -84,7 +84,6 @@ export const standalone_routes = {
     account_settings: `${getDerivDomain('derivHub')}/accounts`,
     bot: `${window.location.origin}`,
     cashier: `${getDerivDomain('derivDtrader')}/cashier/`,
-    cashier_deposit: `${getDerivDomain('derivDtrader')}/cashier/deposit`,
     cashier_p2p: `${getDerivDomain('derivDtrader')}/cashier/p2p`,
     contract: `${getDerivDomain('derivDtrader')}/contract/:contract_id`,
     personal_details: `${getDerivDomain('derivDtrader')}/account/personal-details`,

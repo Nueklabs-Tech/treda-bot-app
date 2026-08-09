@@ -101,7 +101,8 @@ type TReportRow = {
     key: string;
     label: string;
     icon: TIconName;
-    url: string;
+    url?: string;
+    onClick?: () => void;
 };
 
 const Wallet = observer(() => {
@@ -165,11 +166,11 @@ const Wallet = observer(() => {
 
     const payment_rows: TReportRow[] = useMemo(
         () => [
-            { key: 'deposit', label: localize('Deposit'), icon: 'deposit', url: standalone_routes.cashier_deposit },
+            { key: 'deposit', label: localize('Deposit'), icon: 'deposit', onClick: handleTransfer },
             { key: 'cashier', label: localize('Withdraw'), icon: 'cashier', url: standalone_routes.cashier },
             { key: 'p2p', label: localize('Deriv P2P'), icon: 'p2p', url: standalone_routes.cashier_p2p },
         ],
-        []
+        [handleTransfer]
     );
 
     const account_rows: TReportRow[] = useMemo(
@@ -256,7 +257,8 @@ const Wallet = observer(() => {
                     <button
                         type='button'
                         className='wallet__hero-action'
-                        onClick={() => openExternal(standalone_routes.cashier_deposit)}
+                        onClick={handleTransfer}
+                        disabled={!authData?.currency || client?.is_logging_out}
                     >
                         <Icon name='deposit' />
                         <Localize i18n_default_text='Deposit' />
@@ -367,7 +369,11 @@ const Wallet = observer(() => {
                     <ul className='wallet__list'>
                         {payment_rows.map(row => (
                             <li key={row.key}>
-                                <button type='button' className='wallet__row' onClick={() => openExternal(row.url)}>
+                                <button
+                                    type='button'
+                                    className='wallet__row'
+                                    onClick={() => (row.onClick ? row.onClick() : openExternal(row.url as string))}
+                                >
                                     <Icon name={row.icon} className='wallet__row-icon' />
                                     <span className='wallet__row-label'>{row.label}</span>
                                     <Icon name='chevron' className='wallet__chevron' />

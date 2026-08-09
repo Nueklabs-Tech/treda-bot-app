@@ -178,7 +178,8 @@ const Profile = observer(() => {
                 key: 'deposit',
                 label: localize('Deposit'),
                 icon: 'deposit',
-                onClick: () => openExternal(standalone_routes.cashier_deposit),
+                onClick: handleTransfer,
+                is_disabled: !authData?.currency || client?.is_logging_out,
             },
             {
                 key: 'transfer',
