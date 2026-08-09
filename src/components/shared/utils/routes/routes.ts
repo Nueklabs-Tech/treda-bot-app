@@ -86,7 +86,6 @@ export const standalone_routes = {
     cashier: `${getDerivDomain('derivDtrader')}/cashier/`,
     cashier_p2p: `${getDerivDomain('derivDtrader')}/cashier/p2p`,
     contract: `${getDerivDomain('derivDtrader')}/contract/:contract_id`,
-    personal_details: `${getDerivDomain('derivDtrader')}/account/personal-details`,
     positions: `${getDerivDomain('derivDtrader')}/reports/positions`,
     profit: `${getDerivDomain('derivDtrader')}/reports/profit`,
     reports: `${getDerivDomain('derivDtrader')}/reports`,

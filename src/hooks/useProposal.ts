@@ -76,7 +76,9 @@ export const useProposal = (request: TProposalRequest | null): TProposalState =>
                     currency,
                     duration,
                     duration_unit,
-                    symbol,
+                    // The API's `proposal` call takes `underlying_symbol`, not `symbol` —
+                    // see mcp/deriv.ts for the confirmed API quirk.
+                    underlying_symbol: symbol,
                     ...(barrier ? { barrier } : {}),
                 },
                 msg_type: 'proposal',

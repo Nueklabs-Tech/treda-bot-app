@@ -31,27 +31,34 @@ const AccountSelector = observer(() => {
     // account, so the sheet stays read-only until the bot stops.
     const is_locked = Boolean(run_panel?.is_running || api_base.is_running);
 
-    // The authorize payload's balance is a snapshot; `all_accounts_balance` is the
-    // live subscription, so prefer it and fall back to what the account list has.
+    // The authorize payload's balance is a snapshot; `all_accounts_balance` would
+    // be the live per-account subscription, but nothing currently populates it
+    // (the balance stream isn't subscribed with account: 'all'). `client.balance`
+    // is the one figure that IS pushed live, and only for the active account, so
+    // it takes priority there; every other account still shows its login-time
+    // snapshot until an all-accounts subscription exists.
     const balances = client?.all_accounts_balance?.accounts;
 
     const accounts = useMemo<TSheetAccount[]>(() => {
         if (!accountList) return [];
 
         return accountList.map(account => {
+            const is_active_account = account.loginid === activeLoginid;
             const live = balances?.[account.loginid];
             const currency = live?.currency || account.currency || '';
-            const amount = live?.balance ?? Number(account.balance ?? 0);
+            const amount =
+                live?.balance ??
+                (is_active_account && client?.balance ? Number(client.balance) : Number(account.balance ?? 0));
 
             return {
                 loginid: account.loginid,
                 currency: currency ? getCurrencyDisplayCode(currency) : '',
                 balance: addComma(Number(amount).toFixed(getDecimalPlaces(currency))),
                 is_virtual: isDemoAccount(account.loginid),
-                is_active: account.loginid === activeLoginid,
+                is_active: is_active_account,
             };
         });
-    }, [accountList, activeLoginid, balances]);
+    }, [accountList, activeLoginid, balances, client?.balance]);
 
     const active_account = accounts.find(account => account.is_active);
 

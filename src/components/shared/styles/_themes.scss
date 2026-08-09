@@ -52,7 +52,7 @@
     --brand-border: #6b7280;
     --brand-text: #0f172a;
     --brand-text-secondary: #64748b;
-    --brand-success: #10b981;
+    --brand-success: #00c390;
     --brand-danger: #ef4444;
     --brand-warning: #f59e0b;
     --brand-info: #0ea5e9;
@@ -183,7 +183,7 @@
         --status-default: #{constants.$color-grey-3};
         --status-adjustment: #{constants.$color-grey-1};
         --status-danger: #{constants.$color-red-1};
-        --status-success: #{constants.$color-green-1};
+        --status-success: #00c390;
         --status-warning: #{constants.$color-yellow};
         --status-warning-transparent: #{constants.$alpha-color-yellow-1};
         --status-transfer: #{constants.$color-orange};
@@ -343,7 +343,7 @@
         --status-danger: #{constants.$color-red-2};
         --status-warning: #{constants.$color-yellow};
         --status-warning-transparent: #{constants.$alpha-color-yellow-1};
-        --status-success: #{constants.$color-green-3};
+        --status-success: #00c390;
         --status-transfer: #{constants.$color-orange};
         --status-info: var(--brand-accent);
         --status-colored-background: #{constants.$color-white};

@@ -127,20 +127,26 @@ const Wallet = observer(() => {
         () =>
             (accountList ?? [])
                 .map(account => {
+                    const is_active_account = account.loginid === activeLoginid;
                     const balance_data = client?.all_accounts_balance?.accounts?.[account.loginid];
                     const currency = balance_data?.currency || account.currency;
-                    const raw_balance = balance_data?.balance ?? Number(account.balance ?? 0);
+                    // `all_accounts_balance` isn't populated by anything today, so the
+                    // active account's figure comes from `client.balance` instead —
+                    // that one IS pushed live by the balance subscription.
+                    const raw_balance =
+                        balance_data?.balance ??
+                        (is_active_account && client?.balance ? Number(client.balance) : Number(account.balance ?? 0));
 
                     return {
                         loginid: account.loginid,
                         currency,
                         is_virtual: isVirtualAccount(account.loginid),
-                        is_active: account.loginid === activeLoginid,
+                        is_active: is_active_account,
                         balance: addComma(Number(raw_balance).toFixed(getDecimalPlaces(currency))),
                     };
                 })
                 .sort((a, b) => Number(b.is_active) - Number(a.is_active)),
-        [accountList, activeLoginid, client?.all_accounts_balance]
+        [accountList, activeLoginid, client?.all_accounts_balance, client?.balance]
     );
 
     const active_account = accounts.find(account => account.is_active);

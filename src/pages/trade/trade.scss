@@ -377,6 +377,23 @@
         }
     }
 
+    &__equals {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.8rem;
+        padding: 1.2rem;
+        border: 1px solid var(--border-normal);
+        border-radius: 1.2rem;
+        background: var(--general-main-1);
+    }
+
+    &__equals-label {
+        color: var(--text-prominent);
+        font-size: 1.4rem;
+        font-weight: 600;
+    }
+
     &__message {
         margin: 0;
         color: var(--status-danger);
@@ -798,5 +815,70 @@
             font-size: 1.2rem;
             font-weight: 600;
         }
+    }
+}
+
+/* ------------------------------------------------------------- result toast */
+
+// Declared standalone rather than layered on the shared .Toastify__toast base
+// (bot-notification.scss) — that stylesheet isn't guaranteed to be in the
+// bundle chunk this route loads, so this toast carries its own background,
+// color and sizing instead of assuming the base rule already set them.
+.Toastify__toast.trade-result-toast-toast {
+    width: 28rem;
+    height: auto;
+    min-height: auto;
+    padding: 1rem 1.4rem;
+    border-radius: 0.8rem;
+    background: var(--icon-black-plus);
+    color: var(--general-main-1);
+    box-shadow: 0 4px 16px rgb(0 0 0 / 20%);
+}
+
+.trade-result-toast {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    &__icon {
+        display: flex;
+        flex-shrink: 0;
+        align-items: center;
+        justify-content: center;
+        width: 3.2rem;
+        height: 3.2rem;
+        border-radius: 50%;
+        color: var(--general-main-1);
+    }
+
+    &--win &__icon {
+        background: var(--status-success);
+    }
+
+    &--loss &__icon {
+        background: var(--status-danger);
+    }
+
+    &__text {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+        min-width: 0;
+    }
+
+    &__title {
+        color: var(--general-main-1);
+        font-size: 1.4rem;
+        font-weight: 700;
+        line-height: 2rem;
+    }
+
+    &__subtitle {
+        color: var(--text-less-prominent);
+        font-size: 1.2rem;
+        line-height: 1.6rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 }

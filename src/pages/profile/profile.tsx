@@ -3,11 +3,13 @@ import { observer } from 'mobx-react-lite';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { standalone_routes } from '@/components/shared/utils/routes/routes';
 import ToggleSwitch from '@/components/shared_ui/toggle-switch';
+import { api_base } from '@/external/bot-skeleton/services/api/api-base';
 import useActiveAccount from '@/hooks/api/account/useActiveAccount';
 import { useApiBase } from '@/hooks/useApiBase';
 import { useLogout } from '@/hooks/useLogout';
 import { useStore } from '@/hooks/useStore';
 import useThemeSwitcher from '@/hooks/useThemeSwitcher';
+import { fetchPersonalDetails, TPersonalDetails } from '@/services/user-profile.service';
 import { navigateToTransfer } from '@/utils/transfer-utils';
 import { Localize, localize } from '@deriv-com/translations';
 // @ts-ignore: Allow side-effect import of SCSS without type declarations
@@ -140,6 +142,10 @@ const Profile = observer(() => {
     const { is_dark_mode_on, toggleTheme } = useThemeSwitcher();
     const handleLogout = useLogout();
     const [is_copied, setIsCopied] = useState(false);
+    const [is_personal_details_open, setIsPersonalDetailsOpen] = useState(false);
+    const [is_personal_details_loading, setIsPersonalDetailsLoading] = useState(false);
+    const [personal_details, setPersonalDetails] = useState<TPersonalDetails | null>(null);
+    const [personal_details_failed, setPersonalDetailsFailed] = useState(false);
 
     const { data: activeAccount } = useActiveAccount({
         allBalanceData: client?.all_accounts_balance,
@@ -166,6 +172,28 @@ const Profile = observer(() => {
             () => setIsCopied(false)
         );
     }, [activeLoginid]);
+
+    const togglePersonalDetails = useCallback(async () => {
+        setIsPersonalDetailsOpen(open => !open);
+
+        if (personal_details || is_personal_details_loading) return;
+
+        setIsPersonalDetailsLoading(true);
+        setPersonalDetailsFailed(false);
+        // `api_base.api.send` is mistyped upstream as returning `void`; it actually
+        // resolves the raw API response, same as every other `api_base.api.send()`
+        // call site in the app.
+        const details = await fetchPersonalDetails(
+            api_base.api as unknown as Parameters<typeof fetchPersonalDetails>[0]
+        );
+        setIsPersonalDetailsLoading(false);
+
+        if (details) {
+            setPersonalDetails(details);
+        } else {
+            setPersonalDetailsFailed(true);
+        }
+    }, [personal_details, is_personal_details_loading]);
 
     const onLogout = useCallback(async () => {
         await handleLogout();
@@ -204,16 +232,11 @@ const Profile = observer(() => {
         [authData?.currency, client?.is_logging_out, handleTransfer, openExternal]
     );
 
-    // "About you" mirrors the reference design; both destinations live on Deriv,
-    // so they open externally rather than as routes of this app.
+    // "Account settings" still lives on Deriv, so it opens externally. "Personal
+    // details" used to as well; it's now fetched from `get_settings` and shown
+    // in-app instead (see the "About you" section below).
     const about_rows: TLinkRow[] = useMemo(
         () => [
-            {
-                key: 'personal',
-                label: localize('Personal details'),
-                icon: 'id_card',
-                onClick: () => openExternal(standalone_routes.personal_details),
-            },
             {
                 key: 'settings',
                 label: localize('Account settings'),
@@ -223,6 +246,29 @@ const Profile = observer(() => {
         ],
         [openExternal]
     );
+
+    const personal_detail_fields = personal_details
+        ? [
+              { label: localize('Full name'), value: personal_details.fullname },
+              { label: localize('Email'), value: personal_details.email },
+              { label: localize('Phone'), value: personal_details.phone },
+              { label: localize('Date of birth'), value: personal_details.date_of_birth },
+              { label: localize('Country'), value: personal_details.country },
+              {
+                  label: localize('Address'),
+                  value:
+                      [
+                          personal_details.address_line_1,
+                          personal_details.address_line_2,
+                          personal_details.address_city,
+                          personal_details.address_state,
+                          personal_details.address_postcode,
+                      ]
+                          .filter(Boolean)
+                          .join(', ') || undefined,
+              },
+          ].filter(field => field.value)
+        : [];
 
     const support_rows: TLinkRow[] = useMemo(
         () => [
@@ -293,7 +339,61 @@ const Profile = observer(() => {
                     <h2 className='profile__group-title'>
                         <Localize i18n_default_text='About you' />
                     </h2>
-                    <ul className='profile__list'>{renderLinkRows(about_rows)}</ul>
+                    <ul className='profile__list'>
+                        <li>
+                            <button
+                                type='button'
+                                className='profile__row'
+                                onClick={togglePersonalDetails}
+                                aria-expanded={is_personal_details_open}
+                            >
+                                <Icon name='id_card' className='profile__row-icon' />
+                                <span className='profile__row-label'>
+                                    <Localize i18n_default_text='Personal details' />
+                                </span>
+                                <Icon
+                                    name='chevron'
+                                    className={`profile__chevron${
+                                        is_personal_details_open ? ' profile__chevron--open' : ''
+                                    }`}
+                                />
+                            </button>
+                            {is_personal_details_open && (
+                                <ul className='profile__list profile__list--nested'>
+                                    {is_personal_details_loading && (
+                                        <li className='profile__row profile__row--static'>
+                                            <span className='profile__row-label'>
+                                                <Localize i18n_default_text='Loading…' />
+                                            </span>
+                                        </li>
+                                    )}
+                                    {!is_personal_details_loading && personal_details_failed && (
+                                        <li className='profile__row profile__row--static'>
+                                            <span className='profile__row-label'>
+                                                <Localize i18n_default_text="Couldn't load personal details. Try again later." />
+                                            </span>
+                                        </li>
+                                    )}
+                                    {!is_personal_details_loading &&
+                                        !personal_details_failed &&
+                                        personal_detail_fields.length === 0 && (
+                                            <li className='profile__row profile__row--static'>
+                                                <span className='profile__row-label'>
+                                                    <Localize i18n_default_text='No personal details on file.' />
+                                                </span>
+                                            </li>
+                                        )}
+                                    {personal_detail_fields.map(field => (
+                                        <li key={field.label} className='profile__row profile__row--static'>
+                                            <span className='profile__row-label'>{field.label}</span>
+                                            <span className='profile__row-value'>{field.value}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </li>
+                        {renderLinkRows(about_rows)}
+                    </ul>
                 </section>
 
                 <section className='profile__group'>

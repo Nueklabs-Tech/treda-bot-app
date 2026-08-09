@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import clsx from 'clsx';
 import { addComma, getCurrencyDisplayCode, getDecimalPlaces } from '@/components/shared';
+import ToggleSwitch from '@/components/shared_ui/toggle-switch';
 import { TTradeTypeConfig } from '@/constants/trade';
 import { TProposalState } from '@/hooks/useProposal';
 import { TApiError } from '@/utils/api-subscription';
@@ -19,6 +20,8 @@ type TTradePanelProps = {
     onStakeChange: (stake: string) => void;
     barrier: string;
     onBarrierChange: (barrier: string) => void;
+    allow_equals: boolean;
+    onAllowEqualsChange: (allow_equals: boolean) => void;
     currency: string;
     proposal_state: TProposalState;
     /** False while the parameters cannot be priced at all (no stake, no session). */
@@ -63,6 +66,8 @@ const TradePanel = ({
     onStakeChange,
     barrier,
     onBarrierChange,
+    allow_equals,
+    onAllowEqualsChange,
     currency,
     proposal_state,
     is_pricing_enabled,
@@ -166,6 +171,20 @@ const TradePanel = ({
                             <span className='trade-panel__param-value'>{barrier}</span>
                         </button>
                     )}
+                </div>
+            )}
+
+            {is_expanded && config.has_equals && (
+                <div className='trade-panel__equals'>
+                    <span className='trade-panel__equals-label'>
+                        <Localize i18n_default_text='Allow equals' />
+                    </span>
+                    <ToggleSwitch
+                        id='trade-panel-allow-equals'
+                        handleToggle={() => onAllowEqualsChange(!allow_equals)}
+                        is_enabled={allow_equals}
+                        classNameLabel='trade-panel__equals-toggle'
+                    />
                 </div>
             )}
 

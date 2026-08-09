@@ -70,6 +70,8 @@ export type TTradeTypeConfig = {
     durations: TDurationRange[];
     barrier?: 'digit' | 'offset';
     default_barrier?: string;
+    /** Whether an exit spot equal to the entry spot counts as a win for this side (CALLE/PUTE). */
+    has_equals?: boolean;
     description: string;
 };
 
@@ -96,6 +98,7 @@ export const TRADE_TYPES: TTradeTypeConfig[] = [
             { value: 'PUT', label: localize('Fall'), tone: 'down' },
         ],
         durations: [TICKS, MINUTES, HOURS],
+        has_equals: true,
     },
     {
         value: 'higher_lower',
@@ -148,6 +151,24 @@ export const TRADE_TYPES: TTradeTypeConfig[] = [
 export const getTradeTypeConfig = (trade_type: string): TTradeTypeConfig =>
     TRADE_TYPES.find(config => config.value === trade_type) ??
     (TRADE_TYPES.find(config => config.value === DEFAULT_TRADE_PARAMS.trade_type) as TTradeTypeConfig);
+
+/**
+ * Maps a bought contract's raw API contract_type (e.g. "CALL", "PUTE") back to
+ * its side label ("Rise", "Fall") for display after settlement, independent of
+ * whichever trade type the ticket has since been switched to.
+ */
+export const getSideLabel = (contract_type?: string): string => {
+    if (!contract_type) return '';
+
+    const base_type = contract_type.replace(/E$/, '');
+
+    for (const config of TRADE_TYPES) {
+        const side = config.sides.find(side => side.value === base_type);
+        if (side) return side.label;
+    }
+
+    return contract_type;
+};
 
 export const isValidChartType = (chart_type?: string | null): boolean =>
     Boolean(chart_type && chart_type in CHART_TYPES);

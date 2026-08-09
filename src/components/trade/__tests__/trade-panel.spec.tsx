@@ -21,6 +21,8 @@ const buildProps = (overrides = {}) => ({
     onStakeChange: jest.fn(),
     barrier: '',
     onBarrierChange: jest.fn(),
+    allow_equals: false,
+    onAllowEqualsChange: jest.fn(),
     currency: 'USD',
     proposal_state: { proposal, error: null, is_loading: false },
     is_pricing_enabled: true,
@@ -82,6 +84,21 @@ describe('TradePanel', () => {
         );
 
         expect(screen.getByText('Minimum stake is 0.35 USD.')).toBeInTheDocument();
+    });
+
+    it('toggles allow equals for a trade type that supports it', () => {
+        const onAllowEqualsChange = jest.fn();
+        render(<TradePanel {...buildProps({ onAllowEqualsChange })} />);
+
+        fireEvent.click(screen.getByLabelText('toggle_switch'));
+
+        expect(onAllowEqualsChange).toHaveBeenCalledWith(true);
+    });
+
+    it('hides allow equals for a trade type without an equals variant', () => {
+        render(<TradePanel {...buildProps({ config: getTradeTypeConfig('even_odd') })} />);
+
+        expect(screen.queryByText('Allow equals')).not.toBeInTheDocument();
     });
 
     it('asks a signed-out visitor to log in instead of buying', () => {

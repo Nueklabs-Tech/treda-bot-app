@@ -192,6 +192,24 @@
         height: 1.8rem;
         flex-shrink: 0;
         color: var(--text-less-prominent);
+        transition: transform 0.2s ease;
+
+        &--open {
+            transform: rotate(90deg);
+        }
+    }
+
+    // The personal-details drill-down: same row shape, indented and on a faint
+    // fill so it reads as nested content rather than a new list of its own.
+    &__list--nested {
+        background: color-mix(in srgb, var(--text-less-prominent) 6%, transparent);
+
+        .profile__row-value {
+            max-width: 60%;
+            overflow-wrap: anywhere;
+            white-space: normal;
+            text-align: end;
+        }
     }
 
     &__logout {

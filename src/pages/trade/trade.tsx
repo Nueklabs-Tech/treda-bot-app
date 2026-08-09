@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import RectangleSkeleton from '@/components/loader/rectangle-skeleton';
 import { generateOAuthURL } from '@/components/shared';
@@ -7,10 +7,12 @@ import { TDuration } from '@/components/trade/duration-sheet';
 import MarketTabs from '@/components/trade/market-tabs';
 import SymbolSheet from '@/components/trade/symbol-sheet';
 import TradePanel from '@/components/trade/trade-panel';
+import { showTradeResultToast } from '@/components/trade/trade-result-toast';
 import {
     getChartType,
     getGranularity,
     getInterval,
+    getSideLabel,
     getSmartChartType,
     getTradeTypeConfig,
     STAKE_LIMITS,
@@ -54,6 +56,7 @@ const Trade = observer(() => {
     });
     const [stake, setStake] = useState(String(STAKE_LIMITS.default));
     const [barrier, setBarrier] = useState(config.default_barrier ?? '');
+    const [allow_equals, setAllowEquals] = useState(false);
     const [is_panel_expanded, setIsPanelExpanded] = useState(true);
     const [is_symbol_sheet_open, setIsSymbolSheetOpen] = useState(false);
 
@@ -75,6 +78,7 @@ const Trade = observer(() => {
         setContractType(config.sides[0].value);
         setDuration({ value: config.durations[0].default, unit: config.durations[0].unit });
         setBarrier(config.default_barrier ?? '');
+        setAllowEquals(false);
     }, [config]);
 
     useEffect(() => {
@@ -139,6 +143,10 @@ const Trade = observer(() => {
     const amount = Number(stake);
     const is_stake_valid = !Number.isNaN(amount) && amount >= STAKE_LIMITS.min && amount <= STAKE_LIMITS.max;
 
+    // CALLE/PUTE are the API's "equals" variants of CALL/PUT — an exit spot equal
+    // to the entry spot counts as a win. Only rise/fall offers this trade-off.
+    const effective_contract_type = config.has_equals && allow_equals ? `${contract_type}E` : contract_type;
+
     // Prices are only requested for a signed-in session: the account is what
     // decides the currency a payout is quoted in, so quoting before there is one
     // would put a number on screen in a currency the user may not hold.
@@ -147,7 +155,7 @@ const Trade = observer(() => {
 
         return {
             symbol: params.symbol,
-            contract_type,
+            contract_type: effective_contract_type,
             amount,
             currency,
             duration: duration.value,
@@ -158,7 +166,7 @@ const Trade = observer(() => {
         amount,
         barrier,
         config.barrier,
-        contract_type,
+        effective_contract_type,
         currency,
         duration,
         isAuthorized,
@@ -169,6 +177,23 @@ const Trade = observer(() => {
 
     const proposal_state = useProposal(proposal_request);
     const { contract } = useOpenContract(contract_id);
+
+    // The settlement stream keeps pushing updates after is_sold flips to true,
+    // so this guards the toast to the first one rather than firing on every tick.
+    const notified_contract_id_ref = useRef<number | null>(null);
+
+    useEffect(() => {
+        if (!contract?.is_sold || notified_contract_id_ref.current === contract.contract_id) return;
+
+        notified_contract_id_ref.current = contract.contract_id;
+
+        showTradeResultToast({
+            profit: Number(contract.profit ?? 0),
+            currency,
+            side_label: getSideLabel(contract.contract_type),
+            symbol_label: contract.display_name || active_symbol?.display_name || params.symbol,
+        });
+    }, [contract, currency, active_symbol, params.symbol]);
 
     const handleBuy = useCallback(async () => {
         const proposal = proposal_state.proposal;
@@ -232,7 +257,7 @@ const Trade = observer(() => {
                 onSelect={symbol => setParams({ symbol })}
             />
 
-              <TradePanel
+            <TradePanel
                 config={config}
                 contract_type={contract_type}
                 onContractTypeChange={setContractType}
@@ -242,6 +267,8 @@ const Trade = observer(() => {
                 onStakeChange={setStake}
                 barrier={barrier}
                 onBarrierChange={setBarrier}
+                allow_equals={allow_equals}
+                onAllowEqualsChange={setAllowEquals}
                 currency={currency}
                 proposal_state={proposal_state}
                 is_pricing_enabled={proposal_request !== null}
@@ -253,7 +280,7 @@ const Trade = observer(() => {
                 onToggleExpanded={() => setIsPanelExpanded(value => !value)}
                 onBuy={handleBuy}
                 onLogin={handleLogin}
-            /> 
+            />
         </div>
     );
 });
