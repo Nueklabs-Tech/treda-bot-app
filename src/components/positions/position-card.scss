@@ -1,0 +1,132 @@
+.position-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    width: 100%;
+    padding: 1.4rem;
+    background: var(--general-main-1);
+    border: none;
+    border-radius: 1.2rem;
+    box-shadow: 0 1px 4px rgb(0 0 0 / 6%);
+    text-align: left;
+    cursor: default;
+
+    &[role='button'] {
+        cursor: pointer;
+
+        &:hover,
+        &:focus-visible {
+            box-shadow: 0 1px 4px rgb(0 0 0 / 14%);
+        }
+    }
+
+    &__top {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    &__icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    &__info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+        flex: 1;
+        min-width: 0;
+    }
+
+    &__name {
+        color: var(--text-prominent);
+        font-size: 1.5rem;
+        font-weight: 600;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &__side {
+        color: var(--text-less-prominent);
+        font-size: 1.3rem;
+    }
+
+    &__top-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 0.6rem;
+        flex-shrink: 0;
+    }
+
+    &__chart-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.4rem;
+        height: 2.4rem;
+        border: 1px solid var(--border-normal);
+        border-radius: 0.6rem;
+        color: var(--text-less-prominent);
+    }
+
+    &__stake {
+        color: var(--text-less-prominent);
+        font-size: 1.4rem;
+    }
+
+    &__bottom {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    &__timer {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: var(--general-section-1);
+        border-radius: 4rem;
+        color: var(--text-general);
+        font-size: 1.3rem;
+        font-variant-numeric: tabular-nums;
+    }
+
+    &__badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.4rem 1.2rem;
+        border-radius: 4rem;
+        font-size: 1.3rem;
+        font-weight: 600;
+
+        &--win {
+            background: color-mix(in srgb, var(--status-success) 16%, transparent);
+            color: var(--status-success);
+        }
+
+        &--loss {
+            background: color-mix(in srgb, var(--status-danger) 14%, transparent);
+            color: var(--status-danger);
+        }
+    }
+
+    &__profit {
+        font-size: 1.5rem;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+
+        &--win {
+            color: var(--status-success);
+        }
+
+        &--loss {
+            color: var(--status-danger);
+        }
+    }
+}

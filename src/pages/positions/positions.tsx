@@ -8,11 +8,14 @@ import Money from '@/components/shared_ui/money';
 import { APP_ROUTES } from '@/constants/routes';
 import { useStore } from '@/hooks/useStore';
 import { Localize } from '@deriv-com/translations';
+import { useDevice } from '@deriv-com/ui';
+import PositionsMobile from './positions-mobile';
 // @ts-ignore: Allow side-effect import of SCSS without type declarations
 import './positions.scss';
 
 const Positions = observer(() => {
     const navigate = useNavigate();
+    const { isDesktop } = useDevice();
     const { client, run_panel, transactions } = useStore();
     const { currency } = client;
     const { active_index, is_clear_stat_disabled, is_running, onClearStatClick, onMount, onUnmount, setActiveTabIndex } =
@@ -30,6 +33,11 @@ const Positions = observer(() => {
     }, [onMount, onUnmount]);
 
     const has_transactions = Boolean(transaction_list?.length);
+
+    // The mobile app has its own Open/Closed positions layout, backed by the
+    // account's live contracts rather than this desktop view's run-panel
+    // summary — see positions-mobile.tsx.
+    if (!isDesktop) return <PositionsMobile />;
 
     return (
         <PageShell

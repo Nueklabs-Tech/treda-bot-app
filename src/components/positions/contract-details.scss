@@ -1,0 +1,111 @@
+.contract-details {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    background: var(--general-section-1);
+
+    &__header {
+        display: flex;
+        align-items: center;
+        gap: 1.2rem;
+        padding: 1.4rem 1.6rem;
+        background: var(--general-main-1);
+        border-bottom: 1px solid var(--border-normal);
+    }
+
+    &__back {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 3.2rem;
+        height: 3.2rem;
+        flex-shrink: 0;
+        background: none;
+        color: var(--text-prominent);
+    }
+
+    &__back-icon {
+        transform: rotate(180deg);
+    }
+
+    &__title {
+        flex: 1;
+        margin: 0;
+        color: var(--text-prominent);
+        font-size: 1.7rem;
+        font-weight: 700;
+        text-align: center;
+        // Balances the back button on the left so the title reads centred.
+        padding-right: 3.2rem;
+    }
+
+    &__body {
+        display: flex;
+        flex-direction: column;
+        gap: 1.2rem;
+        padding: 1.6rem;
+    }
+
+    &__section {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1.4rem;
+        background: var(--general-main-1);
+        border-radius: 1.2rem;
+        box-shadow: 0 1px 4px rgb(0 0 0 / 6%);
+    }
+
+    &__section-title {
+        margin: 0;
+        color: var(--text-prominent);
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    &__list {
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1.6rem;
+        padding: 1.2rem 0;
+        border-top: 1px solid var(--general-section-1);
+
+        &:first-child {
+            border-top: none;
+        }
+
+        dt {
+            color: var(--text-less-prominent);
+            font-size: 1.4rem;
+        }
+
+        dd {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            margin: 0;
+            color: var(--text-prominent);
+            font-size: 1.4rem;
+            font-weight: 600;
+            text-align: right;
+            white-space: pre-line;
+        }
+    }
+
+    &__row-value {
+        font-size: 1.5rem;
+    }
+
+    &__row-meta {
+        color: var(--text-less-prominent);
+        font-size: 1.2rem;
+        font-weight: 400;
+    }
+}

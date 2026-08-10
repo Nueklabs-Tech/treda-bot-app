@@ -1,6 +1,13 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import Positions from '../positions';
 
+// This suite exercises the desktop run-panel layout; the mobile Open/Closed
+// layout (positions-mobile.tsx) has its own test file.
+jest.mock('@deriv-com/ui', () => ({
+    ...jest.requireActual('@deriv-com/ui'),
+    useDevice: () => ({ isDesktop: true }),
+}));
+
 const mockNavigate = jest.fn();
 const mockOnMount = jest.fn();
 const mockOnUnmount = jest.fn();

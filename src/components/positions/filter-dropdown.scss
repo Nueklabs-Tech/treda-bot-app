@@ -1,0 +1,47 @@
+.positions-filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.9rem 1.4rem;
+    background: var(--general-main-1);
+    border: 1px solid var(--general-section-1);
+    border-radius: 4rem;
+    color: var(--text-general);
+    font-size: 1.4rem;
+    font-weight: 500;
+    white-space: nowrap;
+
+    &__chevron {
+        transform: rotate(90deg);
+        color: var(--text-less-prominent);
+        flex-shrink: 0;
+    }
+}
+
+.positions-filter-sheet {
+    &__list {
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__option {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: 1.4rem 0.4rem;
+        border-bottom: 1px solid var(--general-section-1);
+        color: var(--text-general);
+        font-size: 1.5rem;
+        text-align: left;
+
+        &:last-child {
+            border-bottom: none;
+        }
+
+        &--active {
+            color: var(--status-success);
+            font-weight: 600;
+        }
+    }
+}

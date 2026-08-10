@@ -1,10 +1,20 @@
 import { useEffect, useState } from 'react';
 import { TApiError, subscribeToStream } from '@/utils/api-subscription';
 
+/** One point of a contract's tick-by-tick price path, as returned in `audit_details`. */
+export type TContractTick = {
+    epoch?: number;
+    tick?: number | null;
+    tick_display_value?: string | null;
+    flag?: string | null;
+    name?: string | null;
+};
+
 export type TOpenContract = {
     contract_id: number;
     contract_type: string;
     display_name?: string;
+    underlying?: string;
     longcode?: string;
     buy_price: number;
     bid_price?: number;
@@ -13,11 +23,22 @@ export type TOpenContract = {
     currency: string;
     status?: 'open' | 'won' | 'lost' | 'sold';
     is_sold?: 0 | 1;
+    barrier?: string;
+    date_start?: number;
+    date_expiry?: number;
+    sell_time?: number | null;
+    entry_spot?: number | null;
     entry_spot_display_value?: string;
+    entry_tick_time?: number;
+    exit_tick?: number;
+    exit_tick_display_value?: string;
+    exit_tick_time?: number;
     current_spot_display_value?: string;
     tick_count?: number;
     tick_stream?: { epoch: number; tick: number }[];
-    date_expiry?: number;
+    transaction_ids?: { buy?: number; sell?: number };
+    /** Present once the contract has ended — the full tick path used to draw its chart. */
+    audit_details?: { all_ticks?: TContractTick[] } | null;
 };
 
 /**
