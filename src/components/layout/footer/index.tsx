@@ -24,7 +24,7 @@ const Footer = () => {
     const enableThemeToggle = brandConfig.platform.footer?.enable_theme_toggle ?? true;
     const languageItems = FILTERED_LANGUAGES.map(language => ({
         ...language,
-        icon: language.code.toLowerCase(),
+        icon: null,
     }));
 
     const openLanguageSettingModal = () => showModal('DesktopLanguagesModal');
@@ -55,7 +55,7 @@ const Footer = () => {
                 <DesktopLanguagesModal
                     headerTitle={localize('Select Language')}
                     isModalOpen
-                    languages={FILTERED_LANGUAGES}
+                    languages={languageItems}
                     onClose={hideModal}
                     onLanguageSwitch={code => {
                         try {

@@ -17,7 +17,9 @@
     height: 100%;
     min-height: 0;
     padding: 0.8rem 1.2rem 1.2rem;
-    background: var(--general-section-1);
+    // White page, grey cards and ticket — dtrader's mobile layering, inverted
+    // from the rest of the app so the chart reads as part of the page.
+    background: var(--general-main-1);
     box-sizing: border-box;
 
     &__chart {
@@ -148,10 +150,10 @@
         flex-shrink: 0;
         align-items: center;
         justify-content: center;
-        width: 4.4rem;
+        width: 5.6rem;
         border: none;
         border-radius: 1.2rem;
-        background: var(--general-main-1);
+        background: var(--general-section-1);
         color: var(--text-prominent);
         cursor: pointer;
 
@@ -181,20 +183,24 @@
     flex-shrink: 0;
     min-width: 0;
     max-width: 100%;
-    padding: 0.8rem 1.2rem;
-    border: none;
+    padding: 0.8rem 1.6rem 0.8rem 1.2rem;
     border-radius: 1.2rem;
-    background: none;
-    text-align: start;
-    cursor: pointer;
-
-    &:hover {
-        background: var(--general-hover);
-    }
 
     &--active {
-        background: var(--general-main-1);
-        box-shadow: 0 1px 4px rgb(0 0 0 / 10%);
+        background: var(--general-section-1);
+    }
+
+    // The card is three buttons (icon, name, trade type); they share its
+    // background and only differ in what they open.
+    &__icon,
+    &__name,
+    &__trade-type {
+        padding: 0;
+        border: none;
+        background: none;
+        font: inherit;
+        text-align: start;
+        cursor: pointer;
     }
 
     &__icon {
@@ -209,12 +215,13 @@
     &__text {
         display: flex;
         flex-direction: column;
+        align-items: flex-start;
         gap: 0.2rem;
         min-width: 0;
     }
 
     &__name {
-        min-width: 0;
+        max-width: 100%;
         overflow: hidden;
         color: var(--text-prominent);
         font-size: 1.6rem;
@@ -224,10 +231,12 @@
         white-space: nowrap;
     }
 
-    &__subtitle {
+    &__trade-type {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
         color: var(--text-less-prominent);
         font-size: 1.4rem;
-        font-weight: 500;
         line-height: 2rem;
 
         &--closed {
@@ -235,37 +244,8 @@
         }
     }
 
-    &__price {
-        display: flex;
-        align-items: baseline;
-        gap: 0.6rem;
-        min-width: 0;
-        font-size: 1.4rem;
-        line-height: 2rem;
-    }
-
-    &__price--up &__change {
-        color: var(--status-success);
-    }
-
-    &__price--down &__change {
-        color: var(--status-danger);
-    }
-
-    &__quote {
-        color: var(--text-prominent);
-        font-weight: 700;
-    }
-
-    &__change {
-        display: flex;
-        align-items: center;
-        gap: 0.2rem;
-        white-space: nowrap;
-    }
-
-    &__arrow {
-        font-size: 1rem;
+    &__chevron {
+        flex-shrink: 0;
     }
 }
 
@@ -279,47 +259,30 @@
     // Pulls level with the screen edges so the ticket reads as a sheet resting on
     // the chart, the way a native trade drawer does.
     margin: 0 -1.2rem -1.2rem;
-    padding: 0.4rem 1.6rem 1.6rem;
+    padding: 1.2rem 0.8rem 1.2rem;
     border-radius: 1.6rem 1.6rem 0 0;
-    background: var(--general-main-1);
-    box-shadow: 0 -2px 16px rgb(0 0 0 / 8%);
-
-    &__handle {
-        align-self: center;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 4.8rem;
-        height: 2rem;
-        border: none;
-        background: none;
-        cursor: pointer;
-
-        &-bar {
-            width: 3.6rem;
-            height: 0.4rem;
-            border-radius: 999px;
-            background: var(--border-normal);
-        }
-    }
+    background: var(--general-section-1);
+    box-shadow: 0 -1px 0 var(--border-disabled, rgb(0 0 0 / 6%));
 
     &__sides {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 0.4rem;
         padding: 0.4rem;
-        border-radius: 1.2rem;
-        background: var(--general-section-1);
+        border-radius: 999px;
+        // A shade darker than the ticket in either theme, like dtrader's track.
+        background: color-mix(in srgb, var(--text-prominent) 7%, transparent);
     }
 
     &__side {
-        padding: 1.2rem 0.8rem;
+        padding: 1rem 0.8rem;
         border: none;
-        border-radius: 0.8rem;
+        border-radius: 999px;
         background: none;
         color: var(--text-less-prominent);
-        font-size: 1.5rem;
-        font-weight: 700;
+        font-size: 1.6rem;
+        font-weight: 500;
+        text-align: center;
         cursor: pointer;
         transition:
             background 0.2s ease,
@@ -327,6 +290,7 @@
 
         &--active {
             background: var(--general-main-1);
+            font-weight: 700;
             box-shadow: 0 1px 4px rgb(0 0 0 / 10%);
         }
 
@@ -339,21 +303,25 @@
         }
     }
 
+    // One row however many parameters the trade type has (two to three), each
+    // card an equal share — dtrader's ticket never wraps onto a second line.
     &__params {
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 0.8rem;
+        grid-auto-columns: minmax(0, 1fr);
+        grid-auto-flow: column;
+        gap: 0.4rem;
     }
 
     &__param {
         display: flex;
         flex-direction: column;
-        gap: 0.4rem;
-        padding: 1.2rem;
+        align-items: center;
+        gap: 0.2rem;
+        padding: 1rem 0.4rem;
         border: 1px solid var(--border-normal);
-        border-radius: 1.2rem;
+        border-radius: 0.8rem;
         background: var(--general-main-1);
-        text-align: start;
+        text-align: center;
         cursor: pointer;
 
         &:hover {
@@ -363,35 +331,19 @@
         &-label {
             color: var(--text-less-prominent);
             font-size: 1.2rem;
-            line-height: 1.6rem;
+            line-height: 1.8rem;
         }
 
         &-value {
+            max-width: 100%;
             color: var(--text-prominent);
             font-size: 1.6rem;
-            font-weight: 600;
+            font-weight: 500;
             line-height: 2.4rem;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
-    }
-
-    &__equals {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 0.8rem;
-        padding: 1.2rem;
-        border: 1px solid var(--border-normal);
-        border-radius: 1.2rem;
-        background: var(--general-main-1);
-    }
-
-    &__equals-label {
-        color: var(--text-prominent);
-        font-size: 1.4rem;
-        font-weight: 600;
     }
 
     &__message {
@@ -410,7 +362,7 @@
         min-height: 5.6rem;
         padding: 0.8rem 1.6rem;
         border: none;
-        border-radius: 1.2rem;
+        border-radius: 999px;
         color: var(--brand-white, #fff);
         cursor: pointer;
         transition: opacity 0.2s ease;
@@ -444,10 +396,6 @@
     @include desktop-screen {
         margin: 0;
         padding: 1.6rem;
-
-        &__params {
-            grid-template-columns: minmax(0, 1fr);
-        }
     }
 }
 
@@ -683,6 +631,87 @@
 
 /* -------------------------------------------------------------- symbol picker */
 
+.param-sheet__equals {
+    padding: 0 1.6rem;
+}
+
+.param-sheet__toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.2rem;
+    padding: 1.2rem 0;
+}
+
+.param-sheet__toggle-label {
+    color: var(--text-prominent);
+    font-size: 1.6rem;
+    font-weight: 600;
+}
+
+.trade-type-sheet {
+    &__list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        margin: 0;
+        padding: 0 1.2rem;
+        list-style: none;
+    }
+
+    &__row {
+        display: flex;
+        align-items: center;
+        gap: 1.2rem;
+        width: 100%;
+        padding: 1.2rem;
+        border: 1px solid transparent;
+        border-radius: 1.2rem;
+        background: none;
+        text-align: start;
+        cursor: pointer;
+
+        &:hover {
+            background: var(--general-hover);
+        }
+
+        &--active {
+            border-color: var(--text-prominent);
+        }
+    }
+
+    &__icon {
+        display: flex;
+        flex-shrink: 0;
+        align-items: center;
+        justify-content: center;
+        width: 4rem;
+        height: 4rem;
+        border-radius: 1rem;
+        background: var(--general-section-1);
+    }
+
+    &__text {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+        min-width: 0;
+    }
+
+    &__label {
+        color: var(--text-prominent);
+        font-size: 1.6rem;
+        font-weight: 700;
+        line-height: 2.4rem;
+    }
+
+    &__description {
+        color: var(--text-less-prominent);
+        font-size: 1.3rem;
+        line-height: 1.8rem;
+    }
+}
+
 .symbol-sheet {
     &__search {
         width: 100%;
@@ -755,7 +784,7 @@
         flex-direction: column;
         gap: 0.4rem;
         margin: 0;
-        padding: 0;
+        padding: 0 1.2rem;
         list-style: none;
     }
 
