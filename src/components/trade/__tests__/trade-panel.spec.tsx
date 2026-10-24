@@ -30,8 +30,6 @@ const buildProps = (overrides = {}) => ({
     is_market_open: true,
     is_buying: false,
     buy_error: null,
-    is_expanded: true,
-    onToggleExpanded: jest.fn(),
     onBuy: jest.fn(),
     onLogin: jest.fn(),
     ...overrides,
@@ -90,6 +88,7 @@ describe('TradePanel', () => {
         const onAllowEqualsChange = jest.fn();
         render(<TradePanel {...buildProps({ onAllowEqualsChange })} />);
 
+        fireEvent.click(screen.getByRole('button', { name: /Allow equals/ }));
         fireEvent.click(screen.getByLabelText('toggle_switch'));
 
         expect(onAllowEqualsChange).toHaveBeenCalledWith(true);
@@ -101,11 +100,40 @@ describe('TradePanel', () => {
         expect(screen.queryByText('Allow equals')).not.toBeInTheDocument();
     });
 
-    it('asks a signed-out visitor to log in instead of buying', () => {
-        const onLogin = jest.fn();
-        render(<TradePanel {...buildProps({ is_authorized: false, onLogin })} />);
+    it('shows each parameter as a card in one row', () => {
+        render(<TradePanel {...buildProps()} />);
 
-        fireEvent.click(screen.getByRole('button', { name: 'Log in to trade' }));
+        expect(screen.getByRole('button', { name: /Duration/ })).toHaveTextContent('5 ticks');
+        expect(screen.getByRole('button', { name: /Stake/ })).toHaveTextContent('2 USD');
+        expect(screen.getByRole('button', { name: /Allow equals/ })).toHaveTextContent('-');
+    });
+
+    it('quotes a signed-out visitor and sends the buy press to the login', () => {
+        const onBuy = jest.fn();
+        const onLogin = jest.fn();
+        render(<TradePanel {...buildProps({ is_authorized: false, onBuy, onLogin })} />);
+
+        fireEvent.click(screen.getByRole('button', { name: /Payout 3.85 USD/ }));
+
+        expect(onLogin).toHaveBeenCalled();
+        expect(onBuy).not.toHaveBeenCalled();
+    });
+
+    it('lets a signed-out visitor log in even before there is a price', () => {
+        const onLogin = jest.fn();
+        render(
+            <TradePanel
+                {...buildProps({
+                    is_authorized: false,
+                    onLogin,
+                    proposal_state: { proposal: null, error: null, is_loading: true },
+                })}
+            />
+        );
+
+        const button = screen.getByText('Getting price…').closest('button') as HTMLButtonElement;
+        expect(button).toBeEnabled();
+        fireEvent.click(button);
 
         expect(onLogin).toHaveBeenCalled();
     });

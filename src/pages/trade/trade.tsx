@@ -7,6 +7,7 @@ import { TDuration } from '@/components/trade/duration-sheet';
 import MarketTabs from '@/components/trade/market-tabs';
 import SymbolSheet from '@/components/trade/symbol-sheet';
 import TradePanel from '@/components/trade/trade-panel';
+import TradeTypeSheet from '@/components/trade/trade-type-sheet';
 import { showTradeResultToast } from '@/components/trade/trade-result-toast';
 import {
     getChartType,
@@ -57,8 +58,8 @@ const Trade = observer(() => {
     const [stake, setStake] = useState(String(STAKE_LIMITS.default));
     const [barrier, setBarrier] = useState(config.default_barrier ?? '');
     const [allow_equals, setAllowEquals] = useState(false);
-    const [is_panel_expanded, setIsPanelExpanded] = useState(true);
     const [is_symbol_sheet_open, setIsSymbolSheetOpen] = useState(false);
+    const [is_trade_type_sheet_open, setIsTradeTypeSheetOpen] = useState(false);
 
     const [active_symbols, setActiveSymbols] = useState<TActiveSymbol[]>(
         () => (api_base?.active_symbols as TActiveSymbol[]) ?? []
@@ -68,7 +69,9 @@ const Trade = observer(() => {
     /** The contract being followed, or null once the user dismisses its card. */
     const [contract_id, setContractId] = useState<number | null>(null);
 
-    const currency = client.currency || 'USD';
+    // Signed out there is no account to quote in, so prices are in USD — what
+    // dtrader shows a visitor too. The account's own currency takes over on login.
+    const currency = (isAuthorized && client.currency) || 'USD';
     const is_connected = connectionStatus === CONNECTION_STATUS.OPENED;
 
     // A trade type change can invalidate the parameters carried over from the
@@ -147,11 +150,10 @@ const Trade = observer(() => {
     // to the entry spot counts as a win. Only rise/fall offers this trade-off.
     const effective_contract_type = config.has_equals && allow_equals ? `${contract_type}E` : contract_type;
 
-    // Prices are only requested for a signed-in session: the account is what
-    // decides the currency a payout is quoted in, so quoting before there is one
-    // would put a number on screen in a currency the user may not hold.
+    // Quotes come over the public socket, so a visitor sees the payout before
+    // logging in — the button only turns into a login prompt when pressed.
     const proposal_request = useMemo(() => {
-        if (!isAuthorized || !is_stake_valid || !params.symbol || !is_market_open) return null;
+        if (!is_stake_valid || !params.symbol || !is_market_open) return null;
 
         return {
             symbol: params.symbol,
@@ -169,7 +171,6 @@ const Trade = observer(() => {
         effective_contract_type,
         currency,
         duration,
-        isAuthorized,
         is_market_open,
         is_stake_valid,
         params.symbol,
@@ -231,6 +232,7 @@ const Trade = observer(() => {
                 trade_type_label={config.label}
                 is_market_open={is_market_open}
                 onOpenSymbolPicker={() => setIsSymbolSheetOpen(true)}
+                onOpenTradeTypePicker={() => setIsTradeTypeSheetOpen(true)}
             />
 
             <div className='trade__chart'>
@@ -257,6 +259,13 @@ const Trade = observer(() => {
                 onSelect={symbol => setParams({ symbol })}
             />
 
+            <TradeTypeSheet
+                is_open={is_trade_type_sheet_open}
+                onClose={() => setIsTradeTypeSheetOpen(false)}
+                value={config.value}
+                onSelect={trade_type => setParams({ trade_type })}
+            />
+
             <TradePanel
                 config={config}
                 contract_type={contract_type}
@@ -276,8 +285,6 @@ const Trade = observer(() => {
                 is_market_open={is_market_open}
                 is_buying={is_buying}
                 buy_error={buy_error}
-                is_expanded={is_panel_expanded}
-                onToggleExpanded={() => setIsPanelExpanded(value => !value)}
                 onBuy={handleBuy}
                 onLogin={handleLogin}
             />
